@@ -1,11 +1,11 @@
+![Users](https://ghstats.dev/api/badge)
+![Visits](https://ghstats.dev/api/visits)
+
 # GitHub Profile Stats
 
 Beautiful, dynamically generated stats cards for your GitHub profile README. Just paste one line and your stats are always up to date — no setup, no tokens, no deployment needed.
 
 **[ghstats.dev](https://ghstats.dev)**
-
-![Users](https://ghstats.dev/api/badge)
-![Visits](https://ghstats.dev/api/visits)
 
 [![Example Card](https://ghstats.dev/api/card?username=octocat&theme=tokyonight)](https://github.com/rowkav09/GitHub-profile-stats)
 
