@@ -62,6 +62,12 @@ const PARAMS = [
     desc: 'Set to "false" to hide stat icons',
   },
   {
+    name: "show_ring",
+    type: "boolean",
+    default: "true",
+    desc: 'Set to "false" to hide the activity ring',
+  },
+  {
     name: "hide",
     type: "string",
     default: "—",
@@ -88,6 +94,10 @@ const HIDE_KEYS = [
   { key: "issues", desc: "Issues Opened" },
   { key: "streak", desc: "Current Streak" },
   { key: "week", desc: "Commits This Week" },
+  { key: "trend", desc: "Monthly Trend (+/-)" },
+  { key: "avg", desc: "Avg Commits Per Day" },
+  { key: "active_day", desc: "Most Active Day" },
+  { key: "grade", desc: "Activity Grade" },
   { key: "contributions", desc: "Contributions This Year" },
   { key: "repos", desc: "Public Repos" },
   { key: "followers", desc: "Followers" },

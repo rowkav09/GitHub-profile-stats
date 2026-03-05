@@ -27,6 +27,10 @@ const STAT_OPTIONS = [
   { key: "issues", label: "Issues" },
   { key: "streak", label: "Streak" },
   { key: "week", label: "This Week" },
+  { key: "trend", label: "Monthly Trend" },
+  { key: "avg", label: "Avg/Day" },
+  { key: "active_day", label: "Active Day" },
+  { key: "grade", label: "Grade" },
   { key: "contributions", label: "Contributions" },
   { key: "repos", label: "Repos" },
   { key: "followers", label: "Followers" },
@@ -38,6 +42,7 @@ export default function CardPreview() {
   const [showIcons, setShowIcons] = useState(true);
   const [hideBorder, setHideBorder] = useState(false);
   const [hideTitle, setHideTitle] = useState(false);
+  const [showRing, setShowRing] = useState(true);
   const [hiddenStats, setHiddenStats] = useState<string[]>([]);
   const [customTitle, setCustomTitle] = useState("");
   const [borderRadius, setBorderRadius] = useState("4.5");
@@ -58,12 +63,13 @@ export default function CardPreview() {
       if (!showIcons) p.set("show_icons", "false");
       if (hideBorder) p.set("hide_border", "true");
       if (hideTitle) p.set("hide_title", "true");
+      if (!showRing) p.set("show_ring", "false");
       if (hiddenStats.length) p.set("hide", hiddenStats.join(","));
       if (customTitle.trim()) p.set("custom_title", customTitle.trim());
       if (borderRadius !== "4.5") p.set("border_radius", borderRadius);
       return `${base}/api/card?${p.toString()}`;
     },
-    [username, theme, showIcons, hideBorder, hideTitle, hiddenStats, customTitle, borderRadius],
+    [username, theme, showIcons, hideBorder, hideTitle, showRing, hiddenStats, customTitle, borderRadius],
   );
 
   useEffect(() => {
@@ -140,6 +146,7 @@ export default function CardPreview() {
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             {[
               { label: "Show Icons", checked: showIcons, set: setShowIcons },
+              { label: "Show Ring", checked: showRing, set: setShowRing },
               { label: "Hide Border", checked: hideBorder, set: setHideBorder },
               { label: "Hide Title", checked: hideTitle, set: setHideTitle },
             ].map((t) => (

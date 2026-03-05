@@ -9,9 +9,16 @@ export interface GitHubStats {
   currentStreak: number;
   longestStreak: number;
   commitsThisWeek: number;
+  commitsThisMonth: number;
+  commitsLastMonth: number;
+  monthlyTrend: number; // percentage change vs last month
+  avgCommitsPerDay: number;
+  mostActiveDay: string; // e.g. "Monday"
   publicRepos: number;
   followers: number;
   contributionsThisYear: number;
+  activityLevel: number; // 0–100 percentage for the ring
+  grade: string; // A+, A, B+, B, C, D
 }
 
 export interface ContributionDay {
@@ -34,6 +41,7 @@ export interface CardOptions {
   hide_title: boolean;
   hide: string[];
   show_icons: boolean;
+  show_ring: boolean;
   border_radius: number;
   custom_title?: string;
 }
@@ -45,6 +53,10 @@ export type StatKey =
   | "issues"
   | "streak"
   | "week"
+  | "trend"
+  | "avg"
+  | "active_day"
+  | "grade"
   | "repos"
   | "followers"
   | "contributions";

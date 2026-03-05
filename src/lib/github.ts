@@ -38,6 +38,8 @@ query($username: String!) {
   }
 }`;
 
+const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
 function calculateStreak(days: ContributionDay[]): {
   current: number;
   longest: number;
@@ -55,7 +57,6 @@ function calculateStreak(days: ContributionDay[]): {
     }
   }
 
-  // Current streak: walk backwards from today
   let current = 0;
   const today = new Date().toISOString().split("T")[0];
 
@@ -66,7 +67,6 @@ function calculateStreak(days: ContributionDay[]): {
     if (day.contributionCount > 0) {
       current++;
     } else {
-      // Today having 0 is OK (day isn't over yet), but past days break the streak
       if (day.date === today) continue;
       break;
     }
@@ -84,6 +84,72 @@ function calculateWeekCommits(days: ContributionDay[]): number {
   return days
     .filter((d) => d.date >= weekAgoStr)
     .reduce((sum, d) => sum + d.contributionCount, 0);
+}
+
+function calculateMonthlyCommits(
+  days: ContributionDay[],
+): { thisMonth: number; lastMonth: number } {
+  const now = new Date();
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+    .toISOString()
+    .split("T")[0];
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+    .toISOString()
+    .split("T")[0];
+
+  const thisMonth = days
+    .filter((d) => d.date >= thisMonthStart)
+    .reduce((sum, d) => sum + d.contributionCount, 0);
+
+  const lastMonth = days
+    .filter((d) => d.date >= lastMonthStart && d.date < thisMonthStart)
+    .reduce((sum, d) => sum + d.contributionCount, 0);
+
+  return { thisMonth, lastMonth };
+}
+
+function calculateMostActiveDay(days: ContributionDay[]): string {
+  const totals = [0, 0, 0, 0, 0, 0, 0]; // Sun–Sat
+  for (const d of days) {
+    const dow = new Date(d.date + "T00:00:00").getDay();
+    totals[dow] += d.contributionCount;
+  }
+  const maxIdx = totals.indexOf(Math.max(...totals));
+  return DAY_NAMES[maxIdx];
+}
+
+function calculateAvgCommitsPerDay(days: ContributionDay[]): number {
+  if (days.length === 0) return 0;
+  const total = days.reduce((sum, d) => sum + d.contributionCount, 0);
+  return Math.round((total / days.length) * 10) / 10;
+}
+
+function calculateActivityLevel(days: ContributionDay[]): number {
+  // Activity level: % of days in past 90 that had at least 1 contribution
+  const now = new Date();
+  const ninetyAgo = new Date(now);
+  ninetyAgo.setDate(ninetyAgo.getDate() - 90);
+  const cutoff = ninetyAgo.toISOString().split("T")[0];
+
+  const recent = days.filter((d) => d.date >= cutoff);
+  if (recent.length === 0) return 0;
+  const activeDays = recent.filter((d) => d.contributionCount > 0).length;
+  return Math.round((activeDays / recent.length) * 100);
+}
+
+function calculateGrade(activityLevel: number, streak: number, totalCommits: number): string {
+  // Weighted score: 40% activity, 30% streak (capped at 60 days), 30% commit volume (capped at 1000)
+  const actScore = activityLevel; // 0–100
+  const streakScore = Math.min(streak / 60, 1) * 100;
+  const commitScore = Math.min(totalCommits / 1000, 1) * 100;
+  const score = actScore * 0.4 + streakScore * 0.3 + commitScore * 0.3;
+
+  if (score >= 90) return "A+";
+  if (score >= 80) return "A";
+  if (score >= 70) return "B+";
+  if (score >= 60) return "B";
+  if (score >= 45) return "C";
+  return "D";
 }
 
 export async function fetchGitHubStats(
@@ -134,6 +200,10 @@ export async function fetchGitHubStats(
   );
 
   const { current, longest } = calculateStreak(allDays);
+  const { thisMonth, lastMonth } = calculateMonthlyCommits(allDays);
+  const monthlyTrend =
+    lastMonth > 0 ? Math.round(((thisMonth - lastMonth) / lastMonth) * 100) : thisMonth > 0 ? 100 : 0;
+  const activityLevel = calculateActivityLevel(allDays);
 
   return {
     username: user.login,
@@ -146,8 +216,15 @@ export async function fetchGitHubStats(
     currentStreak: current,
     longestStreak: longest,
     commitsThisWeek: calculateWeekCommits(allDays),
+    commitsThisMonth: thisMonth,
+    commitsLastMonth: lastMonth,
+    monthlyTrend,
+    avgCommitsPerDay: calculateAvgCommitsPerDay(allDays),
+    mostActiveDay: calculateMostActiveDay(allDays),
     publicRepos: user.repositories.totalCount,
     followers: user.followers.totalCount,
     contributionsThisYear: calendar.totalContributions,
+    activityLevel,
+    grade: calculateGrade(activityLevel, current, contrib.totalCommitContributions),
   };
 }

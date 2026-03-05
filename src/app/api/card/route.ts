@@ -31,6 +31,7 @@ export async function GET(request: NextRequest) {
       .map((s) => s.trim())
       .filter(Boolean),
     show_icons: params.get("show_icons") !== "false",
+    show_ring: params.get("show_ring") !== "false",
     border_radius: Math.min(
       Math.max(parseFloat(params.get("border_radius") ?? "4.5") || 4.5, 0),
       50,

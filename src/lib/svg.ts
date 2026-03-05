@@ -17,12 +17,27 @@ const ICONS: Record<string, string> = {
     "M5.5 3.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM2 5.5a3.5 3.5 0 1 1 5.898 2.549 5.508 5.508 0 0 1 3.034 4.084.75.75 0 1 1-1.482.235 4.001 4.001 0 0 0-7.9 0 .75.75 0 0 1-1.482-.236A5.507 5.507 0 0 1 3.102 8.05 3.49 3.49 0 0 1 2 5.5zM11 4a.75.75 0 1 0 0 1.5 1.5 1.5 0 0 1 .666 2.844.75.75 0 0 0-.416.672v.352a.75.75 0 0 0 .574.73c1.2.289 2.162 1.2 2.522 2.372a.75.75 0 1 0 1.434-.44 5.01 5.01 0 0 0-2.56-3.012A3 3 0 0 0 11 4z",
   graph:
     "M1.5 1.75V13.5h13.75a.75.75 0 0 1 0 1.5H.75a.75.75 0 0 1-.75-.75V1.75a.75.75 0 0 1 1.5 0zm14.28 2.53-5.25 5.25a.75.75 0 0 1-1.06 0L7 7.06 4.28 9.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.25-3.25a.75.75 0 0 1 1.06 0L10 7.94l4.72-4.72a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042z",
+  trend:
+    "M.75 8a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0v-5.5A.75.75 0 0 1 .75 8zm4-4a.75.75 0 0 1 .75.75v9.5a.75.75 0 0 1-1.5 0v-9.5A.75.75 0 0 1 4.75 4zM8.75 0a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-1.5 0V.75a.75.75 0 0 1 .75-.75zm4 2a.75.75 0 0 1 .75.75v11.5a.75.75 0 0 1-1.5 0V2.75a.75.75 0 0 1 .75-.75z",
+  clock:
+    "M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm.5 4.75v3.44l2.78 1.61a.75.75 0 1 1-.75 1.3l-3.16-1.83A.75.75 0 0 1 7 8.69V4.75a.75.75 0 0 1 1.5 0z",
+  trophy:
+    "M4.25 1a.25.25 0 0 0-.25.25v1h-1A1.75 1.75 0 0 0 1.25 4v1c0 .966.784 1.75 1.75 1.75h.25v.457a4.002 4.002 0 0 0 2.5 3.693V12h-1a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5h-1v-1.1a4.002 4.002 0 0 0 2.5-3.693V6.75h.25c.966 0 1.75-.784 1.75-1.75V4c0-.966-.784-1.75-1.75-1.75h-1v-1A.25.25 0 0 0 11.75 1zM3 4.25h1v2.5H3.25a.25.25 0 0 1-.25-.25V4.25zm10 0v2.25a.25.25 0 0 1-.25.25H12v-2.5z",
+  day:
+    "M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM1.5 8a6.5 6.5 0 1 1 13 0 6.5 6.5 0 0 1-13 0zm9.78-2.22-4.03 4.03-1.97-1.97a.75.75 0 0 0-1.06 1.06l2.5 2.5a.75.75 0 0 0 1.06 0l4.56-4.56a.75.75 0 0 0-1.06-1.06z",
 };
 
 interface StatItem {
   label: string;
   value: string;
   icon: string;
+  trend?: { direction: "up" | "down" | "neutral"; text: string };
+}
+
+function formatTrend(pct: number): { direction: "up" | "down" | "neutral"; text: string } {
+  if (pct > 0) return { direction: "up", text: `+${pct}%` };
+  if (pct < 0) return { direction: "down", text: `${pct}%` };
+  return { direction: "neutral", text: "0%" };
 }
 
 function getVisibleStats(
@@ -30,7 +45,7 @@ function getVisibleStats(
   hide: string[],
 ): StatItem[] {
   const year = new Date().getFullYear();
-  const all: { key: string; label: string; value: string; icon: string }[] = [
+  const all: { key: string; label: string; value: string; icon: string; trend?: StatItem["trend"] }[] = [
     {
       key: "stars",
       label: "Total Stars Earned",
@@ -68,6 +83,31 @@ function getVisibleStats(
       icon: "calendar",
     },
     {
+      key: "trend",
+      label: "Monthly Trend",
+      value: `${formatNumber(stats.commitsThisMonth)} commits`,
+      icon: "trend",
+      trend: formatTrend(stats.monthlyTrend),
+    },
+    {
+      key: "avg",
+      label: "Avg Commits / Day",
+      value: `${stats.avgCommitsPerDay}`,
+      icon: "clock",
+    },
+    {
+      key: "active_day",
+      label: "Most Active Day",
+      value: stats.mostActiveDay,
+      icon: "day",
+    },
+    {
+      key: "grade",
+      label: "Activity Grade",
+      value: stats.grade,
+      icon: "trophy",
+    },
+    {
       key: "contributions",
       label: "Contributions This Year",
       value: formatNumber(stats.contributionsThisYear),
@@ -89,7 +129,28 @@ function getVisibleStats(
 
   return all
     .filter((s) => !hide.includes(s.key))
-    .map(({ label, value, icon }) => ({ label, value, icon }));
+    .map(({ label, value, icon, trend }) => ({ label, value, icon, trend }));
+}
+
+function renderActivityRing(
+  cx: number,
+  cy: number,
+  r: number,
+  pct: number,
+  grade: string,
+  theme: ThemeConfig,
+): string {
+  const circumference = 2 * Math.PI * r;
+  const offset = circumference - (pct / 100) * circumference;
+  const ringColor = theme.title;
+
+  return `
+  <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${theme.border}" stroke-width="5" opacity="0.3"/>
+  <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${ringColor}" stroke-width="5"
+    stroke-linecap="round" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
+    transform="rotate(-90 ${cx} ${cy})" class="ring-progress"/>
+  <text x="${cx}" y="${cy - 6}" text-anchor="middle" class="ring-grade">${escapeXml(grade)}</text>
+  <text x="${cx}" y="${cy + 12}" text-anchor="middle" class="ring-pct">${pct}%</text>`;
 }
 
 export function renderCard(
@@ -99,6 +160,7 @@ export function renderCard(
 ): string {
   const visible = getVisibleStats(stats, options.hide);
   const showIcons = options.show_icons;
+  const showRing = options.show_ring;
 
   const CARD_WIDTH = 495;
   const PAD_X = 25;
@@ -107,9 +169,13 @@ export function renderCard(
   const GAP = 5;
   const ROW_H = 25;
   const PAD_BOT = 20;
+  const RING_R = 40;
+  const RING_AREA = showRing ? RING_R * 2 + 30 : 0;
 
   const statsStartY = PAD_TOP + TITLE_H + GAP;
-  const cardHeight = statsStartY + visible.length * ROW_H + PAD_BOT;
+  const statsHeight = visible.length * ROW_H;
+  const minHeight = showRing ? RING_AREA + PAD_TOP + TITLE_H + GAP + PAD_BOT : 0;
+  const cardHeight = Math.max(statsStartY + statsHeight + PAD_BOT, minHeight);
   const rx = options.border_radius;
 
   const title = options.custom_title
@@ -119,6 +185,8 @@ export function renderCard(
   const titleSvg = options.hide_title
     ? ""
     : `<text x="${PAD_X}" y="${PAD_TOP + 18}" class="title">${title}</text>`;
+
+  const statAreaWidth = showRing ? CARD_WIDTH - PAD_X - RING_AREA - 10 : CARD_WIDTH - PAD_X;
 
   const rows = visible
     .map((stat, i) => {
@@ -131,10 +199,30 @@ export function renderCard(
         ? `<svg x="${iconX}" y="${y}" width="16" height="16" viewBox="0 0 16 16" fill="${theme.icon}"><path d="${ICONS[stat.icon] ?? ""}"/></svg>`
         : "";
 
+      // Trend arrow for monthly trend stat
+      let trendSvg = "";
+      if (stat.trend) {
+        const arrowColor =
+          stat.trend.direction === "up" ? "#3fb950" : stat.trend.direction === "down" ? "#f85149" : theme.text;
+        const arrowPath =
+          stat.trend.direction === "up"
+            ? "M 0 6 L 4 0 L 8 6 L 5 6 L 5 10 L 3 10 L 3 6 Z"
+            : stat.trend.direction === "down"
+              ? "M 0 4 L 4 10 L 8 4 L 5 4 L 5 0 L 3 0 L 3 4 Z"
+              : "M 0 4 L 8 4 L 8 6 L 0 6 Z";
+        const labelWidth = stat.value.length * 7.5 + (showIcons ? 25 : 0);
+        const arrowX = textX + labelWidth + 60;
+        trendSvg = `<g transform="translate(${arrowX}, ${y + 2})">
+          <path d="${arrowPath}" fill="${arrowColor}"/>
+          <text x="12" y="9" fill="${arrowColor}" class="trend-text">${escapeXml(stat.trend.text)}</text>
+        </g>`;
+      }
+
       return `    <g class="row" style="animation-delay:${delay}ms">
       ${iconSvg}
       <text x="${textX}" y="${y + 12.5}" class="label">${escapeXml(stat.label)}:</text>
-      <text x="${CARD_WIDTH - PAD_X}" y="${y + 12.5}" class="value" text-anchor="end">${escapeXml(stat.value)}</text>
+      <text x="${statAreaWidth}" y="${y + 12.5}" class="value" text-anchor="end">${escapeXml(stat.value)}</text>
+      ${trendSvg}
     </g>`;
     })
     .join("\n");
@@ -143,21 +231,36 @@ export function renderCard(
     ? ""
     : ` stroke="${theme.border}" stroke-width="1"`;
 
+  const ringCx = CARD_WIDTH - PAD_X - RING_R - 5;
+  const ringCy = statsStartY + (statsHeight / 2);
+  const ringSvg = showRing
+    ? renderActivityRing(ringCx, ringCy, RING_R, stats.activityLevel, stats.grade, theme)
+    : "";
+
   return `<svg width="${CARD_WIDTH}" height="${cardHeight}" viewBox="0 0 ${CARD_WIDTH} ${cardHeight}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${title}">
   <title>${title}</title>
   <style>
     .title { font: 600 18px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.title}; animation: fadeIn .8s ease-in-out forwards; }
     .label { font: 400 14px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; }
     .value { font: 700 14px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; }
+    .trend-text { font: 700 10px 'Segoe UI', Ubuntu, Sans-Serif; }
+    .ring-grade { font: 800 20px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.title}; }
+    .ring-pct { font: 600 11px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; opacity: 0.7; }
     .row   { opacity: 0; animation: fadeIn .3s ease-in-out forwards; }
+    .ring-progress { animation: ringFill 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+    @keyframes ringFill {
+      from { stroke-dashoffset: ${2 * Math.PI * RING_R}; }
+    }
     @media (prefers-reduced-motion: reduce) {
       .row, .title { animation: none !important; opacity: 1; }
+      .ring-progress { animation: none !important; }
     }
   </style>
   <rect x="0.5" y="0.5" rx="${rx}" ry="${rx}" width="${CARD_WIDTH - 1}" height="${cardHeight - 1}" fill="${theme.bg}"${border}/>
   ${titleSvg}
 ${rows}
+  ${ringSvg}
 </svg>`;
 }
 
