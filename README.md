@@ -4,7 +4,7 @@ Beautiful, dynamically generated stats cards for your GitHub profile README. Jus
 
 **[ghstats.dev](https://ghstats.dev)**
 
-![Example Card](https://ghstats.dev/api/card?username=octocat&theme=tokyonight)
+[![Example Card](https://ghstats.dev/api/card?username=octocat&theme=tokyonight)](https://github.com/rowkav09/GitHub-profile-stats)
 
 ## How to Use
 
