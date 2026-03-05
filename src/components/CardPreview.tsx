@@ -83,8 +83,9 @@ export default function CardPreview() {
   }, [username, buildUrl]);
 
   const embedUrl = buildUrl(origin);
-  const markdownCode = `![GitHub Stats](${embedUrl})`;
-  const htmlCode = `<img src="${embedUrl}" alt="GitHub Stats" />`;
+  const repoUrl = "https://github.com/rowkav09/GitHub-profile-stats";
+  const markdownCode = `[![GitHub Stats](${embedUrl})](${repoUrl})`;
+  const htmlCode = `<a href="${repoUrl}"><img src="${embedUrl}" alt="GitHub Stats" /></a>`;
 
   function toggleStat(key: string) {
     setHiddenStats((prev) =>
