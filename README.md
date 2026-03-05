@@ -4,6 +4,9 @@ Beautiful, dynamically generated stats cards for your GitHub profile README. Jus
 
 **[ghstats.dev](https://ghstats.dev)**
 
+![Users](https://ghstats.dev/api/badge)
+![Visits](https://ghstats.dev/api/visits)
+
 [![Example Card](https://ghstats.dev/api/card?username=octocat&theme=tokyonight)](https://github.com/rowkav09/GitHub-profile-stats)
 
 ## How to Use
@@ -123,6 +126,22 @@ Pass a comma-separated list of keys to the `hide` parameter, e.g. `?hide=stars,i
 | `sunset` | Warm reds / oranges |
 | `forest` | Greens |
 | `midnight` | Ultra-dark blue |
+
+## Badges
+
+Two live badges are available once you set up Upstash Redis (see `.env.example`):
+
+| Badge | URL | Description |
+|---|---|---|
+| ![Users](https://ghstats.dev/api/badge) | `/api/badge` | Unique usernames that have used the embed |
+| ![Visits](https://ghstats.dev/api/visits) | `/api/visits` | Total card requests (incremented per visit) |
+
+Add them to your own README:
+
+```markdown
+![Users](https://ghstats.dev/api/badge)
+![Visits](https://ghstats.dev/api/visits)
+```
 
 ## License
 

@@ -3,6 +3,7 @@ import { fetchGitHubStats } from "@/lib/github";
 import { renderCard, renderErrorCard } from "@/lib/svg";
 import { resolveTheme } from "@/lib/themes";
 import { sanitizeUsername, sanitizeHexParam } from "@/lib/sanitize";
+import { trackUser, trackVisit } from "@/lib/tracking";
 
 export const dynamic = "force-dynamic";
 
@@ -53,6 +54,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    // Fire-and-forget: don't let tracking failures affect the card
+    trackUser(username).catch(() => {});
+    trackVisit().catch(() => {});
+
     const stats = await fetchGitHubStats(username);
     return new Response(renderCard(stats, theme, options), {
       status: 200,
