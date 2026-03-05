@@ -129,12 +129,11 @@ export default function Home() {
       <section className="border-b border-[#21262d] bg-gradient-to-b from-[#010409] to-[#0d1117]">
         <div className="mx-auto max-w-6xl px-6 py-20 text-center">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl animate-slide-up">
-            Beautiful GitHub Stats Cards
+            GitHub Stats for Your README
           </h1>
           <p className="mt-4 text-lg text-[#8b949e] max-w-2xl mx-auto animate-slide-up" style={{ animationDelay: '80ms' }}>
-            Dynamically generated stats cards for your GitHub README.
-            <br />
-            Just swap in your username — no build step, no config files.
+            One line in your README — that&apos;s it. Your stats card stays up to date automatically.
+            Pick a theme, hide what you don&apos;t need, and you&apos;re done.
           </p>
           <div className="mt-8 flex justify-center gap-4 animate-slide-up" style={{ animationDelay: '160ms' }}>
             <a
@@ -161,18 +160,15 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="text-2xl font-bold">Quick Start</h2>
           <p className="mt-3 text-[#8b949e]">
-            Add this line to your GitHub README and replace{" "}
-            <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-sm text-[#79c0ff]">
-              YOUR_USERNAME
-            </code>{" "}
-            with your GitHub username:
+            Add this to your GitHub profile README:
           </p>
           <pre className="mt-4 overflow-x-auto rounded-lg border border-[#30363d] bg-[#161b22] px-5 py-4 text-sm text-[#c9d1d9]">
             {`![GitHub Stats](https://ghstats.dev/api/card?username=YOUR_USERNAME)`}
           </pre>
-          <p className="mt-3 text-sm text-[#484f58]">
-            Replace <code className="text-[#79c0ff]">YOUR_USERNAME</code> with your
-            GitHub username.
+          <p className="mt-3 text-sm text-[#8b949e]">
+            Want a different look? Add{" "}
+            <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-[#79c0ff]">{'&theme=tokyonight'}</code>{" "}
+            or any other theme name. See all options below.
           </p>
         </div>
       </section>
@@ -182,7 +178,7 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="text-2xl font-bold mb-2">Try It Out</h2>
           <p className="text-[#8b949e] mb-8">
-            Customise your card below and copy the embed code.
+            Customise your card and copy the embed code.
           </p>
           <CardPreview />
         </div>
@@ -191,7 +187,10 @@ export default function Home() {
       {/* ─── Parameters ─── */}
       <section id="params" className="border-b border-[#21262d]">
         <div className="mx-auto max-w-6xl px-6 py-16">
-          <h2 className="text-2xl font-bold mb-6">Parameters</h2>
+          <h2 className="text-2xl font-bold mb-2">All Parameters</h2>
+          <p className="text-[#8b949e] mb-6">
+            Everything you can pass as a URL query parameter.
+          </p>
           <div className="overflow-x-auto rounded-lg border border-[#30363d]">
             <table className="w-full text-sm">
               <thead className="bg-[#161b22] text-left text-[#8b949e]">
