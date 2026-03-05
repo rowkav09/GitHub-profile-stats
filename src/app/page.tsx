@@ -159,17 +159,47 @@ export default function Home() {
       <section className="border-b border-[#21262d]">
         <div className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="text-2xl font-bold">Quick Start</h2>
-          <p className="mt-3 text-[#8b949e]">
-            Add this to your GitHub profile README:
-          </p>
-          <pre className="mt-4 overflow-x-auto rounded-lg border border-[#30363d] bg-[#161b22] px-5 py-4 text-sm text-[#c9d1d9]">
-            {`![GitHub Stats](https://ghstats.dev/api/card?username=YOUR_USERNAME)`}
-          </pre>
-          <p className="mt-3 text-sm text-[#8b949e]">
-            Want a different look? Add{" "}
-            <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-[#79c0ff]">{'&theme=tokyonight'}</code>{" "}
-            or any other theme name. See all options below.
-          </p>
+
+          {/* Step 1 */}
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold text-[#c9d1d9] flex items-center gap-2">
+              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#238636] text-xs font-bold text-white">1</span>
+              Create your profile README
+            </h3>
+            <p className="mt-2 text-sm text-[#8b949e] ml-8">
+              GitHub displays a special README on your profile when you create a repo with the same name as your username.
+            </p>
+            <ol className="mt-2 ml-8 text-sm text-[#8b949e] list-decimal list-inside space-y-1">
+              <li>Go to{" "}
+                <a href="https://github.com/new" target="_blank" rel="noopener noreferrer" className="text-[#58a6ff] hover:underline">github.com/new</a>
+              </li>
+              <li>Set the repo name to <strong className="text-[#c9d1d9]">your exact username</strong></li>
+              <li>Make it <strong className="text-[#c9d1d9]">public</strong> and check <strong className="text-[#c9d1d9]">&quot;Add a README file&quot;</strong></li>
+              <li>Click <strong className="text-[#c9d1d9]">Create repository</strong></li>
+            </ol>
+            <p className="mt-2 text-xs text-[#484f58] ml-8">
+              Already have a profile README? Skip to step 2.
+            </p>
+          </div>
+
+          {/* Step 2 */}
+          <div className="mt-8">
+            <h3 className="text-lg font-semibold text-[#c9d1d9] flex items-center gap-2">
+              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#238636] text-xs font-bold text-white">2</span>
+              Add your stats card
+            </h3>
+            <p className="mt-2 text-sm text-[#8b949e] ml-8">
+              Edit the <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-[#79c0ff]">README.md</code> in your profile repo and paste:
+            </p>
+            <pre className="mt-3 ml-8 overflow-x-auto rounded-lg border border-[#30363d] bg-[#161b22] px-5 py-4 text-sm text-[#c9d1d9]">
+              {`![GitHub Stats](https://ghstats.dev/api/card?username=YOUR_USERNAME)`}
+            </pre>
+            <p className="mt-3 ml-8 text-sm text-[#8b949e]">
+              Want a different look? Add{" "}
+              <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-[#79c0ff]">{'&theme=tokyonight'}</code>{" "}
+              or use the editor below to customise everything.
+            </p>
+          </div>
         </div>
       </section>
 

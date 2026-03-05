@@ -8,7 +8,21 @@ Beautiful, dynamically generated stats cards for your GitHub profile README. Jus
 
 ## How to Use
 
-Add this to your GitHub profile `README.md`:
+### 1. Create your profile README (if you don't have one)
+
+GitHub shows a special README on your profile page when you create a repo that matches your username:
+
+1. Go to [github.com/new](https://github.com/new)
+2. Set the repository name to **your exact username** (e.g. `rowkav09`)
+3. Make it **public**
+4. Check **"Add a README file"**
+5. Click **Create repository**
+
+You'll now see the contents of that `README.md` on your profile page.
+
+### 2. Add your stats card
+
+Edit the `README.md` in your new profile repo and add:
 
 ```markdown
 ![GitHub Stats](https://ghstats.dev/api/card?username=YOUR_USERNAME)
