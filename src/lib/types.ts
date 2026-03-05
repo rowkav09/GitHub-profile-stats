@@ -9,9 +9,8 @@ export interface GitHubStats {
   currentStreak: number;
   longestStreak: number;
   commitsThisWeek: number;
-  commitsThisMonth: number;
-  commitsLastMonth: number;
-  monthlyTrend: number; // percentage change vs last month
+  commitsLastWeek: number;
+  weeklyTrend: number; // percentage change vs last week
   avgCommitsPerDay: number;
   mostActiveDay: string; // e.g. "Monday"
   publicRepos: number;

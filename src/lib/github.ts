@@ -75,37 +75,27 @@ function calculateStreak(days: ContributionDay[]): {
   return { current, longest };
 }
 
-function calculateWeekCommits(days: ContributionDay[]): number {
+function calculateWeeklyTrend(
+  days: ContributionDay[],
+): { thisWeek: number; lastWeek: number } {
   const now = new Date();
   const weekAgo = new Date(now);
   weekAgo.setDate(weekAgo.getDate() - 7);
-  const weekAgoStr = weekAgo.toISOString().split("T")[0];
+  const twoWeeksAgo = new Date(now);
+  twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
 
-  return days
+  const weekAgoStr = weekAgo.toISOString().split("T")[0];
+  const twoWeeksAgoStr = twoWeeksAgo.toISOString().split("T")[0];
+
+  const thisWeek = days
     .filter((d) => d.date >= weekAgoStr)
     .reduce((sum, d) => sum + d.contributionCount, 0);
-}
 
-function calculateMonthlyCommits(
-  days: ContributionDay[],
-): { thisMonth: number; lastMonth: number } {
-  const now = new Date();
-  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-    .toISOString()
-    .split("T")[0];
-  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-    .toISOString()
-    .split("T")[0];
-
-  const thisMonth = days
-    .filter((d) => d.date >= thisMonthStart)
+  const lastWeek = days
+    .filter((d) => d.date >= twoWeeksAgoStr && d.date < weekAgoStr)
     .reduce((sum, d) => sum + d.contributionCount, 0);
 
-  const lastMonth = days
-    .filter((d) => d.date >= lastMonthStart && d.date < thisMonthStart)
-    .reduce((sum, d) => sum + d.contributionCount, 0);
-
-  return { thisMonth, lastMonth };
+  return { thisWeek, lastWeek };
 }
 
 function calculateMostActiveDay(days: ContributionDay[]): string {
@@ -125,11 +115,11 @@ function calculateAvgCommitsPerDay(days: ContributionDay[]): number {
 }
 
 function calculateActivityLevel(days: ContributionDay[]): number {
-  // Activity level: % of days in past 30 that had at least 1 contribution
+  // Activity level: % of days in past 7 that had at least 1 contribution
   const now = new Date();
-  const thirtyAgo = new Date(now);
-  thirtyAgo.setDate(thirtyAgo.getDate() - 30);
-  const cutoff = thirtyAgo.toISOString().split("T")[0];
+  const weekAgo = new Date(now);
+  weekAgo.setDate(weekAgo.getDate() - 7);
+  const cutoff = weekAgo.toISOString().split("T")[0];
 
   const recent = days.filter((d) => d.date >= cutoff);
   if (recent.length === 0) return 0;
@@ -137,18 +127,18 @@ function calculateActivityLevel(days: ContributionDay[]): number {
   return Math.round((activeDays / recent.length) * 100);
 }
 
-function calculateGrade(activityLevel: number, streak: number, totalCommits: number): string {
-  // Weighted score: 50% activity (past 30 days), 25% streak (capped at 14 days), 25% commit volume (capped at 300)
+function calculateGrade(activityLevel: number, streak: number, commitsThisWeek: number): string {
+  // Weighted score: 50% activity (past 7 days), 25% streak (capped at 7 days), 25% weekly volume (capped at 20)
   const actScore = activityLevel; // 0–100
-  const streakScore = Math.min(streak / 14, 1) * 100;
-  const commitScore = Math.min(totalCommits / 300, 1) * 100;
+  const streakScore = Math.min(streak / 7, 1) * 100;
+  const commitScore = Math.min(commitsThisWeek / 20, 1) * 100;
   const score = actScore * 0.5 + streakScore * 0.25 + commitScore * 0.25;
 
-  if (score >= 85) return "A+";
-  if (score >= 70) return "A";
-  if (score >= 55) return "B+";
-  if (score >= 40) return "B";
-  if (score >= 25) return "C";
+  if (score >= 80) return "A+";
+  if (score >= 65) return "A";
+  if (score >= 50) return "B+";
+  if (score >= 35) return "B";
+  if (score >= 20) return "C";
   return "D";
 }
 
@@ -200,9 +190,9 @@ export async function fetchGitHubStats(
   );
 
   const { current, longest } = calculateStreak(allDays);
-  const { thisMonth, lastMonth } = calculateMonthlyCommits(allDays);
-  const monthlyTrend =
-    lastMonth > 0 ? Math.round(((thisMonth - lastMonth) / lastMonth) * 100) : thisMonth > 0 ? 100 : 0;
+  const { thisWeek, lastWeek } = calculateWeeklyTrend(allDays);
+  const weeklyTrend =
+    lastWeek > 0 ? Math.round(((thisWeek - lastWeek) / lastWeek) * 100) : thisWeek > 0 ? 100 : 0;
   const activityLevel = calculateActivityLevel(allDays);
 
   return {
@@ -215,16 +205,15 @@ export async function fetchGitHubStats(
     totalIssues: contrib.totalIssueContributions,
     currentStreak: current,
     longestStreak: longest,
-    commitsThisWeek: calculateWeekCommits(allDays),
-    commitsThisMonth: thisMonth,
-    commitsLastMonth: lastMonth,
-    monthlyTrend,
+    commitsThisWeek: thisWeek,
+    commitsLastWeek: lastWeek,
+    weeklyTrend,
     avgCommitsPerDay: calculateAvgCommitsPerDay(allDays),
     mostActiveDay: calculateMostActiveDay(allDays),
     publicRepos: user.repositories.totalCount,
     followers: user.followers.totalCount,
     contributionsThisYear: calendar.totalContributions,
     activityLevel,
-    grade: calculateGrade(activityLevel, current, contrib.totalCommitContributions),
+    grade: calculateGrade(activityLevel, current, thisWeek),
   };
 }

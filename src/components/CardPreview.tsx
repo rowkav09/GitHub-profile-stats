@@ -27,7 +27,7 @@ const STAT_OPTIONS = [
   { key: "issues", label: "Issues" },
   { key: "streak", label: "Streak" },
   { key: "week", label: "This Week" },
-  { key: "trend", label: "Monthly Trend" },
+  { key: "trend", label: "Weekly Trend" },
   { key: "avg", label: "Avg/Day" },
   { key: "active_day", label: "Active Day" },
   { key: "grade", label: "Grade" },

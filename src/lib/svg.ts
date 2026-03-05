@@ -84,10 +84,10 @@ function getVisibleStats(
     },
     {
       key: "trend",
-      label: "Monthly Trend",
-      value: `${formatNumber(stats.commitsThisMonth)} commits`,
+      label: "Weekly Trend",
+      value: `${formatNumber(stats.commitsThisWeek)} commits`,
       icon: "trend",
-      trend: formatTrend(stats.monthlyTrend),
+      trend: formatTrend(stats.weeklyTrend),
     },
     {
       key: "avg",

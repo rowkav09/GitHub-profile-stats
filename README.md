@@ -58,9 +58,9 @@ https://ghstats.dev/api/card?username=octocat&show_ring=false
 
 ## Features
 
-- **13 stats** — stars, commits, PRs, issues, streak, weekly activity, monthly trend, avg commits/day, most active day, activity grade, contributions, repos, followers
-- **Activity ring** — circular progress indicator showing your activity level and grade
-- **Monthly trend** — shows how your commits this month compare to last month (+/- %)
+- **13 stats** — stars, commits, PRs, issues, streak, weekly activity, weekly trend, avg commits/day, most active day, activity grade, contributions, repos, followers
+- **Activity ring** — circular progress indicator showing your weekly activity level and grade
+- **Weekly trend** — shows how your commits this week compare to last week (+/- %)
 - **12 built-in themes** — Default, Light, Radical, Tokyo Night, Dracula, Nord, Gruvbox, Catppuccin, Ocean, Sunset, Forest, Midnight
 - **Fully customisable** — override any colour, hide individual stats, change title and border radius
 - **SVG output** — crisp at any size, works everywhere Markdown or HTML images are supported
@@ -99,7 +99,7 @@ Pass a comma-separated list of keys to the `hide` parameter, e.g. `?hide=stars,i
 | `issues` | Issues Opened |
 | `streak` | Current Streak |
 | `week` | Commits This Week |
-| `trend` | Monthly Trend (+/-) |
+| `trend` | Weekly Trend (+/-) |
 | `avg` | Avg Commits Per Day |
 | `active_day` | Most Active Day |
 | `grade` | Activity Grade |
