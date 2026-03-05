@@ -1,4 +1,5 @@
 import CardPreview from "@/components/CardPreview";
+import HeroCard from "@/components/HeroCard";
 
 const PARAMS = [
   {
@@ -113,12 +114,13 @@ export default function Home() {
             <span className="text-[#58a6ff]">GitHub</span> Profile Stats
           </span>
           <a
-            href="https://github.com"
+            href="https://github.com/rowkav09/GitHub-profile-stats"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
+            className="flex items-center gap-1.5 text-sm text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
           >
-            GitHub →
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            View on GitHub
           </a>
         </div>
       </header>
@@ -149,12 +151,7 @@ export default function Home() {
             </a>
           </div>
           <div className="mt-12 animate-slide-up" style={{ animationDelay: '240ms' }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/api/card?username=octocat&theme=default"
-              alt="Example stats card"
-              className="mx-auto max-w-full rounded-xl shadow-2xl shadow-black/50"
-            />
+            <HeroCard />
           </div>
         </div>
       </section>
@@ -171,11 +168,11 @@ export default function Home() {
             with your GitHub username:
           </p>
           <pre className="mt-4 overflow-x-auto rounded-lg border border-[#30363d] bg-[#161b22] px-5 py-4 text-sm text-[#c9d1d9]">
-            {`![GitHub Stats](https://your-deploy.vercel.app/api/card?username=YOUR_USERNAME)`}
+            {`![GitHub Stats](https://ghstats.dev/api/card?username=YOUR_USERNAME)`}
           </pre>
           <p className="mt-3 text-sm text-[#484f58]">
-            Replace <code className="text-[#79c0ff]">your-deploy.vercel.app</code> with your
-            actual deployment URL after deploying.
+            Replace <code className="text-[#79c0ff]">YOUR_USERNAME</code> with your
+            GitHub username.
           </p>
         </div>
       </section>
@@ -266,9 +263,18 @@ export default function Home() {
 
 
       {/* ─── Footer ─── */}
-      <footer className="bg-[#010409]">
-        <div className="mx-auto max-w-6xl px-6 py-8 text-center text-sm text-[#484f58]">
-          GitHub Profile Stats — open source and free to use.
+      <footer className="border-t border-[#21262d] bg-[#010409]">
+        <div className="mx-auto max-w-6xl px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-[#484f58]">
+          <span>GitHub Profile Stats — open source and free to use.</span>
+          <a
+            href="https://github.com/rowkav09/GitHub-profile-stats"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            rowkav09/GitHub-profile-stats
+          </a>
         </div>
       </footer>
     </main>

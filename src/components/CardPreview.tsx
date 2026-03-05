@@ -48,7 +48,7 @@ export default function CardPreview() {
   const [borderRadius, setBorderRadius] = useState("4.5");
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [imgUrl, setImgUrl] = useState("");
-  const [origin, setOrigin] = useState("https://your-deploy.vercel.app");
+  const [origin, setOrigin] = useState("https://ghstats.dev");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
