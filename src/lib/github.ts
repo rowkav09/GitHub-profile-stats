@@ -125,11 +125,11 @@ function calculateAvgCommitsPerDay(days: ContributionDay[]): number {
 }
 
 function calculateActivityLevel(days: ContributionDay[]): number {
-  // Activity level: % of days in past 90 that had at least 1 contribution
+  // Activity level: % of days in past 30 that had at least 1 contribution
   const now = new Date();
-  const ninetyAgo = new Date(now);
-  ninetyAgo.setDate(ninetyAgo.getDate() - 90);
-  const cutoff = ninetyAgo.toISOString().split("T")[0];
+  const thirtyAgo = new Date(now);
+  thirtyAgo.setDate(thirtyAgo.getDate() - 30);
+  const cutoff = thirtyAgo.toISOString().split("T")[0];
 
   const recent = days.filter((d) => d.date >= cutoff);
   if (recent.length === 0) return 0;
@@ -138,17 +138,17 @@ function calculateActivityLevel(days: ContributionDay[]): number {
 }
 
 function calculateGrade(activityLevel: number, streak: number, totalCommits: number): string {
-  // Weighted score: 40% activity, 30% streak (capped at 60 days), 30% commit volume (capped at 1000)
+  // Weighted score: 50% activity (past 30 days), 25% streak (capped at 14 days), 25% commit volume (capped at 300)
   const actScore = activityLevel; // 0–100
-  const streakScore = Math.min(streak / 60, 1) * 100;
-  const commitScore = Math.min(totalCommits / 1000, 1) * 100;
-  const score = actScore * 0.4 + streakScore * 0.3 + commitScore * 0.3;
+  const streakScore = Math.min(streak / 14, 1) * 100;
+  const commitScore = Math.min(totalCommits / 300, 1) * 100;
+  const score = actScore * 0.5 + streakScore * 0.25 + commitScore * 0.25;
 
-  if (score >= 90) return "A+";
-  if (score >= 80) return "A";
-  if (score >= 70) return "B+";
-  if (score >= 60) return "B";
-  if (score >= 45) return "C";
+  if (score >= 85) return "A+";
+  if (score >= 70) return "A";
+  if (score >= 55) return "B+";
+  if (score >= 40) return "B";
+  if (score >= 25) return "C";
   return "D";
 }
 
