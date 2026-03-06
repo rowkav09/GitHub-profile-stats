@@ -3,11 +3,24 @@
 
 # GitHub Profile Stats
 
+> 🚀 Free, open-source GitHub stats card generator — embed beautiful, real-time stats in your profile README with a single line of Markdown. No tokens needed.
+
 Beautiful, dynamically generated stats cards for your GitHub profile README. Just paste one line and your stats are always up to date — no setup, no tokens, no deployment needed.
 
 **[ghstats.dev](https://ghstats.dev)**
 
 [![Example Card](https://ghstats.dev/api/card?username=octocat&theme=tokyonight)](https://github.com/rowkav09/GitHub-profile-stats)
+
+## Why GitHub Profile Stats?
+
+- ✅ **Free & open source** — no cost, no hidden limits, MIT licensed
+- 🔑 **No GitHub token required** — just your username
+- 📊 **13 live stats** — stars, commits, PRs, issues, streak, weekly activity, and more
+- 🎨 **12 built-in themes** — Default, Tokyo Night, Dracula, Nord, and more
+- 🖼️ **SVG output** — crisp at any size, works everywhere Markdown or HTML images are supported
+- ⚡ **Edge-cached** — fast responses refreshed every 30 minutes
+- 🛠️ **Fully customisable** — override colours, hide stats, change border radius
+- 🌍 **Works anywhere** — GitHub, GitLab, Notion, any Markdown-supported platform
 
 ## How to Use
 
@@ -142,6 +155,35 @@ Add them to your own README:
 ![Users](https://ghstats.dev/api/badge)
 ![Visits](https://ghstats.dev/api/visits)
 ```
+
+## FAQ
+
+**How do I add stats to my GitHub profile?**
+Create a public repo named after your GitHub username, add a `README.md`, and paste `![GitHub Stats](https://ghstats.dev/api/card?username=YOUR_USERNAME)` into it. Your stats card will appear on your profile instantly.
+
+**Do I need a GitHub token?**
+No. GitHub Profile Stats uses the public GitHub GraphQL API without any token. Just provide your username.
+
+**How often do stats update?**
+Cards are edge-cached and refresh every 30 minutes, so your stats are always near real-time.
+
+**Can I customize the colors?**
+Yes! Use URL parameters like `bg`, `text`, `title_color`, `icon_color`, and `border_color` to override any colour, or choose from 12 built-in themes.
+
+**Is this free?**
+Completely free and open source under the MIT license. No sign-up, no API key, no cost.
+
+## Contributing
+
+Contributions are welcome! If you have ideas for new themes, stats, or features, feel free to [open an issue](https://github.com/rowkav09/GitHub-profile-stats/issues) or submit a pull request.
+
+1. Fork the repo
+2. Create a feature branch (`git checkout -b feat/my-feature`)
+3. Commit your changes and open a PR
+
+## Support
+
+If you find this project useful, please consider giving it a ⭐ on [GitHub](https://github.com/rowkav09/GitHub-profile-stats) — it helps others discover it!
 
 ## License
 
