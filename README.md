@@ -140,21 +140,6 @@ Pass a comma-separated list of keys to the `hide` parameter, e.g. `?hide=stars,i
 | `forest` | Greens |
 | `midnight` | Ultra-dark blue |
 
-## Badges
-
-Two live badges are available once you set up Upstash Redis (see `.env.example`):
-
-| Badge | URL | Description |
-|---|---|---|
-| ![Users](https://ghstats.dev/api/badge) | `/api/badge` | Unique usernames that have used the embed |
-| ![Visits](https://ghstats.dev/api/visits) | `/api/visits` | Total card requests (incremented per visit) |
-
-Add them to your own README:
-
-```markdown
-![Users](https://ghstats.dev/api/badge)
-![Visits](https://ghstats.dev/api/visits)
-```
 
 ## FAQ
 
