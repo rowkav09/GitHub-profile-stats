@@ -1,4 +1,4 @@
-import { GitHubStats, ThemeConfig, CardOptions } from "./types";
+import { GitHubStats, ThemeConfig, CardOptions, LanguageStat, LangChartOptions } from "./types";
 import { escapeXml, formatNumber } from "./sanitize";
 
 // Octicon-style SVG paths (16x16 viewBox)
@@ -44,6 +44,7 @@ function formatTrend(pct: number): { direction: "up" | "down" | "neutral"; text:
 function getVisibleStats(
   stats: GitHubStats,
   hide: string[],
+  order?: string[],
 ): StatItem[] {
   const year = new Date().getFullYear();
   const all: { key: string; label: string; short: string; value: string; icon: string; trend?: StatItem["trend"] }[] = [
@@ -141,9 +142,21 @@ function getVisibleStats(
     },
   ];
 
-  return all
-    .filter((s) => !hide.includes(s.key))
-    .map(({ label, short, value, icon, trend }) => ({ label, short, value, icon, trend }));
+  const filtered = all.filter((s) => !hide.includes(s.key));
+
+  // Apply custom order if provided
+  if (order && order.length > 0) {
+    filtered.sort((a, b) => {
+      const ai = order.indexOf(a.key);
+      const bi = order.indexOf(b.key);
+      if (ai === -1 && bi === -1) return 0;
+      if (ai === -1) return 1;
+      if (bi === -1) return -1;
+      return ai - bi;
+    });
+  }
+
+  return filtered.map(({ label, short, value, icon, trend }) => ({ label, short, value, icon, trend }));
 }
 
 function renderActivityRing(
@@ -184,7 +197,7 @@ function renderCompactCard(
   const count = options.compact_count;
   // 4 stats → 2 cols; 3 or 6 → 3 cols
   const COLS = count === 4 ? 2 : 3;
-  const visible = getVisibleStats(stats, options.hide).slice(0, count);
+  const visible = getVisibleStats(stats, options.hide, options.order).slice(0, count);
   const useEmoji = options.show_emoji;
 
   const W = 495;
@@ -281,7 +294,7 @@ export function renderCard(
     return renderCompactCard(stats, theme, options);
   }
 
-  const visible = getVisibleStats(stats, options.hide);
+  const visible = getVisibleStats(stats, options.hide, options.order);
   const showIcons = options.show_icons;
   const showRing = options.show_ring;
 
@@ -410,3 +423,127 @@ export function renderErrorCard(message: string, theme: ThemeConfig): string {
   <text x="25" y="75" class="err-msg">${safe}</text>
 </svg>`;
 }
+
+// ─── Language Chart ─────────────────────────────────────────────────────────
+
+function donutSlicePath(
+  cx: number,
+  cy: number,
+  outerR: number,
+  innerR: number,
+  startAngle: number,
+  endAngle: number,
+): string {
+  const cos = Math.cos;
+  const sin = Math.sin;
+  // Gap between slices (radians)
+  const GAP = 0.03;
+  const sa = startAngle + GAP / 2;
+  const ea = endAngle - GAP / 2;
+  if (ea <= sa) return "";
+  const ox1 = cx + outerR * cos(sa);
+  const oy1 = cy + outerR * sin(sa);
+  const ox2 = cx + outerR * cos(ea);
+  const oy2 = cy + outerR * sin(ea);
+  const ix1 = cx + innerR * cos(ea);
+  const iy1 = cy + innerR * sin(ea);
+  const ix2 = cx + innerR * cos(sa);
+  const iy2 = cy + innerR * sin(sa);
+  const large = ea - sa > Math.PI ? 1 : 0;
+  return `M ${ox1.toFixed(2)} ${oy1.toFixed(2)} A ${outerR} ${outerR} 0 ${large} 1 ${ox2.toFixed(2)} ${oy2.toFixed(2)} L ${ix1.toFixed(2)} ${iy1.toFixed(2)} A ${innerR} ${innerR} 0 ${large} 0 ${ix2.toFixed(2)} ${iy2.toFixed(2)} Z`;
+}
+
+export function renderLanguageChart(
+  languages: LanguageStat[],
+  theme: ThemeConfig,
+  options: LangChartOptions,
+): string {
+  const maxLangs = Math.min(options.max_langs, 12);
+  const topLangs = languages.slice(0, maxLangs);
+
+  if (topLangs.length === 0) {
+    return renderErrorCard("No language data available for this user.", theme);
+  }
+
+  const W = 320;
+  const PAD = 18;
+  const TITLE_H = options.hide_title ? 0 : 26;
+  const DONUT_R_OUTER = 52;
+  const DONUT_R_INNER = 32;
+  const DONUT_CX = PAD + DONUT_R_OUTER;
+  const CHART_TOP = TITLE_H + PAD;
+  const DONUT_CY = CHART_TOP + DONUT_R_OUTER;
+  const H = Math.max(DONUT_CY + DONUT_R_OUTER + PAD, TITLE_H + PAD + topLangs.length * 18 + PAD);
+  const rx = options.border_radius;
+
+  const totalSize = topLangs.reduce((s, l) => s + l.size, 0);
+
+  // Donut slices
+  let angle = -Math.PI / 2;
+  const slices = topLangs.map((lang) => {
+    const fraction = lang.size / totalSize;
+    const startAngle = angle;
+    const endAngle = angle + fraction * 2 * Math.PI;
+    angle = endAngle;
+    const pct = Math.round(fraction * 1000) / 10;
+    return { ...lang, path: donutSlicePath(DONUT_CX, DONUT_CY, DONUT_R_OUTER, DONUT_R_INNER, startAngle, endAngle), pct };
+  });
+
+  const sliceSvg = slices
+    .filter((s) => s.path)
+    .map((s) => `<path d="${s.path}" fill="${s.color}"/>`)
+    .join("\n  ");
+
+  // Center label
+  const countLabel = `<text x="${DONUT_CX}" y="${DONUT_CY - 5}" text-anchor="middle" class="lc-count">${topLangs.length}</text>
+  <text x="${DONUT_CX}" y="${DONUT_CY + 12}" text-anchor="middle" class="lc-sub">langs</text>`;
+
+  // Legend
+  const LEGEND_X = DONUT_CX + DONUT_R_OUTER + 16;
+  const LEGEND_ROW_H = 17;
+  const legendItems = slices
+    .map((s, i) => {
+      const y = TITLE_H + PAD + i * LEGEND_ROW_H;
+      const name = s.name.length > 13 ? s.name.slice(0, 12) + "…" : s.name;
+      return `<rect x="${LEGEND_X}" y="${y}" width="9" height="9" rx="2" fill="${s.color}"/>
+  <text x="${LEGEND_X + 13}" y="${y + 8}" class="lc-label">${escapeXml(name)}</text>
+  <text x="${W - PAD}" y="${y + 8}" class="lc-pct" text-anchor="end">${s.pct}%</text>`;
+    })
+    .join("\n  ");
+
+  // Bar chart strip below donut (GitHub-style language bar)
+  const BAR_Y = DONUT_CY + DONUT_R_OUTER + 8;
+  const BAR_H = 8;
+  const BAR_W = W - PAD * 2;
+  let barX = PAD;
+  const bars = slices.map((s) => {
+    const w = Math.max(1, Math.round((s.size / totalSize) * BAR_W));
+    const el = `<rect x="${barX}" y="${BAR_Y}" width="${w}" height="${BAR_H}" rx="2" fill="${s.color}"/>`;
+    barX += w;
+    return el;
+  });
+
+  const titleSvg = options.hide_title
+    ? ""
+    : `<text x="${PAD}" y="${TITLE_H - 4}" class="lc-title">${escapeXml(options.custom_title ?? "Top Languages")}</text>`;
+
+  const border = options.hide_border ? "" : ` stroke="${theme.border}" stroke-width="1"`;
+
+  return `<svg width="${W}" height="${H + 20}" viewBox="0 0 ${W} ${H + 20}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Top Languages">
+  <title>${escapeXml(options.custom_title ?? "Top Languages")}</title>
+  <style>
+    .lc-title { font: 600 13px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.title}; }
+    .lc-label { font: 400 10px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; }
+    .lc-pct   { font: 600 10px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; opacity: 0.6; }
+    .lc-count { font: 700 15px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.title}; }
+    .lc-sub   { font: 400 9px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; opacity: 0.6; }
+  </style>
+  <rect x="0.5" y="0.5" rx="${rx}" ry="${rx}" width="${W - 1}" height="${H + 19}" fill="${theme.bg}"${border}/>
+  ${titleSvg}
+  ${sliceSvg}
+  ${countLabel}
+  ${legendItems}
+  ${bars.join("\n  ")}
+</svg>`;
+}
+
