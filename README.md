@@ -50,11 +50,38 @@ Replace `YOUR_USERNAME` with your GitHub username. That's it — your card will 
 
 Visit **[ghstats.dev](https://ghstats.dev)** to customise your card with the interactive editor. Pick a theme, toggle stats on and off, and copy the embed code when you're done.
 
+## Card Layouts
+
+### Standard
+The default layout shows all stats in a single column alongside a circular activity ring.
+
+[![Standard Card](https://ghstats.dev/api/card?username=octocat&theme=tokyonight)](https://github.com/rowkav09/GitHub-profile-stats)
+
+```markdown
+![GitHub Stats](https://ghstats.dev/api/card?username=octocat&theme=tokyonight)
+```
+
+### Compact
+A minimal 2-column grid showing just your key numbers — no ring, no grade, clean and space-efficient.
+
+[![Compact Card](https://ghstats.dev/api/card?username=octocat&theme=tokyonight&size=compact)](https://github.com/rowkav09/GitHub-profile-stats)
+
+```markdown
+![GitHub Stats](https://ghstats.dev/api/card?username=octocat&theme=tokyonight&size=compact)
+```
+
+You can hide any stat in compact mode the same way as standard, e.g. `&hide=trend,avg,active_day`.
+
 ## Examples
 
 **Default:**
 ```
 https://ghstats.dev/api/card?username=octocat
+```
+
+**Compact layout, Tokyo Night:**
+```
+https://ghstats.dev/api/card?username=octocat&theme=tokyonight&size=compact
 ```
 
 **Tokyo Night theme, hiding issues and followers:**
@@ -75,7 +102,8 @@ https://ghstats.dev/api/card?username=octocat&show_ring=false
 ## Features
 
 - **13 stats** — stars, commits, PRs, issues, streak, weekly activity, weekly trend, avg commits/day, most active day, activity grade, contributions, repos, followers
-- **Activity ring** — circular progress indicator showing your weekly activity level and grade
+- **Two layouts** — standard (list + activity ring) and compact (2-column grid, minimal)
+- **Activity ring** — circular progress indicator showing your weekly activity level and grade (standard layout only)
 - **Weekly trend** — shows how your commits this week compare to last week (+/- %)
 - **12 built-in themes** — Default, Light, Radical, Tokyo Night, Dracula, Nord, Gruvbox, Catppuccin, Ocean, Sunset, Forest, Midnight
 - **Fully customisable** — override any colour, hide individual stats, change title and border radius
@@ -102,6 +130,7 @@ All parameters are passed as URL query strings.
 | `hide` | string | — | Comma-separated stat keys to hide |
 | `border_radius` | number | `4.5` | Corner radius (`0`–`50`) |
 | `custom_title` | string | — | Override the title text |
+| `size` | string | `default` | Layout: `default` (list + ring) or `compact` (2-column grid) |
 
 ### Stats You Can Hide
 
@@ -160,11 +189,7 @@ Completely free and open source under the MIT license. No sign-up, no API key, n
 
 ## Contributing
 
-Contributions are welcome! If you have ideas for new themes, stats, or features, feel free to [open an issue](https://github.com/rowkav09/GitHub-profile-stats/issues) or submit a pull request.
-
-1. Fork the repo
-2. Create a feature branch (`git checkout -b feat/my-feature`)
-3. Commit your changes and open a PR
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guides on adding themes, stats, layouts, and more.
 
 ## Support
 

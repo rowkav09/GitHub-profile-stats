@@ -29,6 +29,7 @@ const ICONS: Record<string, string> = {
 
 interface StatItem {
   label: string;
+  short: string;
   value: string;
   icon: string;
   trend?: { direction: "up" | "down" | "neutral"; text: string };
@@ -45,46 +46,53 @@ function getVisibleStats(
   hide: string[],
 ): StatItem[] {
   const year = new Date().getFullYear();
-  const all: { key: string; label: string; value: string; icon: string; trend?: StatItem["trend"] }[] = [
+  const all: { key: string; label: string; short: string; value: string; icon: string; trend?: StatItem["trend"] }[] = [
     {
       key: "stars",
       label: "Total Stars Earned",
+      short: "Stars",
       value: formatNumber(stats.totalStars),
       icon: "star",
     },
     {
       key: "commits",
       label: `Total Commits (${year})`,
+      short: "Commits",
       value: formatNumber(stats.totalCommits),
       icon: "commit",
     },
     {
       key: "prs",
       label: "Pull Requests",
+      short: "Pull Requests",
       value: formatNumber(stats.totalPRs),
       icon: "pr",
     },
     {
       key: "issues",
       label: "Issues Opened",
+      short: "Issues",
       value: formatNumber(stats.totalIssues),
       icon: "issue",
     },
     {
       key: "streak",
       label: "Current Streak",
+      short: "Streak",
       value: `${stats.currentStreak} days`,
       icon: "fire",
     },
     {
       key: "week",
       label: "Commits This Week",
+      short: "This Week",
       value: formatNumber(stats.commitsThisWeek),
       icon: "calendar",
     },
     {
       key: "trend",
       label: "Weekly Trend",
+      short: "Trend",
       value: `${formatNumber(stats.commitsThisWeek)} commits`,
       icon: "trend",
       trend: formatTrend(stats.weeklyTrend),
@@ -92,36 +100,42 @@ function getVisibleStats(
     {
       key: "avg",
       label: "Avg Commits / Day",
+      short: "Avg / Day",
       value: `${stats.avgCommitsPerDay}`,
       icon: "clock",
     },
     {
       key: "active_day",
       label: "Most Active Day",
+      short: "Active Day",
       value: stats.mostActiveDay,
       icon: "day",
     },
     {
       key: "grade",
       label: "Activity Grade",
+      short: "Grade",
       value: stats.grade,
       icon: "trophy",
     },
     {
       key: "contributions",
       label: "Contributions This Year",
+      short: "Contributions",
       value: formatNumber(stats.contributionsThisYear),
       icon: "graph",
     },
     {
       key: "repos",
       label: "Public Repos",
+      short: "Repos",
       value: formatNumber(stats.publicRepos),
       icon: "repo",
     },
     {
       key: "followers",
       label: "Followers",
+      short: "Followers",
       value: formatNumber(stats.followers),
       icon: "people",
     },
@@ -129,7 +143,7 @@ function getVisibleStats(
 
   return all
     .filter((s) => !hide.includes(s.key))
-    .map(({ label, value, icon, trend }) => ({ label, value, icon, trend }));
+    .map(({ label, short, value, icon, trend }) => ({ label, short, value, icon, trend }));
 }
 
 function renderActivityRing(
@@ -156,35 +170,120 @@ function renderActivityRing(
   <text x="${cx}" y="${cy + pctOffY}" text-anchor="middle" class="ring-pct">${pct}%</text>`;
 }
 
-export function renderCard(
+function renderCompactCard(
   stats: GitHubStats,
   theme: ThemeConfig,
   options: CardOptions,
 ): string {
   const visible = getVisibleStats(stats, options.hide);
   const showIcons = options.show_icons;
+
+  const W = 495;
+  const PAD_X = 22;
+  const PAD_TOP = 20;
+  const TITLE_FS = 15;
+  const TITLE_H = options.hide_title ? 0 : TITLE_FS + 10;
+  const GAP = 12;
+  const CELL_H = 52;
+  const CELL_GAP = 14;
+  const COLS = 2;
+  const CELL_W = Math.floor((W - PAD_X * 2 - CELL_GAP) / COLS);
+  const PAD_BOT = 18;
+  const numCellRows = Math.ceil(visible.length / COLS);
+  const statsStartY = PAD_TOP + TITLE_H + GAP;
+  const cardHeight = statsStartY + numCellRows * CELL_H + PAD_BOT;
+  const rx = options.border_radius;
+
+  const title = options.custom_title
+    ? escapeXml(options.custom_title)
+    : `${escapeXml(stats.name || stats.username)}&apos;s GitHub Stats`;
+
+  const titleSvg = options.hide_title
+    ? ""
+    : `<text x="${PAD_X}" y="${PAD_TOP + TITLE_FS}" class="c-title">${title}</text>`;
+
+  const separators = Array.from({ length: numCellRows - 1 }, (_, row) => {
+    const sepY = statsStartY + (row + 1) * CELL_H - 1;
+    return `<line x1="${PAD_X}" y1="${sepY}" x2="${W - PAD_X}" y2="${sepY}" stroke="${theme.border}" stroke-width="1" opacity="0.35"/>`;
+  }).join("\n");
+
+  const cells = visible
+    .map((stat, i) => {
+      const col = i % COLS;
+      const row = Math.floor(i / COLS);
+      const cellX = PAD_X + col * (CELL_W + CELL_GAP);
+      const cellY = statsStartY + row * CELL_H + 8;
+      const delay = i * 70;
+
+      const iconSvg = showIcons
+        ? `<svg x="${cellX}" y="${cellY}" width="13" height="13" viewBox="0 0 16 16" fill="${theme.icon}"><path d="${ICONS[stat.icon] ?? ""}"/></svg>`
+        : "";
+
+      const textX = cellX + (showIcons ? 20 : 0);
+
+      return `<g class="c-row" style="animation-delay:${delay}ms">
+      ${iconSvg}
+      <text x="${textX}" y="${cellY + 10}" class="c-label">${escapeXml(stat.short)}</text>
+      <text x="${textX}" y="${cellY + 33}" class="c-value">${escapeXml(stat.value)}</text>
+    </g>`;
+    })
+    .join("\n");
+
+  const border = options.hide_border
+    ? ""
+    : ` stroke="${theme.border}" stroke-width="1"`;
+
+  return `<svg width="${W}" height="${cardHeight}" viewBox="0 0 ${W} ${cardHeight}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${title}">
+  <title>${title}</title>
+  <style>
+    .c-title { font: 600 ${TITLE_FS}px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.title}; animation: cFadeIn .8s ease-in-out forwards; }
+    .c-label { font: 400 11px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; opacity: 0.55; }
+    .c-value { font: 700 16px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; }
+    .c-row { opacity: 0; animation: cFadeIn .3s ease-in-out forwards; }
+    @keyframes cFadeIn { from { opacity: 0 } to { opacity: 1 } }
+    @media (prefers-reduced-motion: reduce) {
+      .c-row, .c-title { animation: none !important; opacity: 1; }
+    }
+  </style>
+  <rect x="0.5" y="0.5" rx="${rx}" ry="${rx}" width="${W - 1}" height="${cardHeight - 1}" fill="${theme.bg}"${border}/>
+  ${titleSvg}
+${separators}
+${cells}
+</svg>`;
+}
+
+export function renderCard(
+  stats: GitHubStats,
+  theme: ThemeConfig,
+  options: CardOptions,
+): string {
+  if (options.size === "compact") {
+    return renderCompactCard(stats, theme, options);
+  }
+
+  const visible = getVisibleStats(stats, options.hide);
+  const showIcons = options.show_icons;
   const showRing = options.show_ring;
-  const compact = options.size === "compact";
 
   const CARD_WIDTH = 495;
-  const PAD_X = compact ? 20 : 25;
-  const PAD_TOP = compact ? 18 : 25;
-  const TITLE_H = options.hide_title ? 0 : (compact ? 22 : 30);
-  const GAP = compact ? 3 : 5;
-  const ROW_H = compact ? 19 : 25;
-  const PAD_BOT = compact ? 14 : 20;
-  const RING_R = compact ? 30 : 40;
-  const RING_AREA = showRing ? RING_R * 2 + (compact ? 18 : 30) : 0;
-  const ICON_SIZE = compact ? 13 : 16;
-  const TEXT_ICON_PAD = compact ? 20 : 25;
-  const TEXT_Y_OFF = compact ? 10 : 12.5;
-  const CHAR_W = compact ? 6.5 : 7.5;
-  const TITLE_FS = compact ? 14 : 18;
-  const LABEL_FS = compact ? 12 : 14;
-  const TREND_FS = compact ? 9 : 10;
-  const RING_GRADE_FS = compact ? 16 : 20;
-  const RING_PCT_FS = compact ? 10 : 11;
-  const RING_STROKE = compact ? 4 : 5;
+  const PAD_X = 25;
+  const PAD_TOP = 25;
+  const TITLE_H = options.hide_title ? 0 : 30;
+  const GAP = 5;
+  const ROW_H = 25;
+  const PAD_BOT = 20;
+  const RING_R = 40;
+  const RING_AREA = showRing ? RING_R * 2 + 30 : 0;
+  const ICON_SIZE = 16;
+  const TEXT_ICON_PAD = 25;
+  const TEXT_Y_OFF = 12.5;
+  const CHAR_W = 7.5;
+  const TITLE_FS = 18;
+  const LABEL_FS = 14;
+  const TREND_FS = 10;
+  const RING_GRADE_FS = 20;
+  const RING_PCT_FS = 11;
+  const RING_STROKE = 5;
 
   const statsStartY = PAD_TOP + TITLE_H + GAP;
   const statsHeight = visible.length * ROW_H;
