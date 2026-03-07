@@ -41,3 +41,22 @@ export async function getVisitCount(): Promise<number> {
   if (!redis) return 0;
   return (await redis.get<number>(VISITS_KEY)) ?? 0;
 }
+
+/**
+ * Increment and return the profile view count for a specific username.
+ * This is the per-profile counter — each user embeds their own badge URL.
+ */
+export async function trackProfileView(username: string): Promise<number> {
+  const redis = getRedis();
+  if (!redis) return 0;
+  const key = `views:${username.toLowerCase()}`;
+  return await redis.incr(key);
+}
+
+/** Return the profile view count without incrementing. */
+export async function getProfileViewCount(username: string): Promise<number> {
+  const redis = getRedis();
+  if (!redis) return 0;
+  const key = `views:${username.toLowerCase()}`;
+  return (await redis.get<number>(key)) ?? 0;
+}
