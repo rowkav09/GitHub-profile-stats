@@ -291,9 +291,76 @@ export default function VisualBuilder() {
   }
 
   function toggleStat(key: string) {
-    setStats((prev) =>
-      prev.map((s) => (s.key === key ? { ...s, enabled: !s.enabled } : s)),
-    );
+    if (layout === "compact") {
+      setStats((prev) => {
+        const target = prev.find((s) => s.key === key);
+        if (!target) return prev;
+        if (target.enabled) {
+          return prev.map((s) => (s.key === key ? { ...s, enabled: false } : s));
+        }
+        const enabledCount = prev.filter((s) => s.enabled).length;
+        if (enabledCount >= gridCols) return prev;
+        return prev.map((s) => (s.key === key ? { ...s, enabled: true } : s));
+      });
+    } else {
+      setStats((prev) =>
+        prev.map((s) => (s.key === key ? { ...s, enabled: !s.enabled } : s)),
+      );
+    }
+  }
+
+  function handleSetGridCols(n: 3 | 4 | 6) {
+    setGridCols(n);
+    setStats((prev) => {
+      const result = [...prev];
+      let enabledCount = result.filter((s) => s.enabled).length;
+      if (enabledCount > n) {
+        let toDisable = enabledCount - n;
+        for (let i = result.length - 1; i >= 0 && toDisable > 0; i--) {
+          if (result[i].enabled) {
+            result[i] = { ...result[i], enabled: false };
+            toDisable--;
+          }
+        }
+      } else if (enabledCount < n) {
+        let toEnable = n - enabledCount;
+        for (let i = 0; i < result.length && toEnable > 0; i++) {
+          if (!result[i].enabled) {
+            result[i] = { ...result[i], enabled: true };
+            toEnable--;
+          }
+        }
+      }
+      return result;
+    });
+  }
+
+  function handleSetLayout(mode: LayoutMode) {
+    setLayout(mode);
+    if (mode === "compact") {
+      setStats((prev) => {
+        const result = [...prev];
+        let enabledCount = result.filter((s) => s.enabled).length;
+        if (enabledCount > gridCols) {
+          let toDisable = enabledCount - gridCols;
+          for (let i = result.length - 1; i >= 0 && toDisable > 0; i--) {
+            if (result[i].enabled) {
+              result[i] = { ...result[i], enabled: false };
+              toDisable--;
+            }
+          }
+        } else if (enabledCount < gridCols) {
+          let toEnable = gridCols - enabledCount;
+          for (let i = 0; i < result.length && toEnable > 0; i++) {
+            if (!result[i].enabled) {
+              result[i] = { ...result[i], enabled: true };
+              toEnable--;
+            }
+          }
+        }
+        return result;
+      });
+    }
   }
 
   function moveStatUp(index: number) {
@@ -422,6 +489,9 @@ export default function VisualBuilder() {
 
   // ─── Render ────────────────────────────────────────────────────────────────
 
+  const compactLimitReached =
+    layout === "compact" && stats.filter((s) => s.enabled).length >= gridCols;
+
   return (
     <div className="space-y-0">
       {/* ─── Tab switcher ─── */}
@@ -549,11 +619,20 @@ export default function VisualBuilder() {
                   <SectionHeader>Stats</SectionHeader>
                   <div className="flex gap-1">
                     <button
-                      onClick={() => setStats((prev) => prev.map((s) => ({ ...s, enabled: true })))}
-                      className="text-xs text-[#58a6ff] hover:text-[#79c0ff] transition-colors"
-                    >
-                      All
-                    </button>
+                    onClick={() => {
+                      if (layout === "compact") {
+                        setStats((prev) => {
+                          let count = 0;
+                          return prev.map((s) => ({ ...s, enabled: count++ < gridCols }));
+                        });
+                      } else {
+                        setStats((prev) => prev.map((s) => ({ ...s, enabled: true })));
+                      }
+                    }}
+                    className="text-xs text-[#58a6ff] hover:text-[#79c0ff] transition-colors"
+                  >
+                    All
+                  </button>
                     <span className="text-[#30363d]">/</span>
                     <button
                       onClick={() => setStats((prev) => prev.map((s) => ({ ...s, enabled: false })))}
@@ -582,7 +661,7 @@ export default function VisualBuilder() {
                           : dragOverIndex === i
                           ? "border-t-2 border-[#58a6ff]"
                           : "hover:bg-[#161b22]"
-                      } ${!stat.enabled ? "opacity-50" : ""}`}
+                      } ${!stat.enabled ? "opacity-50" : ""} ${compactLimitReached && !stat.enabled ? "opacity-30" : ""}`}
                     >
                       {/* Drag handle */}
                       <svg
@@ -604,7 +683,8 @@ export default function VisualBuilder() {
                         type="checkbox"
                         checked={stat.enabled}
                         onChange={() => toggleStat(stat.key)}
-                        className="accent-[#238636] cursor-pointer"
+                        disabled={compactLimitReached && !stat.enabled}
+                        className={`accent-[#238636] ${compactLimitReached && !stat.enabled ? "cursor-not-allowed opacity-40" : "cursor-pointer"}`}
                         onClick={(e) => e.stopPropagation()}
                       />
                       <span className="text-xs text-[#c9d1d9] flex-1 truncate">
@@ -694,7 +774,7 @@ export default function VisualBuilder() {
                         key={langsImgUrl}
                         src={langsImgUrl}
                         alt="Languages"
-                        style={{ maxWidth: Math.min(embedWidth, 320) }}
+                        style={{ maxWidth: Math.min(embedWidth, 495) }}
                         className="rounded-lg transition-opacity duration-300"
                         onLoad={() => setCardLoading(false)}
                       />
@@ -760,7 +840,7 @@ export default function VisualBuilder() {
                           name="layout"
                           value={mode}
                           checked={layout === mode}
-                          onChange={() => setLayout(mode)}
+                          onChange={() => handleSetLayout(mode)}
                           className="accent-[#238636]"
                         />
                         <span className="text-sm text-[#c9d1d9]">
@@ -772,12 +852,12 @@ export default function VisualBuilder() {
 
                   {layout === "compact" && (
                     <div className="pt-2 border-t border-[#21262d]">
-                      <p className="text-xs text-[#8b949e] mb-2">Grid columns</p>
+                      <p className="text-xs text-[#8b949e] mb-2">Stat slots</p>
                       <div className="flex gap-1.5">
                         {([3, 4, 6] as const).map((n) => (
                           <button
                             key={n}
-                            onClick={() => setGridCols(n)}
+                            onClick={() => handleSetGridCols(n)}
                             className={`flex-1 rounded-lg py-1.5 text-sm font-semibold transition-all duration-150 ${
                               gridCols === n
                                 ? "bg-[#238636] text-white"
@@ -825,7 +905,9 @@ export default function VisualBuilder() {
                   <Toggle checked={!hideBorder} onChange={(v) => setHideBorder(!v)} label="Show border" />
                   <Toggle checked={!hideTitle} onChange={(v) => setHideTitle(!v)} label="Show title" />
                   <Toggle checked={showRing && layout !== "compact"} onChange={setShowRing} label="Activity ring" />
-                  <Toggle checked={showIcons} onChange={setShowIcons} label="Icons" />
+                  {layout !== "compact" && (
+                    <Toggle checked={showIcons} onChange={setShowIcons} label="Icons" />
+                  )}
                   {layout === "compact" && (
                     <Toggle checked={showEmoji} onChange={setShowEmoji} label="Emoji icons" />
                   )}

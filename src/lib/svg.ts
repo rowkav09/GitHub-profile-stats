@@ -426,33 +426,6 @@ export function renderErrorCard(message: string, theme: ThemeConfig): string {
 
 // ─── Language Chart ─────────────────────────────────────────────────────────
 
-function donutSlicePath(
-  cx: number,
-  cy: number,
-  outerR: number,
-  innerR: number,
-  startAngle: number,
-  endAngle: number,
-): string {
-  const cos = Math.cos;
-  const sin = Math.sin;
-  // Gap between slices (radians)
-  const GAP = 0.03;
-  const sa = startAngle + GAP / 2;
-  const ea = endAngle - GAP / 2;
-  if (ea <= sa) return "";
-  const ox1 = cx + outerR * cos(sa);
-  const oy1 = cy + outerR * sin(sa);
-  const ox2 = cx + outerR * cos(ea);
-  const oy2 = cy + outerR * sin(ea);
-  const ix1 = cx + innerR * cos(ea);
-  const iy1 = cy + innerR * sin(ea);
-  const ix2 = cx + innerR * cos(sa);
-  const iy2 = cy + innerR * sin(sa);
-  const large = ea - sa > Math.PI ? 1 : 0;
-  return `M ${ox1.toFixed(2)} ${oy1.toFixed(2)} A ${outerR} ${outerR} 0 ${large} 1 ${ox2.toFixed(2)} ${oy2.toFixed(2)} L ${ix1.toFixed(2)} ${iy1.toFixed(2)} A ${innerR} ${innerR} 0 ${large} 0 ${ix2.toFixed(2)} ${iy2.toFixed(2)} Z`;
-}
-
 export function renderLanguageChart(
   languages: LanguageStat[],
   theme: ThemeConfig,
@@ -465,62 +438,44 @@ export function renderLanguageChart(
     return renderErrorCard("No language data available for this user.", theme);
   }
 
-  const W = 320;
-  const PAD = 18;
-  const TITLE_H = options.hide_title ? 0 : 26;
-  const DONUT_R_OUTER = 52;
-  const DONUT_R_INNER = 32;
-  const DONUT_CX = PAD + DONUT_R_OUTER;
-  const CHART_TOP = TITLE_H + PAD;
-  const DONUT_CY = CHART_TOP + DONUT_R_OUTER;
-  const H = Math.max(DONUT_CY + DONUT_R_OUTER + PAD, TITLE_H + PAD + topLangs.length * 18 + PAD);
+  const W = 495;
+  const PAD = 25;
+  const TITLE_H = options.hide_title ? 0 : 30;
+  const BAR_TOP = TITLE_H + 12;
+  const BAR_H = 10;
+  const BAR_W = W - PAD * 2;
+  const COLS = 3;
+  const ROW_H = 20;
+  const NAMES_TOP = BAR_TOP + BAR_H + 16;
+  const numRows = Math.ceil(topLangs.length / COLS);
+  const H = NAMES_TOP + numRows * ROW_H + 16;
   const rx = options.border_radius;
 
   const totalSize = topLangs.reduce((s, l) => s + l.size, 0);
 
-  // Donut slices
-  let angle = -Math.PI / 2;
-  const slices = topLangs.map((lang) => {
-    const fraction = lang.size / totalSize;
-    const startAngle = angle;
-    const endAngle = angle + fraction * 2 * Math.PI;
-    angle = endAngle;
-    const pct = Math.round(fraction * 1000) / 10;
-    return { ...lang, path: donutSlicePath(DONUT_CX, DONUT_CY, DONUT_R_OUTER, DONUT_R_INNER, startAngle, endAngle), pct };
+  // Stacked colour bar (clipped to rounded rect for pill shape)
+  let bx = PAD;
+  const barSegments = topLangs.map((lang) => {
+    const w = Math.max(2, Math.round((lang.size / totalSize) * BAR_W));
+    const el = `<rect x="${bx}" y="${BAR_TOP}" width="${w}" height="${BAR_H}" fill="${lang.color ?? "#586069"}"/>`;
+    bx += w;
+    return el;
   });
 
-  const sliceSvg = slices
-    .filter((s) => s.path)
-    .map((s) => `<path d="${s.path}" fill="${s.color}"/>`)
-    .join("\n  ");
+  const clipDef = `<clipPath id="lc-clip"><rect x="${PAD}" y="${BAR_TOP}" width="${BAR_W}" height="${BAR_H}" rx="${BAR_H / 2}"/></clipPath>`;
 
-  // Center label
-  const countLabel = `<text x="${DONUT_CX}" y="${DONUT_CY - 5}" text-anchor="middle" class="lc-count">${topLangs.length}</text>
-  <text x="${DONUT_CX}" y="${DONUT_CY + 12}" text-anchor="middle" class="lc-sub">langs</text>`;
-
-  // Legend
-  const LEGEND_X = DONUT_CX + DONUT_R_OUTER + 16;
-  const LEGEND_ROW_H = 17;
-  const legendItems = slices
-    .map((s, i) => {
-      const y = TITLE_H + PAD + i * LEGEND_ROW_H;
-      const name = s.name.length > 13 ? s.name.slice(0, 12) + "…" : s.name;
-      return `<rect x="${LEGEND_X}" y="${y}" width="9" height="9" rx="2" fill="${s.color}"/>
-  <text x="${LEGEND_X + 13}" y="${y + 8}" class="lc-label">${escapeXml(name)}</text>
-  <text x="${W - PAD}" y="${y + 8}" class="lc-pct" text-anchor="end">${s.pct}%</text>`;
-    })
-    .join("\n  ");
-
-  // Bar chart strip below donut (GitHub-style language bar)
-  const BAR_Y = DONUT_CY + DONUT_R_OUTER + 8;
-  const BAR_H = 8;
-  const BAR_W = W - PAD * 2;
-  let barX = PAD;
-  const bars = slices.map((s) => {
-    const w = Math.max(1, Math.round((s.size / totalSize) * BAR_W));
-    const el = `<rect x="${barX}" y="${BAR_Y}" width="${w}" height="${BAR_H}" rx="2" fill="${s.color}"/>`;
-    barX += w;
-    return el;
+  // Language name + percentage labels in 3 columns
+  const COL_W = Math.floor(BAR_W / COLS);
+  const langLabels = topLangs.map((lang, i) => {
+    const col = i % COLS;
+    const row = Math.floor(i / COLS);
+    const lx = PAD + col * COL_W;
+    const ly = NAMES_TOP + row * ROW_H;
+    const pct = ((lang.size / totalSize) * 100).toFixed(1);
+    const name = lang.name.length > 16 ? lang.name.slice(0, 15) + "…" : lang.name;
+    return `<circle cx="${lx + 6}" cy="${ly + 5}" r="4" fill="${lang.color ?? "#586069"}"/>
+  <text x="${lx + 14}" y="${ly + 9}" class="lc-name">${escapeXml(name)}</text>
+  <text x="${lx + COL_W - 2}" y="${ly + 9}" class="lc-pct" text-anchor="end">${pct}%</text>`;
   });
 
   const titleSvg = options.hide_title
@@ -529,21 +484,18 @@ export function renderLanguageChart(
 
   const border = options.hide_border ? "" : ` stroke="${theme.border}" stroke-width="1"`;
 
-  return `<svg width="${W}" height="${H + 20}" viewBox="0 0 ${W} ${H + 20}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Top Languages">
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Top Languages">
   <title>${escapeXml(options.custom_title ?? "Top Languages")}</title>
+  <defs>${clipDef}</defs>
   <style>
-    .lc-title { font: 600 13px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.title}; }
-    .lc-label { font: 400 10px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; }
-    .lc-pct   { font: 600 10px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; opacity: 0.6; }
-    .lc-count { font: 700 15px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.title}; }
-    .lc-sub   { font: 400 9px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; opacity: 0.6; }
+    .lc-title { font: 600 14px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.title}; }
+    .lc-name  { font: 400 11px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; }
+    .lc-pct   { font: 600 11px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; opacity: 0.7; }
   </style>
-  <rect x="0.5" y="0.5" rx="${rx}" ry="${rx}" width="${W - 1}" height="${H + 19}" fill="${theme.bg}"${border}/>
+  <rect x="0.5" y="0.5" rx="${rx}" ry="${rx}" width="${W - 1}" height="${H - 1}" fill="${theme.bg}"${border}/>
   ${titleSvg}
-  ${sliceSvg}
-  ${countLabel}
-  ${legendItems}
-  ${bars.join("\n  ")}
+  <g clip-path="url(#lc-clip)">${barSegments.join("")}</g>
+  ${langLabels.join("\n  ")}
 </svg>`;
 }
 
