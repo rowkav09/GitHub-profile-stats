@@ -1,5 +1,5 @@
 ![Users](https://ghstats.dev/api/badge)
-![Visits](https://ghstats.dev/api/visits)
+![Repo Views](https://ghstats.dev/api/visits?username=rowkav09&repo=GitHub-profile-stats)
 
 # GitHub Profile Stats
 
