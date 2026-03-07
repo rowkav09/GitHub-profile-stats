@@ -86,6 +86,12 @@ const PARAMS = [
     default: "—",
     desc: "Override the card title text",
   },
+  {
+    name: "size",
+    type: "string",
+    default: '"default"',
+    desc: 'Card density — "default" or "compact" (smaller fonts & tighter rows)',
+  },
 ];
 
 const HIDE_KEYS = [
