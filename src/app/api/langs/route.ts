@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { fetchGitHubStats } from "@/lib/github";
+import { fetchLanguageStats } from "@/lib/github";
 import { renderLanguageChart, renderErrorCard } from "@/lib/svg";
 import { resolveTheme } from "@/lib/themes";
 import { sanitizeUsername, sanitizeHexParam } from "@/lib/sanitize";
@@ -53,8 +53,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const stats = await fetchGitHubStats(username);
-    return new Response(renderLanguageChart(stats.languages, theme, options), {
+    const languages = await fetchLanguageStats(username);
+    return new Response(renderLanguageChart(languages, theme, options), {
       status: 200,
       headers,
     });

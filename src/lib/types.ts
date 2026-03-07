@@ -25,7 +25,6 @@ export interface GitHubStats {
   contributionsThisYear: number;
   activityLevel: number; // 0–100 percentage for the ring
   grade: string; // A+, A, B+, B, C, D
-  languages: LanguageStat[];
 }
 
 export interface ContributionDay {
