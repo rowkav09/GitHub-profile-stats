@@ -44,6 +44,8 @@ export interface CardOptions {
   border_radius: number;
   custom_title?: string;
   size: "default" | "compact";
+  compact_count: 3 | 4 | 6;
+  show_emoji: boolean;
 }
 
 export type StatKey =

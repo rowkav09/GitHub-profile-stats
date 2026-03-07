@@ -170,28 +170,36 @@ function renderActivityRing(
   <text x="${cx}" y="${cy + pctOffY}" text-anchor="middle" class="ring-pct">${pct}%</text>`;
 }
 
+const EMOJIS: Record<string, string> = {
+  star: "⭐", commit: "💻", pr: "🔀", issue: "🐛",
+  fire: "🔥", calendar: "📅", trend: "📈", clock: "⏱",
+  day: "📆", trophy: "🏆", graph: "📊", repo: "📁", people: "👥",
+};
+
 function renderCompactCard(
   stats: GitHubStats,
   theme: ThemeConfig,
   options: CardOptions,
 ): string {
-  const visible = getVisibleStats(stats, options.hide);
-  const showIcons = options.show_icons;
+  const count = options.compact_count;
+  // 4 stats → 2 cols; 3 or 6 → 3 cols
+  const COLS = count === 4 ? 2 : 3;
+  const visible = getVisibleStats(stats, options.hide).slice(0, count);
+  const useEmoji = options.show_emoji;
 
   const W = 495;
-  const PAD_X = 22;
-  const PAD_TOP = 20;
-  const TITLE_FS = 15;
+  const PAD_X = 20;
+  const PAD_TOP = 14;
+  const TITLE_FS = 13;
   const TITLE_H = options.hide_title ? 0 : TITLE_FS + 10;
-  const GAP = 12;
-  const CELL_H = 52;
-  const CELL_GAP = 14;
-  const COLS = 2;
-  const CELL_W = Math.floor((W - PAD_X * 2 - CELL_GAP) / COLS);
-  const PAD_BOT = 18;
-  const numCellRows = Math.ceil(visible.length / COLS);
-  const statsStartY = PAD_TOP + TITLE_H + GAP;
-  const cardHeight = statsStartY + numCellRows * CELL_H + PAD_BOT;
+  const COL_GAP = 1; // gap between cols (visual divider drawn manually)
+  const ROW_GAP = 1; // gap between rows (divider line)
+  const CELL_H = 62;
+  const CELL_W = Math.floor((W - PAD_X * 2) / COLS);
+  const PAD_BOT = 14;
+  const numRows = Math.ceil(visible.length / COLS);
+  const statsStartY = PAD_TOP + TITLE_H;
+  const cardHeight = statsStartY + numRows * CELL_H + (numRows - 1) * ROW_GAP + PAD_BOT;
   const rx = options.border_radius;
 
   const title = options.custom_title
@@ -202,29 +210,39 @@ function renderCompactCard(
     ? ""
     : `<text x="${PAD_X}" y="${PAD_TOP + TITLE_FS}" class="c-title">${title}</text>`;
 
-  const separators = Array.from({ length: numCellRows - 1 }, (_, row) => {
-    const sepY = statsStartY + (row + 1) * CELL_H - 1;
-    return `<line x1="${PAD_X}" y1="${sepY}" x2="${W - PAD_X}" y2="${sepY}" stroke="${theme.border}" stroke-width="1" opacity="0.35"/>`;
+  // Horizontal dividers between rows
+  const rowDividers = Array.from({ length: numRows - 1 }, (_, r) => {
+    const y = statsStartY + (r + 1) * CELL_H + r * ROW_GAP;
+    return `<line x1="${PAD_X}" y1="${y}" x2="${W - PAD_X}" y2="${y}" stroke="${theme.border}" stroke-width="1" opacity="0.3"/>`;
   }).join("\n");
 
-  const cells = visible
+  // Vertical dividers between columns
+  const colDividers = Array.from({ length: COLS - 1 }, (_, c) => {
+    const x = PAD_X + (c + 1) * CELL_W;
+    return `<line x1="${x}" y1="${statsStartY + 8}" x2="${x}" y2="${cardHeight - PAD_BOT - 8}" stroke="${theme.border}" stroke-width="1" opacity="0.3"/>`;
+  }).join("\n");
+
+  const cellSvgs = visible
     .map((stat, i) => {
       const col = i % COLS;
       const row = Math.floor(i / COLS);
-      const cellX = PAD_X + col * (CELL_W + CELL_GAP);
-      const cellY = statsStartY + row * CELL_H + 8;
+      const cellX = PAD_X + col * CELL_W;
+      const cellCenterX = cellX + CELL_W / 2;
+      const cellY = statsStartY + row * (CELL_H + ROW_GAP);
       const delay = i * 70;
 
-      const iconSvg = showIcons
-        ? `<svg x="${cellX}" y="${cellY}" width="13" height="13" viewBox="0 0 16 16" fill="${theme.icon}"><path d="${ICONS[stat.icon] ?? ""}"/></svg>`
-        : "";
+      const iconY = cellY + 11;
+      const valueY = cellY + 40;
+      const labelY = cellY + 55;
 
-      const textX = cellX + (showIcons ? 20 : 0);
+      const iconEl = useEmoji
+        ? `<text x="${cellCenterX}" y="${iconY + 12}" text-anchor="middle" class="c-emoji">${EMOJIS[stat.icon] ?? "•"}</text>`
+        : `<svg x="${cellCenterX - 7}" y="${iconY}" width="14" height="14" viewBox="0 0 16 16" fill="${theme.icon}"><path d="${ICONS[stat.icon] ?? ""}"/></svg>`;
 
-      return `<g class="c-row" style="animation-delay:${delay}ms">
-      ${iconSvg}
-      <text x="${textX}" y="${cellY + 10}" class="c-label">${escapeXml(stat.short)}</text>
-      <text x="${textX}" y="${cellY + 33}" class="c-value">${escapeXml(stat.value)}</text>
+      return `<g class="c-cell" style="animation-delay:${delay}ms">
+      ${iconEl}
+      <text x="${cellCenterX}" y="${valueY}" text-anchor="middle" class="c-value">${escapeXml(stat.value)}</text>
+      <text x="${cellCenterX}" y="${labelY}" text-anchor="middle" class="c-label">${escapeXml(stat.short)}</text>
     </g>`;
     })
     .join("\n");
@@ -237,18 +255,20 @@ function renderCompactCard(
   <title>${title}</title>
   <style>
     .c-title { font: 600 ${TITLE_FS}px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.title}; animation: cFadeIn .8s ease-in-out forwards; }
-    .c-label { font: 400 11px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; opacity: 0.55; }
-    .c-value { font: 700 16px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; }
-    .c-row { opacity: 0; animation: cFadeIn .3s ease-in-out forwards; }
+    .c-label { font: 400 10px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; opacity: 0.45; letter-spacing: 0.3px; }
+    .c-value { font: 700 17px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; }
+    .c-emoji { font: normal 15px sans-serif; }
+    .c-cell { opacity: 0; animation: cFadeIn .3s ease-in-out forwards; }
     @keyframes cFadeIn { from { opacity: 0 } to { opacity: 1 } }
     @media (prefers-reduced-motion: reduce) {
-      .c-row, .c-title { animation: none !important; opacity: 1; }
+      .c-cell, .c-title { animation: none !important; opacity: 1; }
     }
   </style>
   <rect x="0.5" y="0.5" rx="${rx}" ry="${rx}" width="${W - 1}" height="${cardHeight - 1}" fill="${theme.bg}"${border}/>
   ${titleSvg}
-${separators}
-${cells}
+${rowDividers}
+${colDividers}
+${cellSvgs}
 </svg>`;
 }
 
