@@ -1,5 +1,5 @@
 ![Users](https://ghstats.dev/api/badge)
-![Visits](https://ghstats.dev/api/visits)
+![Repo Views](https://ghstats.dev/api/visits?username=rowkav09&repo=GitHub-profile-stats)
 
 # GitHub Profile Stats
 
@@ -46,9 +46,42 @@ Edit the `README.md` in your new profile repo and add:
 
 Replace `YOUR_USERNAME` with your GitHub username. That's it — your card will always show your latest stats.
 
-### Customise with the Visual Editor
+### Customise with the Visual Builder
 
-Visit **[ghstats.dev](https://ghstats.dev)** to customise your card with the interactive editor. Pick a theme, toggle stats on and off, and copy the embed code when you're done.
+Visit **[ghstats.dev/builder](https://ghstats.dev/builder)** to build your card without touching a URL.
+
+- **Drag & drop** to reorder stats
+- **Toggle** each stat on/off
+- **Live preview** updates as you change settings
+- **Import** an existing embed URL or Markdown snippet to load your current settings
+- **Language chart** — add a top-languages bar below your stats card
+- **Compact grid** — pick 3, 4, or 6 stat slots; the builder auto-selects the right stats
+- Choose theme, border radius, custom title, and more
+- Copy finished embed code as **Markdown** or **HTML** in one click
+
+The Classic Editor (theme picker + URL preview) is still available on the same page via the tab switcher.
+
+## Language Chart
+
+Add a top-languages bar beneath your stats card. It shows a proportional colour bar and a per-language name + percentage breakdown.
+
+[![Top Languages](https://ghstats.dev/api/langs?username=octocat&theme=tokyonight)](https://github.com/rowkav09/GitHub-profile-stats)
+
+```markdown
+![Top Languages](https://ghstats.dev/api/langs?username=YOUR_USERNAME)
+```
+
+**Language chart parameters:**
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `username` | string | **required** | GitHub username |
+| `theme` | string | `default` | Theme preset (same options as the stats card) |
+| `max_langs` | number | `8` | Max languages to show (`1`–`12`) |
+| `hide_border` | boolean | `false` | Remove the card border |
+| `hide_title` | boolean | `false` | Remove the "Top Languages" title |
+| `custom_title` | string | — | Override the title text |
+| `border_radius` | number | `4.5` | Corner radius (`0`–`50`) |
 
 ## Card Layouts
 
@@ -152,6 +185,8 @@ https://ghstats.dev/api/card?username=octocat&bg=0f0f23&text=cccccc&title_color=
 - **Fully customisable** — override any colour, hide individual stats, change title and border radius
 - **SVG output** — crisp at any size, works everywhere Markdown or HTML images are supported
 - **Fast** — edge-cached and refreshed every 30 minutes
+- **Language chart** — a separate `/api/langs` endpoint renders a proportional top-languages bar (up to 12 languages)
+- **Visual Builder** — full drag-and-drop editor at `/builder` with live preview, import/export, and one-click embed code
 
 ## Parameters
 
@@ -176,6 +211,7 @@ All parameters are passed as URL query strings.
 | `size` | string | `default` | Layout: `default` (list + ring) or `compact` (2-column grid) |
 | `compact_count` | number | `6` | Compact only: number of stats to show — `3`, `4`, or `6` |
 | `show_emoji` | boolean | `false` | Compact only: use emojis instead of SVG icons |
+| `order` | string | — | Comma-separated stat keys defining display order (enabled stats only) |
 
 ### Stats You Can Hide
 

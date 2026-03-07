@@ -1,8 +1,9 @@
 import { NextRequest } from "next/server";
 import { fetchGitHubStats } from "@/lib/github";
-import { renderCard, renderErrorCard } from "@/lib/svg";
+import { renderLanguageChart, renderErrorCard } from "@/lib/svg";
 import { resolveTheme } from "@/lib/themes";
 import { sanitizeUsername, sanitizeHexParam } from "@/lib/sanitize";
+import { LangChartOptions } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,6 @@ export async function GET(request: NextRequest) {
   const username = sanitizeUsername(rawUsername);
 
   const themeName = params.get("theme") ?? "default";
-
   const theme = resolveTheme(themeName, {
     bg: sanitizeHexParam(params.get("bg")),
     text: sanitizeHexParam(params.get("text")),
@@ -22,27 +22,21 @@ export async function GET(request: NextRequest) {
     border_color: sanitizeHexParam(params.get("border_color")),
   });
 
-  const options = {
-    theme: themeName,
+  const maxLangs = Math.min(
+    Math.max(parseInt(params.get("max_langs") ?? "8") || 8, 1),
+    12,
+  );
+
+  const options: LangChartOptions = {
     hide_border: params.get("hide_border") === "true",
     hide_title: params.get("hide_title") === "true",
-    hide: (params.get("hide") ?? "")
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean),
-    show_icons: params.get("show_icons") !== "false",
-    show_ring: params.get("show_ring") !== "false",
+    custom_title: params.get("custom_title") ?? undefined,
     border_radius: Math.min(
       Math.max(parseFloat(params.get("border_radius") ?? "4.5") || 4.5, 0),
       50,
     ),
-    custom_title: params.get("custom_title") ?? undefined,
-    size: (params.get("size") === "compact" ? "compact" : "default") as "default" | "compact",
-    compact_count: ([3, 4, 6].includes(parseInt(params.get("compact_count") ?? "")) ? parseInt(params.get("compact_count")!) : 6) as 3 | 4 | 6,
-    show_emoji: params.get("show_emoji") === "true",
-    order: params.get("order")
-      ? params.get("order")!.split(",").map((s) => s.trim()).filter(Boolean)
-      : undefined,
+    max_langs: maxLangs,
+    layout: params.get("layout") === "bar" ? "bar" : "donut",
   };
 
   const headers = {
@@ -60,7 +54,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const stats = await fetchGitHubStats(username);
-    return new Response(renderCard(stats, theme, options), {
+    return new Response(renderLanguageChart(stats.languages, theme, options), {
       status: 200,
       headers,
     });

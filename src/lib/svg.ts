@@ -1,4 +1,4 @@
-import { GitHubStats, ThemeConfig, CardOptions } from "./types";
+import { GitHubStats, ThemeConfig, CardOptions, LanguageStat, LangChartOptions } from "./types";
 import { escapeXml, formatNumber } from "./sanitize";
 
 // Octicon-style SVG paths (16x16 viewBox)
@@ -44,6 +44,7 @@ function formatTrend(pct: number): { direction: "up" | "down" | "neutral"; text:
 function getVisibleStats(
   stats: GitHubStats,
   hide: string[],
+  order?: string[],
 ): StatItem[] {
   const year = new Date().getFullYear();
   const all: { key: string; label: string; short: string; value: string; icon: string; trend?: StatItem["trend"] }[] = [
@@ -141,9 +142,21 @@ function getVisibleStats(
     },
   ];
 
-  return all
-    .filter((s) => !hide.includes(s.key))
-    .map(({ label, short, value, icon, trend }) => ({ label, short, value, icon, trend }));
+  const filtered = all.filter((s) => !hide.includes(s.key));
+
+  // Apply custom order if provided
+  if (order && order.length > 0) {
+    filtered.sort((a, b) => {
+      const ai = order.indexOf(a.key);
+      const bi = order.indexOf(b.key);
+      if (ai === -1 && bi === -1) return 0;
+      if (ai === -1) return 1;
+      if (bi === -1) return -1;
+      return ai - bi;
+    });
+  }
+
+  return filtered.map(({ label, short, value, icon, trend }) => ({ label, short, value, icon, trend }));
 }
 
 function renderActivityRing(
@@ -184,7 +197,7 @@ function renderCompactCard(
   const count = options.compact_count;
   // 4 stats → 2 cols; 3 or 6 → 3 cols
   const COLS = count === 4 ? 2 : 3;
-  const visible = getVisibleStats(stats, options.hide).slice(0, count);
+  const visible = getVisibleStats(stats, options.hide, options.order).slice(0, count);
   const useEmoji = options.show_emoji;
 
   const W = 495;
@@ -281,7 +294,7 @@ export function renderCard(
     return renderCompactCard(stats, theme, options);
   }
 
-  const visible = getVisibleStats(stats, options.hide);
+  const visible = getVisibleStats(stats, options.hide, options.order);
   const showIcons = options.show_icons;
   const showRing = options.show_ring;
 
@@ -410,3 +423,79 @@ export function renderErrorCard(message: string, theme: ThemeConfig): string {
   <text x="25" y="75" class="err-msg">${safe}</text>
 </svg>`;
 }
+
+// ─── Language Chart ─────────────────────────────────────────────────────────
+
+export function renderLanguageChart(
+  languages: LanguageStat[],
+  theme: ThemeConfig,
+  options: LangChartOptions,
+): string {
+  const maxLangs = Math.min(options.max_langs, 12);
+  const topLangs = languages.slice(0, maxLangs);
+
+  if (topLangs.length === 0) {
+    return renderErrorCard("No language data available for this user.", theme);
+  }
+
+  const W = 495;
+  const PAD = 25;
+  const TITLE_H = options.hide_title ? 0 : 30;
+  const BAR_TOP = TITLE_H + 12;
+  const BAR_H = 10;
+  const BAR_W = W - PAD * 2;
+  const COLS = 3;
+  const ROW_H = 20;
+  const NAMES_TOP = BAR_TOP + BAR_H + 16;
+  const numRows = Math.ceil(topLangs.length / COLS);
+  const H = NAMES_TOP + numRows * ROW_H + 16;
+  const rx = options.border_radius;
+
+  const totalSize = topLangs.reduce((s, l) => s + l.size, 0);
+
+  // Stacked colour bar (clipped to rounded rect for pill shape)
+  let bx = PAD;
+  const barSegments = topLangs.map((lang) => {
+    const w = Math.max(2, Math.round((lang.size / totalSize) * BAR_W));
+    const el = `<rect x="${bx}" y="${BAR_TOP}" width="${w}" height="${BAR_H}" fill="${lang.color ?? "#586069"}"/>`;
+    bx += w;
+    return el;
+  });
+
+  const clipDef = `<clipPath id="lc-clip"><rect x="${PAD}" y="${BAR_TOP}" width="${BAR_W}" height="${BAR_H}" rx="${BAR_H / 2}"/></clipPath>`;
+
+  // Language name + percentage labels in 3 columns
+  const COL_W = Math.floor(BAR_W / COLS);
+  const langLabels = topLangs.map((lang, i) => {
+    const col = i % COLS;
+    const row = Math.floor(i / COLS);
+    const lx = PAD + col * COL_W;
+    const ly = NAMES_TOP + row * ROW_H;
+    const pct = ((lang.size / totalSize) * 100).toFixed(1);
+    const name = lang.name.length > 16 ? lang.name.slice(0, 15) + "…" : lang.name;
+    return `<circle cx="${lx + 6}" cy="${ly + 5}" r="4" fill="${lang.color ?? "#586069"}"/>
+  <text x="${lx + 14}" y="${ly + 9}" class="lc-name">${escapeXml(name)}</text>
+  <text x="${lx + COL_W - 2}" y="${ly + 9}" class="lc-pct" text-anchor="end">${pct}%</text>`;
+  });
+
+  const titleSvg = options.hide_title
+    ? ""
+    : `<text x="${PAD}" y="${TITLE_H - 4}" class="lc-title">${escapeXml(options.custom_title ?? "Top Languages")}</text>`;
+
+  const border = options.hide_border ? "" : ` stroke="${theme.border}" stroke-width="1"`;
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Top Languages">
+  <title>${escapeXml(options.custom_title ?? "Top Languages")}</title>
+  <defs>${clipDef}</defs>
+  <style>
+    .lc-title { font: 600 14px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.title}; }
+    .lc-name  { font: 400 11px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; }
+    .lc-pct   { font: 600 11px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; opacity: 0.7; }
+  </style>
+  <rect x="0.5" y="0.5" rx="${rx}" ry="${rx}" width="${W - 1}" height="${H - 1}" fill="${theme.bg}"${border}/>
+  ${titleSvg}
+  <g clip-path="url(#lc-clip)">${barSegments.join("")}</g>
+  ${langLabels.join("\n  ")}
+</svg>`;
+}
+

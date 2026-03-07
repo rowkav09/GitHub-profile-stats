@@ -1,4 +1,4 @@
-import { GitHubStats, ContributionDay } from "./types";
+import { GitHubStats, ContributionDay, LanguageStat } from "./types";
 
 const GITHUB_GRAPHQL = "https://api.github.com/graphql";
 
@@ -15,10 +15,20 @@ query($username: String!) {
       first: 100
       ownerAffiliations: OWNER
       orderBy: { field: STARGAZERS, direction: DESC }
+      isFork: false
     ) {
       totalCount
       nodes {
         stargazerCount
+        languages(first: 10, orderBy: { field: SIZE, direction: DESC }) {
+          edges {
+            size
+            node {
+              name
+              color
+            }
+          }
+        }
       }
     }
     contributionsCollection {
@@ -190,6 +200,29 @@ export async function fetchGitHubStats(
     0,
   );
 
+  // Aggregate language sizes across all repos
+  const langTotals: Record<string, { size: number; color: string }> = {};
+  for (const repo of user.repositories.nodes as Array<{
+    stargazerCount: number;
+    languages: { edges: Array<{ size: number; node: { name: string; color: string } }> };
+  }>) {
+    for (const edge of repo.languages?.edges ?? []) {
+      const { name, color } = edge.node;
+      if (!langTotals[name]) langTotals[name] = { size: 0, color: color ?? "#858585" };
+      langTotals[name].size += edge.size;
+    }
+  }
+  const totalLangSize = Object.values(langTotals).reduce((s, l) => s + l.size, 0);
+  const languages: LanguageStat[] = Object.entries(langTotals)
+    .map(([name, { size, color }]) => ({
+      name,
+      size,
+      color: color || "#858585",
+      percentage: totalLangSize > 0 ? Math.round((size / totalLangSize) * 1000) / 10 : 0,
+    }))
+    .sort((a, b) => b.size - a.size)
+    .slice(0, 12);
+
   const { current, longest } = calculateStreak(allDays);
   const { thisWeek, lastWeek } = calculateWeeklyTrend(allDays);
   const weeklyTrend =
@@ -216,5 +249,6 @@ export async function fetchGitHubStats(
     contributionsThisYear: calendar.totalContributions,
     activityLevel,
     grade: calculateGrade(activityLevel, current, thisWeek),
+    languages,
   };
 }
