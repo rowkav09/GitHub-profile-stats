@@ -53,59 +53,102 @@ Visit **[ghstats.dev](https://ghstats.dev)** to customise your card with the int
 ## Card Layouts
 
 ### Standard
-The default layout shows all stats in a single column alongside a circular activity ring.
+The default layout — all stats in a single column with a circular activity ring on the right.
 
-[![Standard Card](https://ghstats.dev/api/card?username=octocat&theme=tokyonight)](https://github.com/rowkav09/GitHub-profile-stats)
-
-```markdown
-![GitHub Stats](https://ghstats.dev/api/card?username=octocat&theme=tokyonight)
-```
-
-### Compact
-A minimal 2-column grid showing just your key numbers — no ring, no grade, clean and space-efficient.
-
-[![Compact Card](https://ghstats.dev/api/card?username=octocat&theme=tokyonight&size=compact)](https://github.com/rowkav09/GitHub-profile-stats)
+[![Standard Card](https://ghstats.dev/api/card?username=octocat&theme=dracula)](https://github.com/rowkav09/GitHub-profile-stats)
 
 ```markdown
-![GitHub Stats](https://ghstats.dev/api/card?username=octocat&theme=tokyonight&size=compact)
+![GitHub Stats](https://ghstats.dev/api/card?username=YOUR_USERNAME&theme=dracula)
 ```
 
-You can hide any stat in compact mode the same way as standard, e.g. `&hide=trend,avg,active_day`.
+### Compact — 3 stats
+A tight single row of 3 key stats. The smallest card — great for a subtle badge-style addition.
+
+[![Compact 3](https://ghstats.dev/api/card?username=octocat&theme=radical&size=compact&compact_count=3)](https://github.com/rowkav09/GitHub-profile-stats)
+
+```markdown
+![GitHub Stats](https://ghstats.dev/api/card?username=YOUR_USERNAME&theme=radical&size=compact&compact_count=3)
+```
+
+### Compact — 4 stats
+A 2×2 grid — slightly more info while staying compact and square.
+
+[![Compact 4](https://ghstats.dev/api/card?username=octocat&theme=catppuccin&size=compact&compact_count=4)](https://github.com/rowkav09/GitHub-profile-stats)
+
+```markdown
+![GitHub Stats](https://ghstats.dev/api/card?username=YOUR_USERNAME&theme=catppuccin&size=compact&compact_count=4)
+```
+
+### Compact — 6 stats
+A 3×2 grid — the default compact layout, showing 6 stats at a glance. Roughly half the height of the standard card.
+
+[![Compact 6](https://ghstats.dev/api/card?username=octocat&theme=tokyonight&size=compact&compact_count=6)](https://github.com/rowkav09/GitHub-profile-stats)
+
+```markdown
+![GitHub Stats](https://ghstats.dev/api/card?username=YOUR_USERNAME&theme=tokyonight&size=compact&compact_count=6)
+```
+
+### Compact with emojis
+Swap SVG icons for emojis — works everywhere, including platforms that don't render SVG fonts cleanly.
+
+[![Compact Emoji](https://ghstats.dev/api/card?username=octocat&theme=nord&size=compact&compact_count=6&show_emoji=true)](https://github.com/rowkav09/GitHub-profile-stats)
+
+```markdown
+![GitHub Stats](https://ghstats.dev/api/card?username=YOUR_USERNAME&theme=nord&size=compact&compact_count=6&show_emoji=true)
+```
+
+Use the `hide` parameter to choose which stats fill the grid slots, e.g. `&hide=trend,avg,active_day,repos,followers` to keep only stars, commits, PRs, issues, streak, and week.
 
 ## Examples
 
-**Default:**
+**Standard — Gruvbox theme:**
+
+[![](https://ghstats.dev/api/card?username=octocat&theme=gruvbox)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
-https://ghstats.dev/api/card?username=octocat
+https://ghstats.dev/api/card?username=octocat&theme=gruvbox
 ```
 
-**Compact layout, Tokyo Night:**
+**Standard — Ocean theme, no border:**
+
+[![](https://ghstats.dev/api/card?username=octocat&theme=ocean&hide_border=true)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
-https://ghstats.dev/api/card?username=octocat&theme=tokyonight&size=compact
+https://ghstats.dev/api/card?username=octocat&theme=ocean&hide_border=true
 ```
 
-**Tokyo Night theme, hiding issues and followers:**
+**Standard — Sunset theme, hiding ring and a few stats:**
+
+[![](https://ghstats.dev/api/card?username=octocat&theme=sunset&show_ring=false&hide=trend,avg,active_day)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
-https://ghstats.dev/api/card?username=octocat&theme=tokyonight&hide=issues,followers
+https://ghstats.dev/api/card?username=octocat&theme=sunset&show_ring=false&hide=trend,avg,active_day
+```
+
+**Compact 6 — Forest theme:**
+
+[![](https://ghstats.dev/api/card?username=octocat&theme=forest&size=compact&compact_count=6)](https://github.com/rowkav09/GitHub-profile-stats)
+```
+https://ghstats.dev/api/card?username=octocat&theme=forest&size=compact&compact_count=6
+```
+
+**Compact 3 — Midnight theme, emojis:**
+
+[![](https://ghstats.dev/api/card?username=octocat&theme=midnight&size=compact&compact_count=3&show_emoji=true)](https://github.com/rowkav09/GitHub-profile-stats)
+```
+https://ghstats.dev/api/card?username=octocat&theme=midnight&size=compact&compact_count=3&show_emoji=true
 ```
 
 **Custom colours:**
 ```
-https://ghstats.dev/api/card?username=octocat&bg=000000&text=ffffff&title_color=ff6b6b&icon_color=ffa07a
-```
-
-**Hide the activity ring:**
-```
-https://ghstats.dev/api/card?username=octocat&show_ring=false
+https://ghstats.dev/api/card?username=octocat&bg=0f0f23&text=cccccc&title_color=ffff66&icon_color=ff6644
 ```
 
 ## Features
 
 - **13 stats** — stars, commits, PRs, issues, streak, weekly activity, weekly trend, avg commits/day, most active day, activity grade, contributions, repos, followers
-- **Two layouts** — standard (list + activity ring) and compact (2-column grid, minimal)
+- **Two layouts** — standard (list + activity ring) and compact (centered grid, 3 / 4 / 6 stats)
 - **Activity ring** — circular progress indicator showing your weekly activity level and grade (standard layout only)
 - **Weekly trend** — shows how your commits this week compare to last week (+/- %)
 - **12 built-in themes** — Default, Light, Radical, Tokyo Night, Dracula, Nord, Gruvbox, Catppuccin, Ocean, Sunset, Forest, Midnight
+- **Emoji mode** — swap SVG icons for emojis in compact layout
 - **Fully customisable** — override any colour, hide individual stats, change title and border radius
 - **SVG output** — crisp at any size, works everywhere Markdown or HTML images are supported
 - **Fast** — edge-cached and refreshed every 30 minutes
@@ -131,6 +174,8 @@ All parameters are passed as URL query strings.
 | `border_radius` | number | `4.5` | Corner radius (`0`–`50`) |
 | `custom_title` | string | — | Override the title text |
 | `size` | string | `default` | Layout: `default` (list + ring) or `compact` (2-column grid) |
+| `compact_count` | number | `6` | Compact only: number of stats to show — `3`, `4`, or `6` |
+| `show_emoji` | boolean | `false` | Compact only: use emojis instead of SVG icons |
 
 ### Stats You Can Hide
 

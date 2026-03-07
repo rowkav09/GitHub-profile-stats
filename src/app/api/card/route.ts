@@ -38,6 +38,8 @@ export async function GET(request: NextRequest) {
     ),
     custom_title: params.get("custom_title") ?? undefined,
     size: (params.get("size") === "compact" ? "compact" : "default") as "default" | "compact",
+    compact_count: ([3, 4, 6].includes(parseInt(params.get("compact_count") ?? "")) ? parseInt(params.get("compact_count")!) : 6) as 3 | 4 | 6,
+    show_emoji: params.get("show_emoji") === "true",
   };
 
   const headers = {

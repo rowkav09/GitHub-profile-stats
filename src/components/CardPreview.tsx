@@ -47,6 +47,8 @@ export default function CardPreview() {
   const [customTitle, setCustomTitle] = useState("");
   const [borderRadius, setBorderRadius] = useState("4.5");
   const [size, setSize] = useState<"default" | "compact">("default");
+  const [compactCount, setCompactCount] = useState<3 | 4 | 6>(6);
+  const [showEmoji, setShowEmoji] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [imgUrl, setImgUrl] = useState("");
   const [origin, setOrigin] = useState("https://ghstats.dev");
@@ -72,9 +74,11 @@ export default function CardPreview() {
       if (customTitle.trim()) p.set("custom_title", customTitle.trim());
       if (borderRadius !== "4.5") p.set("border_radius", borderRadius);
       if (size !== "default") p.set("size", size);
+      if (size === "compact" && compactCount !== 6) p.set("compact_count", String(compactCount));
+      if (size === "compact" && showEmoji) p.set("show_emoji", "true");
       return `${base}/api/card?${p.toString()}`;
     },
-    [username, theme, showIcons, hideBorder, hideTitle, showRing, hiddenStats, customTitle, borderRadius, size],
+    [username, theme, showIcons, hideBorder, hideTitle, showRing, hiddenStats, customTitle, borderRadius, size, compactCount, showEmoji],
   );
 
   useEffect(() => {
@@ -141,6 +145,9 @@ export default function CardPreview() {
       setCustomTitle(p.get("custom_title") ?? "");
       setBorderRadius(p.get("border_radius") ?? "4.5");
       setSize(p.get("size") === "compact" ? "compact" : "default");
+      const cc = parseInt(p.get("compact_count") ?? "");
+      setCompactCount(([3, 4, 6].includes(cc) ? cc : 6) as 3 | 4 | 6);
+      setShowEmoji(p.get("show_emoji") === "true");
       setImportStatus({ ok: true, msg: `Loaded settings for @${u}` });
       setImportInput("");
       setTimeout(() => { setImportOpen(false); setImportStatus(null); }, 1800);
@@ -266,6 +273,39 @@ export default function CardPreview() {
               ))}
             </div>
           </div>
+
+          {size === "compact" && (
+            <div className="space-y-4 rounded-xl border border-[#30363d]/60 bg-[#0d1117] px-4 py-4">
+              <div>
+                <label className="label-text">Stats to show</label>
+                <div className="mt-2 inline-flex rounded-xl border border-[#30363d] bg-[#161b22] p-[3px]">
+                  {([3, 4, 6] as const).map((n) => (
+                    <button
+                      key={n}
+                      onClick={() => setCompactCount(n)}
+                      className={`px-4 py-1.5 rounded-[9px] text-xs font-semibold tracking-wide transition-all duration-200 ease-out ${
+                        compactCount === n
+                          ? "bg-[#21262d] text-white shadow-sm border border-[#30363d]"
+                          : "text-[#8b949e] hover:text-[#c9d1d9]"
+                      }`}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-1.5 text-[11px] text-[#484f58]">Shows the first {compactCount} visible stats in order</p>
+              </div>
+              <label className="toggle-label">
+                <input
+                  type="checkbox"
+                  checked={showEmoji}
+                  onChange={(e) => setShowEmoji(e.target.checked)}
+                  className="accent-[#58a6ff] w-4 h-4 rounded"
+                />
+                Use emojis instead of icons
+              </label>
+            </div>
+          )}
 
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             {[
