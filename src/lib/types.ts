@@ -1,3 +1,10 @@
+export interface LanguageStat {
+  name: string;
+  size: number;
+  color: string; // hex color from GitHub
+  percentage: number; // 0-100
+}
+
 export interface GitHubStats {
   username: string;
   name: string | null;
@@ -18,6 +25,7 @@ export interface GitHubStats {
   contributionsThisYear: number;
   activityLevel: number; // 0–100 percentage for the ring
   grade: string; // A+, A, B+, B, C, D
+  languages: LanguageStat[];
 }
 
 export interface ContributionDay {
@@ -46,6 +54,16 @@ export interface CardOptions {
   size: "default" | "compact";
   compact_count: 3 | 4 | 6;
   show_emoji: boolean;
+  order?: string[]; // custom stat display order
+}
+
+export interface LangChartOptions {
+  hide_border: boolean;
+  hide_title: boolean;
+  custom_title?: string;
+  border_radius: number;
+  max_langs: number; // max languages to show (default 8)
+  layout: "donut" | "bar"; // chart style
 }
 
 export type StatKey =
