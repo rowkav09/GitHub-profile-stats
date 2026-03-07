@@ -158,6 +158,7 @@ export async function fetchGitHubStats(
       "User-Agent": "github-profile-stats",
     },
     body: JSON.stringify({ query: QUERY, variables: { username } }),
+    cache: "no-store",
   });
 
   if (!response.ok) {

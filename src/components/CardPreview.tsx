@@ -46,6 +46,7 @@ export default function CardPreview() {
   const [hiddenStats, setHiddenStats] = useState<string[]>([]);
   const [customTitle, setCustomTitle] = useState("");
   const [borderRadius, setBorderRadius] = useState("4.5");
+  const [size, setSize] = useState<"default" | "compact">("default");
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [imgUrl, setImgUrl] = useState("");
   const [origin, setOrigin] = useState("https://ghstats.dev");
@@ -67,9 +68,10 @@ export default function CardPreview() {
       if (hiddenStats.length) p.set("hide", hiddenStats.join(","));
       if (customTitle.trim()) p.set("custom_title", customTitle.trim());
       if (borderRadius !== "4.5") p.set("border_radius", borderRadius);
+      if (size !== "default") p.set("size", size);
       return `${base}/api/card?${p.toString()}`;
     },
-    [username, theme, showIcons, hideBorder, hideTitle, showRing, hiddenStats, customTitle, borderRadius],
+    [username, theme, showIcons, hideBorder, hideTitle, showRing, hiddenStats, customTitle, borderRadius, size],
   );
 
   useEffect(() => {
@@ -142,6 +144,23 @@ export default function CardPreview() {
               onChange={(e) => setBorderRadius(e.target.value)}
               className="w-full accent-[#58a6ff] mt-1"
             />
+          </div>
+
+          <div>
+            <label className="label-text">Size</label>
+            <div className="flex gap-2 mt-1.5">
+              {(["default", "compact"] as const).map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setSize(s)}
+                  className={`stat-pill capitalize ${
+                    size === s ? "stat-pill-hidden" : "stat-pill-visible"
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-x-5 gap-y-2">

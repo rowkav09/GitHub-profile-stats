@@ -139,18 +139,21 @@ function renderActivityRing(
   pct: number,
   grade: string,
   theme: ThemeConfig,
+  strokeWidth = 5,
 ): string {
   const circumference = 2 * Math.PI * r;
   const offset = circumference - (pct / 100) * circumference;
   const ringColor = theme.title;
+  const gradeOffY = strokeWidth <= 4 ? -4 : -6;
+  const pctOffY = strokeWidth <= 4 ? 9 : 12;
 
   return `
-  <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${theme.border}" stroke-width="5" opacity="0.3"/>
-  <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${ringColor}" stroke-width="5"
+  <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${theme.border}" stroke-width="${strokeWidth}" opacity="0.3"/>
+  <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${ringColor}" stroke-width="${strokeWidth}"
     stroke-linecap="round" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
     transform="rotate(-90 ${cx} ${cy})" class="ring-progress"/>
-  <text x="${cx}" y="${cy - 6}" text-anchor="middle" class="ring-grade">${escapeXml(grade)}</text>
-  <text x="${cx}" y="${cy + 12}" text-anchor="middle" class="ring-pct">${pct}%</text>`;
+  <text x="${cx}" y="${cy + gradeOffY}" text-anchor="middle" class="ring-grade">${escapeXml(grade)}</text>
+  <text x="${cx}" y="${cy + pctOffY}" text-anchor="middle" class="ring-pct">${pct}%</text>`;
 }
 
 export function renderCard(
@@ -161,16 +164,27 @@ export function renderCard(
   const visible = getVisibleStats(stats, options.hide);
   const showIcons = options.show_icons;
   const showRing = options.show_ring;
+  const compact = options.size === "compact";
 
   const CARD_WIDTH = 495;
-  const PAD_X = 25;
-  const PAD_TOP = 25;
-  const TITLE_H = options.hide_title ? 0 : 30;
-  const GAP = 5;
-  const ROW_H = 25;
-  const PAD_BOT = 20;
-  const RING_R = 40;
-  const RING_AREA = showRing ? RING_R * 2 + 30 : 0;
+  const PAD_X = compact ? 20 : 25;
+  const PAD_TOP = compact ? 18 : 25;
+  const TITLE_H = options.hide_title ? 0 : (compact ? 22 : 30);
+  const GAP = compact ? 3 : 5;
+  const ROW_H = compact ? 19 : 25;
+  const PAD_BOT = compact ? 14 : 20;
+  const RING_R = compact ? 30 : 40;
+  const RING_AREA = showRing ? RING_R * 2 + (compact ? 18 : 30) : 0;
+  const ICON_SIZE = compact ? 13 : 16;
+  const TEXT_ICON_PAD = compact ? 20 : 25;
+  const TEXT_Y_OFF = compact ? 10 : 12.5;
+  const CHAR_W = compact ? 6.5 : 7.5;
+  const TITLE_FS = compact ? 14 : 18;
+  const LABEL_FS = compact ? 12 : 14;
+  const TREND_FS = compact ? 9 : 10;
+  const RING_GRADE_FS = compact ? 16 : 20;
+  const RING_PCT_FS = compact ? 10 : 11;
+  const RING_STROKE = compact ? 4 : 5;
 
   const statsStartY = PAD_TOP + TITLE_H + GAP;
   const statsHeight = visible.length * ROW_H;
@@ -184,7 +198,7 @@ export function renderCard(
 
   const titleSvg = options.hide_title
     ? ""
-    : `<text x="${PAD_X}" y="${PAD_TOP + 18}" class="title">${title}</text>`;
+    : `<text x="${PAD_X}" y="${PAD_TOP + TITLE_FS}" class="title">${title}</text>`;
 
   const statAreaWidth = showRing ? CARD_WIDTH - PAD_X - RING_AREA - 10 : CARD_WIDTH - PAD_X;
 
@@ -192,11 +206,11 @@ export function renderCard(
     .map((stat, i) => {
       const y = statsStartY + i * ROW_H;
       const iconX = PAD_X;
-      const textX = PAD_X + (showIcons ? 25 : 0);
+      const textX = PAD_X + (showIcons ? TEXT_ICON_PAD : 0);
       const delay = i * 150;
 
       const iconSvg = showIcons
-        ? `<svg x="${iconX}" y="${y}" width="16" height="16" viewBox="0 0 16 16" fill="${theme.icon}"><path d="${ICONS[stat.icon] ?? ""}"/></svg>`
+        ? `<svg x="${iconX}" y="${y}" width="${ICON_SIZE}" height="${ICON_SIZE}" viewBox="0 0 16 16" fill="${theme.icon}"><path d="${ICONS[stat.icon] ?? ""}"/></svg>`
         : "";
 
       // Trend arrow for monthly trend stat
@@ -210,7 +224,7 @@ export function renderCard(
             : stat.trend.direction === "down"
               ? "M 0 4 L 4 10 L 8 4 L 5 4 L 5 0 L 3 0 L 3 4 Z"
               : "M 0 4 L 8 4 L 8 6 L 0 6 Z";
-        const labelWidth = stat.value.length * 7.5 + (showIcons ? 25 : 0);
+        const labelWidth = stat.value.length * CHAR_W + (showIcons ? TEXT_ICON_PAD : 0);
         const arrowX = textX + labelWidth + 60;
         trendSvg = `<g transform="translate(${arrowX}, ${y + 2})">
           <path d="${arrowPath}" fill="${arrowColor}"/>
@@ -220,8 +234,8 @@ export function renderCard(
 
       return `    <g class="row" style="animation-delay:${delay}ms">
       ${iconSvg}
-      <text x="${textX}" y="${y + 12.5}" class="label">${escapeXml(stat.label)}:</text>
-      <text x="${statAreaWidth}" y="${y + 12.5}" class="value" text-anchor="end">${escapeXml(stat.value)}</text>
+      <text x="${textX}" y="${y + TEXT_Y_OFF}" class="label">${escapeXml(stat.label)}:</text>
+      <text x="${statAreaWidth}" y="${y + TEXT_Y_OFF}" class="value" text-anchor="end">${escapeXml(stat.value)}</text>
       ${trendSvg}
     </g>`;
     })
@@ -234,18 +248,18 @@ export function renderCard(
   const ringCx = CARD_WIDTH - PAD_X - RING_R - 5;
   const ringCy = statsStartY + (statsHeight / 2);
   const ringSvg = showRing
-    ? renderActivityRing(ringCx, ringCy, RING_R, stats.activityLevel, stats.grade, theme)
+    ? renderActivityRing(ringCx, ringCy, RING_R, stats.activityLevel, stats.grade, theme, RING_STROKE)
     : "";
 
   return `<svg width="${CARD_WIDTH}" height="${cardHeight}" viewBox="0 0 ${CARD_WIDTH} ${cardHeight}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${title}">
   <title>${title}</title>
   <style>
-    .title { font: 600 18px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.title}; animation: fadeIn .8s ease-in-out forwards; }
-    .label { font: 400 14px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; }
-    .value { font: 700 14px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; }
-    .trend-text { font: 700 10px 'Segoe UI', Ubuntu, Sans-Serif; }
-    .ring-grade { font: 800 20px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.title}; }
-    .ring-pct { font: 600 11px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; opacity: 0.7; }
+    .title { font: 600 ${TITLE_FS}px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.title}; animation: fadeIn .8s ease-in-out forwards; }
+    .label { font: 400 ${LABEL_FS}px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; }
+    .value { font: 700 ${LABEL_FS}px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; }
+    .trend-text { font: 700 ${TREND_FS}px 'Segoe UI', Ubuntu, Sans-Serif; }
+    .ring-grade { font: 800 ${RING_GRADE_FS}px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.title}; }
+    .ring-pct { font: 600 ${RING_PCT_FS}px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; opacity: 0.7; }
     .row   { opacity: 0; animation: fadeIn .3s ease-in-out forwards; }
     .ring-progress { animation: ringFill 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }

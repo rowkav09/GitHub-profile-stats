@@ -37,12 +37,13 @@ export async function GET(request: NextRequest) {
       50,
     ),
     custom_title: params.get("custom_title") ?? undefined,
+    size: (params.get("size") === "compact" ? "compact" : "default") as "default" | "compact",
   };
 
   const headers = {
     "Content-Type": "image/svg+xml",
     "Cache-Control":
-      "public, max-age=1800, s-maxage=1800, stale-while-revalidate=3600",
+      "public, max-age=300, s-maxage=300, stale-while-revalidate=600",
   };
 
   if (!username) {

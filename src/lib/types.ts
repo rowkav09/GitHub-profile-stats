@@ -43,6 +43,7 @@ export interface CardOptions {
   show_ring: boolean;
   border_radius: number;
   custom_title?: string;
+  size: "default" | "compact";
 }
 
 export type StatKey =
