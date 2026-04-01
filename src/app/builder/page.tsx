@@ -1,4 +1,5 @@
 import VisualBuilder from "@/components/VisualBuilder";
+import CardPreview from "@/components/CardPreview";
 import Link from "next/link";
 
 export const metadata = {
@@ -86,7 +87,25 @@ export default function BuilderPage() {
         </div>
       </section>
 
-      {/* ─── Builder ─── */}
+      {/* ─── New: Multi-embed builder (card, langs, mini, sparkline) ─── */}
+      <section className="border-b border-[#21262d]">
+        <div className="mx-auto max-w-6xl px-6 py-10 space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight">All Embed Types</h2>
+              <p className="text-[#8b949e] text-sm">
+                Generate stats cards, language charts, mini badges, and sparkline embeds in one place.
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#58a6ff]/50 bg-[#58a6ff]/10 px-3 py-1 text-xs font-semibold text-[#58a6ff]">
+              New in preview
+            </span>
+          </div>
+          <CardPreview />
+        </div>
+      </section>
+
+      {/* ─── Visual Builder (drag & drop card editor) ─── */}
       <section>
         <div className="mx-auto max-w-6xl px-6 py-10">
           <VisualBuilder />
