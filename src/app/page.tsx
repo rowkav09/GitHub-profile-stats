@@ -1,6 +1,5 @@
 import CardPreview from "@/components/CardPreview";
 import HeroCard from "@/components/HeroCard";
-import Link from "next/link";
 
 const PARAMS = [
   {
@@ -149,15 +148,6 @@ export default function Home() {
             >
               Try It Out
             </a>
-            <Link
-              href="/builder"
-              className="rounded-lg bg-[#1f2937] border border-[#58a6ff]/40 px-5 py-2.5 text-sm font-medium text-[#58a6ff] hover:bg-[#58a6ff]/10 hover:border-[#58a6ff] transition-all duration-200 flex items-center gap-1.5"
-            >
-              <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M14.064 0h.186C15.216 0 16 .784 16 1.75v.186a8.752 8.752 0 0 1-2.564 6.186l-.458.459c-.314.314-.641.616-.979.904v3.207l-2.209 3.322a.75.75 0 0 1-1.243-.833l1.952-2.932v-.993a8.72 8.72 0 0 1-.49-.292L7.786 13.8a.75.75 0 1 1-1.072-1.05l2.725-2.775a8.59 8.59 0 0 1-.697-.743H5.785l-2.93 1.952a.75.75 0 0 1-.833-1.243L5.344 7.73V4.578a14.56 14.56 0 0 1-.904-.979l-.459-.458A8.752 8.752 0 0 1 1.75 0C.784 0 0 .784 0 1.75v.186a8.752 8.752 0 0 0 2.564 6.186l.458.459c.314.314.641.616.979.904v3.025l2.209 3.322a.75.75 0 0 0 1.243-.833l-1.952-2.932V9.883c.162.1.326.193.49.28l1.764 2.768a.75.75 0 1 0 1.312-.737L7.2 10l.03-.028A8.59 8.59 0 0 0 8 10.71l.03.028-1.08 1.697c.05.032.1.064.15.097a.75.75 0 0 0 1.051-.258l1.765-2.768c.337-.155.666-.33.98-.525V5.754c.338-.288.665-.59.979-.904l.459-.458A8.752 8.752 0 0 0 14.25 1.75v-.186C14.25.784 14.216 0 14.064 0z" />
-              </svg>
-              Visual Builder ✦
-            </Link>
             <a
               href="#params"
               className="rounded-lg border border-[#30363d] px-5 py-2.5 text-sm font-medium text-[#c9d1d9] hover:border-[#8b949e] transition-all duration-200"
@@ -229,20 +219,6 @@ export default function Home() {
                 Customise your card and copy the embed code.
               </p>
             </div>
-            <Link
-              href="/builder"
-              className="sm:ml-auto flex items-center gap-2 rounded-xl border border-[#58a6ff]/30 bg-gradient-to-r from-[#58a6ff]/5 to-[#bf91f3]/5 px-4 py-2.5 text-sm text-[#58a6ff] hover:border-[#58a6ff]/70 hover:from-[#58a6ff]/10 hover:to-[#bf91f3]/10 transition-all duration-200 group"
-            >
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M14.064 0h.186C15.216 0 16 .784 16 1.75v.186a8.752 8.752 0 0 1-2.564 6.186l-.458.459c-.314.314-.641.616-.979.904v3.207l-2.209 3.322a.75.75 0 0 1-1.243-.833l1.952-2.932v-.993a8.72 8.72 0 0 1-.49-.292L7.786 13.8a.75.75 0 1 1-1.072-1.05l2.725-2.775a8.59 8.59 0 0 1-.697-.743H5.785l-2.93 1.952a.75.75 0 0 1-.833-1.243L5.344 7.73V4.578a14.56 14.56 0 0 1-.904-.979l-.459-.458A8.752 8.752 0 0 1 1.75 0C.784 0 0 .784 0 1.75v.186a8.752 8.752 0 0 0 2.564 6.186l.458.459c.314.314.641.616.979.904v3.025l2.209 3.322a.75.75 0 0 0 1.243-.833l-1.952-2.932V9.883c.162.1.326.193.49.28l1.764 2.768a.75.75 0 1 0 1.312-.737L7.2 10l.03-.028A8.59 8.59 0 0 0 8 10.71l.03.028-1.08 1.697c.05.032.1.064.15.097a.75.75 0 0 0 1.051-.258l1.765-2.768c.337-.155.666-.33.98-.525V5.754c.338-.288.665-.59.979-.904l.459-.458A8.752 8.752 0 0 0 14.25 1.75v-.186C14.25.784 14.216 0 14.064 0z" />
-              </svg>
-              <span>
-                Want drag &amp; drop + language charts?{" "}
-                <span className="font-semibold group-hover:underline">
-                  Try the Visual Builder ✦
-                </span>
-              </span>
-            </Link>
           </div>
           <CardPreview />
         </div>

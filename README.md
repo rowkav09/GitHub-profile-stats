@@ -5,7 +5,7 @@
 
 Free, real-time GitHub stat cards, badges, and charts — drop a URL into your README and you're done. No tokens, no setup.
 
-**[ghstats.dev](https://ghstats.dev) • [Visual Builder](https://ghstats.dev/builder)**
+**[ghstats.dev](https://ghstats.dev)**
 
 ---
 
@@ -68,7 +68,7 @@ https://ghstats.dev/api/card?username=YOUR_USERNAME&bg=0f0f23&text=cccccc&title_
 1) Create a public repo named **your-username** on GitHub and add a `README.md`.
 2) Paste an embed from the gallery above. Done.
 
-Need tweaks? Use the Visual Builder to toggle stats, themes, borders, titles, and copy Markdown/HTML instantly.
+Need tweaks? Use the on-page editor to toggle stats, themes, borders, titles, and copy Markdown/HTML instantly.
 
 ---
 
