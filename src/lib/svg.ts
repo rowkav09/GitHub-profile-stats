@@ -608,15 +608,17 @@ export function renderSparkline(
   const WIDTH = Math.max(180, Math.min(options.width, 800));
   const HEIGHT = Math.max(40, Math.min(options.height, 240));
   const PAD_X = 14;
-  const PAD_Y = 10;
+  const TITLE_Y = 16;
+  const PAD_TOP = 28; // give the title breathing room so it doesn't overlap the line
+  const PAD_BOTTOM = 10;
   const contentW = WIDTH - PAD_X * 2;
-  const contentH = HEIGHT - PAD_Y * 2;
+  const contentH = HEIGHT - PAD_TOP - PAD_BOTTOM;
 
   const values = recent.map((d) => d.contributionCount);
   const maxVal = Math.max(...values, 1);
   const points = values.map((v, i) => {
     const x = recent.length === 1 ? WIDTH / 2 : PAD_X + (i / (recent.length - 1)) * contentW;
-    const y = PAD_Y + contentH - (v / maxVal) * contentH;
+    const y = PAD_TOP + contentH - (v / maxVal) * contentH;
     return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10, v };
   });
 
@@ -630,7 +632,7 @@ export function renderSparkline(
 
   const firstX = points[0]?.x ?? PAD_X;
   const lastPoint = points[points.length - 1];
-  const areaPath = `M ${firstX} ${HEIGHT - PAD_Y} ${linePath.replace(/^M/, "L")} L ${lastPoint.x} ${HEIGHT - PAD_Y} Z`;
+  const areaPath = `M ${firstX} ${HEIGHT - PAD_BOTTOM} ${linePath.replace(/^M/, "L")} L ${lastPoint.x} ${HEIGHT - PAD_BOTTOM} Z`;
 
   const title = options.custom_title ?? `Last ${recent.length} days`; // fallback title
   const latestVal = values[values.length - 1];
@@ -647,8 +649,8 @@ export function renderSparkline(
   <path d="${areaPath}" fill="${fillColor}" opacity="0.12" />
   <path d="${linePath}" fill="none" stroke="${lineColor}" stroke-width="2.2" stroke-linecap="round" />
   <circle cx="${lastPoint.x}" cy="${lastPoint.y}" r="3.6" fill="${lineColor}" stroke="${theme.bg}" stroke-width="1" />
-  <text x="${PAD_X}" y="${PAD_Y + 10}" class="sl-title">${escapeXml(title)}</text>
-  <text x="${WIDTH - PAD_X}" y="${PAD_Y + 10}" class="sl-value" text-anchor="end">Today: ${latestVal}</text>
+  <text x="${PAD_X}" y="${TITLE_Y}" class="sl-title">${escapeXml(title)}</text>
+  <text x="${WIDTH - PAD_X}" y="${TITLE_Y}" class="sl-value" text-anchor="end">Today: ${latestVal}</text>
 </svg>`;
 }
 

@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     border_color: sanitizeHexParam(params.get("border_color")),
   });
 
-  const color = sanitizeHexParam(params.get("color")) ?? metric.color;
+  const color = sanitizeHexParam(params.get("color")) ?? theme.title.replace(/^#/, "") ?? metric.color;
   const customLabel = params.get("label")?.trim();
   const label = customLabel && customLabel.length > 0 ? customLabel.slice(0, 32) : metric.label;
 
@@ -65,7 +65,10 @@ export async function GET(request: NextRequest) {
     const raw = metric.get(stats);
     const value = typeof raw === "number" ? formatNumber(raw) : raw;
 
-    return new Response(renderBadge(label, value, color), {
+    const labelBg = theme.border?.replace(/^#/, "") ?? "555";
+    const text = theme.text?.replace(/^#/, "") ?? "fff";
+
+    return new Response(renderBadge(label, value, { accent: color, labelBg, text }), {
       status: 200,
       headers,
     });
