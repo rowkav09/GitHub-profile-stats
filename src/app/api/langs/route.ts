@@ -36,7 +36,12 @@ export async function GET(request: NextRequest) {
       50,
     ),
     max_langs: maxLangs,
-    layout: params.get("layout") === "bar" ? "bar" : "donut",
+    layout:
+      params.get("layout") === "stacked"
+        ? "stacked"
+        : params.get("layout") === "donut"
+          ? "donut"
+          : "bar",
   };
 
   const headers = {
