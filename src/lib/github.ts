@@ -253,3 +253,82 @@ export async function fetchGitHubStats(
     contributionDays: allDays,
   };
 }
+
+const LANG_QUERY = `
+query($username: String!) {
+  user(login: $username) {
+    repositories(
+      first: 50
+      ownerAffiliations: OWNER
+      isFork: false
+      orderBy: { field: UPDATED_AT, direction: DESC }
+    ) {
+      nodes {
+        languages(first: 10, orderBy: { field: SIZE, direction: DESC }) {
+          edges {
+            size
+            node { name color }
+          }
+        }
+      }
+    }
+  }
+}`;
+
+export async function fetchLanguageStats(
+  username: string,
+): Promise<LanguageStat[]> {
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) {
+    throw new Error("GITHUB_TOKEN environment variable is not set");
+  }
+
+  const response = await fetch(GITHUB_GRAPHQL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      "User-Agent": "github-profile-stats",
+    },
+    body: JSON.stringify({ query: LANG_QUERY, variables: { username } }),
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitHub API responded with status ${response.status}`);
+  }
+
+  const json = await response.json();
+
+  if (json.errors) {
+    const msg = json.errors[0]?.message ?? "Unknown GraphQL error";
+    throw new Error(msg);
+  }
+
+  const user = json.data?.user;
+  if (!user) {
+    throw new Error(`User "${username}" not found`);
+  }
+
+  const langTotals: Record<string, { size: number; color: string }> = {};
+  for (const repo of user.repositories.nodes as Array<{
+    languages: { edges: Array<{ size: number; node: { name: string; color: string } }> };
+  }>) {
+    for (const edge of repo.languages?.edges ?? []) {
+      const { name, color } = edge.node;
+      if (!langTotals[name]) langTotals[name] = { size: 0, color: color ?? "#858585" };
+      langTotals[name].size += edge.size;
+    }
+  }
+
+  const totalLangSize = Object.values(langTotals).reduce((s, l) => s + l.size, 0);
+  return Object.entries(langTotals)
+    .map(([name, { size, color }]) => ({
+      name,
+      size,
+      color: color || "#858585",
+      percentage: totalLangSize > 0 ? Math.round((size / totalLangSize) * 1000) / 10 : 0,
+    }))
+    .sort((a, b) => b.size - a.size)
+    .slice(0, 12);
+}
