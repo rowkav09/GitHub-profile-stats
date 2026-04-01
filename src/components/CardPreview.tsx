@@ -45,6 +45,9 @@ export default function CardPreview() {
   const [compactCount, setCompactCount] = useState<3 | 4 | 6>(6);
   const [showEmoji, setShowEmoji] = useState(false);
   const [hiddenStats, setHiddenStats] = useState<string[]>([]);
+  const [statsOrder, setStatsOrder] = useState<string[]>(STAT_OPTIONS.map((s) => s.key));
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   // Languages options
   const [langLayout, setLangLayout] = useState<"bar" | "stacked">("bar");
@@ -81,10 +84,25 @@ export default function CardPreview() {
     }
   }, []);
 
+  useEffect(() => {
+    if (embedType !== "card" && advancedMode) {
+      setAdvancedMode(false);
+    }
+  }, [embedType, advancedMode]);
+
   const toggleStat = useCallback((key: string) => {
     setHiddenStats((prev) =>
       prev.includes(key) ? prev.filter((s) => s !== key) : [...prev, key],
     );
+  }, []);
+
+  const moveStat = useCallback((from: number, to: number) => {
+    setStatsOrder((prev) => {
+      const next = [...prev];
+      const [item] = next.splice(from, 1);
+      next.splice(to, 0, item);
+      return next;
+    });
   }, []);
 
   const buildEmbedUrl = useCallback(() => {
@@ -106,6 +124,13 @@ export default function CardPreview() {
       if (size === "compact" && compactCount !== 6) p.set("compact_count", String(compactCount));
       if (size === "compact" && showEmoji) p.set("show_emoji", "true");
       if (hiddenStats.length > 0) p.set("hide", hiddenStats.join(","));
+
+      const visibleOrder = statsOrder.filter((k) => !hiddenStats.includes(k));
+      const defaultVisible = STAT_OPTIONS.map((s) => s.key).filter((k) => !hiddenStats.includes(k));
+      const isReordered =
+        visibleOrder.length === defaultVisible.length &&
+        visibleOrder.some((k, i) => k !== defaultVisible[i]);
+      if (isReordered) p.set("order", visibleOrder.join(","));
     }
 
     if (embedType === "langs") {
@@ -135,7 +160,36 @@ export default function CardPreview() {
     }
 
     return `${base}?${p.toString()}`;
-  }, [borderRadius, compactCount, customTitle, embedType, hideBorder, hideTitle, hiddenStats, langLayout, maxLangs, miniColor, miniLabel, miniMetric, origin, showEmoji, showIcons, showRing, size, sparkBorderRadius, sparkDays, sparkFillColor, sparkHeight, sparkHideBorder, sparkLineColor, sparkTitle, sparkWidth, theme, username]);
+  }, [
+    borderRadius,
+    compactCount,
+    customTitle,
+    embedType,
+    hideBorder,
+    hideTitle,
+    hiddenStats,
+    langLayout,
+    maxLangs,
+    miniColor,
+    miniLabel,
+    miniMetric,
+    origin,
+    showEmoji,
+    showIcons,
+    showRing,
+    size,
+    sparkBorderRadius,
+    sparkDays,
+    sparkFillColor,
+    sparkHeight,
+    sparkHideBorder,
+    sparkLineColor,
+    sparkTitle,
+    sparkWidth,
+    statsOrder,
+    theme,
+    username,
+  ]);
 
   useEffect(() => {
     const url = buildEmbedUrl();
@@ -218,333 +272,359 @@ export default function CardPreview() {
               />
             </div>
 
-            <div className="flex items-center gap-3">
-              <label className="label-text mb-0">Advanced Options</label>
-              <button
-                type="button"
-                onClick={() => setAdvancedMode((v) => !v)}
-                className={`rounded-lg px-3 py-1 text-xs font-semibold border transition-all duration-200 ${
-                  advancedMode
-                    ? "bg-[#21262d] border-[#58a6ff]/50 text-white"
-                    : "bg-transparent border-[#30363d] text-[#8b949e] hover:text-[#c9d1d9]"
-                }`}
-              >
-                {advancedMode ? "Hide advanced" : "Show advanced"}
-              </button>
-            </div>
-
-            {advancedMode && (
+            {embedType === "card" && (
               <>
-                {(embedType === "card" || embedType === "langs") && (
-                  <div>
-                    <label className="label-text">
-                      Custom Title <span className="text-[#484f58] font-normal">(optional)</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={customTitle}
-                      onChange={(e) => setCustomTitle(e.target.value)}
-                      placeholder="My Awesome Stats"
-                      className="input-field"
-                    />
-                  </div>
-                )}
+                <div>
+                  <label className="label-text">
+                    Custom Title <span className="text-[#484f58] font-normal">(optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={customTitle}
+                    onChange={(e) => setCustomTitle(e.target.value)}
+                    placeholder="My Awesome Stats"
+                    className="input-field"
+                  />
+                </div>
 
-                {(embedType === "card" || embedType === "langs") && (
-                  <div>
-                    <label className="label-text">
-                      Border Radius: <span className="text-[#58a6ff] font-semibold">{borderRadius}</span>
-                    </label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="50"
-                      step="0.5"
-                      value={borderRadius}
-                      onChange={(e) => setBorderRadius(e.target.value)}
-                      className="w-full accent-[#58a6ff] mt-1"
-                    />
-                  </div>
-                )}
+                <div>
+                  <label className="label-text">
+                    Border Radius: <span className="text-[#58a6ff] font-semibold">{borderRadius}</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="50"
+                    step="0.5"
+                    value={borderRadius}
+                    onChange={(e) => setBorderRadius(e.target.value)}
+                    className="w-full accent-[#58a6ff] mt-1"
+                  />
+                </div>
 
-                {embedType === "card" && (
-                  <>
-                    <div>
-                      <label className="label-text">Layout</label>
-                      <div className="mt-2 inline-flex rounded-xl border border-[#30363d] bg-[#0d1117] p-[3px]">
-                        {(["default", "compact"] as const).map((s) => (
-                          <button
-                            key={s}
-                            onClick={() => setSize(s)}
-                            className={`px-5 py-1.5 rounded-[9px] text-xs font-semibold tracking-wide transition-all duration-200 ease-out ${
-                              size === s
-                                ? "bg-[#21262d] text-white shadow-sm border border-[#30363d]"
-                                : "text-[#8b949e] hover:text-[#c9d1d9]"
-                            }`}
-                          >
-                            {s === "default" ? "Standard" : "Compact"}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {size === "compact" && (
-                      <div className="space-y-4 rounded-xl border border-[#30363d]/60 bg-[#0d1117] px-4 py-4">
-                        <div>
-                          <label className="label-text">Stats to show</label>
-                          <div className="mt-2 inline-flex rounded-xl border border-[#30363d] bg-[#161b22] p-[3px]">
-                            {([3, 4, 6] as const).map((n) => (
-                              <button
-                                key={n}
-                                onClick={() => setCompactCount(n)}
-                                className={`px-4 py-1.5 rounded-[9px] text-xs font-semibold tracking-wide transition-all duration-200 ease-out ${
-                                  compactCount === n
-                                    ? "bg-[#21262d] text-white shadow-sm border border-[#30363d]"
-                                    : "text-[#8b949e] hover:text-[#c9d1d9]"
-                                }`}
-                              >
-                                {n}
-                              </button>
-                            ))}
-                          </div>
-                          <p className="mt-1.5 text-[11px] text-[#484f58]">Shows the first {compactCount} visible stats in order</p>
-                        </div>
-                        <label className="toggle-label">
-                          <input
-                            type="checkbox"
-                            checked={showEmoji}
-                            onChange={(e) => setShowEmoji(e.target.checked)}
-                            className="accent-[#58a6ff] w-4 h-4 rounded"
-                          />
-                          Use emojis instead of icons
-                        </label>
-                      </div>
-                    )}
-
-                    <div className="flex flex-wrap gap-x-5 gap-y-2">
-                      {[{ label: "Show Icons", checked: showIcons, set: setShowIcons },
-                        { label: "Show Ring", checked: showRing, set: setShowRing },
-                        { label: "Hide Border", checked: hideBorder, set: setHideBorder },
-                        { label: "Hide Title", checked: hideTitle, set: setHideTitle },
-                      ].map((t) => (
-                        <label key={t.label} className="toggle-label">
-                          <input
-                            type="checkbox"
-                            checked={t.checked}
-                            onChange={(e) => t.set(e.target.checked)}
-                            className="accent-[#58a6ff] w-4 h-4 rounded"
-                          />
-                          {t.label}
-                        </label>
-                      ))}
-                    </div>
-                  </>
-                )}
-
-                {embedType === "langs" && (
-                  <div className="space-y-4 rounded-xl border border-[#30363d]/60 bg-[#0d1117] px-4 py-4">
-                    <div>
-                      <label className="label-text">Layout</label>
-                      <div className="mt-2 inline-flex rounded-xl border border-[#30363d] bg-[#161b22] p-[3px]">
-                        {(["bar", "stacked"] as const).map((opt) => (
-                          <button
-                            key={opt}
-                            onClick={() => setLangLayout(opt)}
-                            className={`px-4 py-1.5 rounded-[9px] text-xs font-semibold tracking-wide transition-all duration-200 ease-out ${
-                              langLayout === opt
-                                ? "bg-[#21262d] text-white shadow-sm border border-[#30363d]"
-                                : "text-[#8b949e] hover:text-[#c9d1d9]"
-                            }`}
-                          >
-                            {opt === "bar" ? "Bar" : "Stacked"}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <label className="label-text">
-                        Max languages: <span className="text-[#58a6ff] font-semibold">{maxLangs}</span>
-                      </label>
-                      <input
-                        type="range"
-                        min="1"
-                        max="12"
-                        value={maxLangs}
-                        onChange={(e) => setMaxLangs(Number(e.target.value))}
-                        className="w-full accent-[#58a6ff] mt-1"
-                      />
-                    </div>
-                    <div className="flex flex-wrap gap-x-5 gap-y-2">
-                      {[{ label: "Hide Border", checked: hideBorder, set: setHideBorder },
-                        { label: "Hide Title", checked: hideTitle, set: setHideTitle }].map((t) => (
-                        <label key={t.label} className="toggle-label">
-                          <input
-                            type="checkbox"
-                            checked={t.checked}
-                            onChange={(e) => t.set(e.target.checked)}
-                            className="accent-[#58a6ff] w-4 h-4 rounded"
-                          />
-                          {t.label}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {embedType === "mini" && (
-                  <div className="space-y-4 rounded-xl border border-[#30363d]/60 bg-[#0d1117] px-4 py-4">
-                    <div>
-                      <label className="label-text">Metric</label>
-                      <select
-                        value={miniMetric}
-                        onChange={(e) => setMiniMetric(e.target.value)}
-                        className="input-field"
+                <div>
+                  <label className="label-text">Layout</label>
+                  <div className="mt-2 inline-flex rounded-xl border border-[#30363d] bg-[#0d1117] p-[3px]">
+                    {(["default", "compact"] as const).map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setSize(s)}
+                        className={`px-5 py-1.5 rounded-[9px] text-xs font-semibold tracking-wide transition-all duration-200 ease-out ${
+                          size === s
+                            ? "bg-[#21262d] text-white shadow-sm border border-[#30363d]"
+                            : "text-[#8b949e] hover:text-[#c9d1d9]"
+                        }`}
                       >
-                        {["stars","commits","prs","issues","streak","week","followers","repos","contributions"].map((m) => (
-                          <option key={m} value={m}>{m}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="label-text">Custom Label (optional)</label>
-                      <input
-                        type="text"
-                        value={miniLabel}
-                        onChange={(e) => setMiniLabel(e.target.value)}
-                        placeholder="Stars"
-                        className="input-field"
-                      />
-                    </div>
-                    <div>
-                      <label className="label-text">Accent Colour (hex, no #)</label>
-                      <input
-                        type="text"
-                        value={miniColor}
-                        onChange={(e) => setMiniColor(e.target.value)}
-                        placeholder="f59e0b"
-                        className="input-field"
-                      />
-                    </div>
+                        {s === "default" ? "Standard" : "Compact"}
+                      </button>
+                    ))}
                   </div>
-                )}
+                </div>
 
-                {embedType === "sparkline" && (
+                {size === "compact" && (
                   <div className="space-y-4 rounded-xl border border-[#30363d]/60 bg-[#0d1117] px-4 py-4">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="label-text">Days (7-90)</label>
-                        <input
-                          type="number"
-                          min={7}
-                          max={90}
-                          value={sparkDays}
-                          onChange={(e) => setSparkDays(e.target.value)}
-                          className="input-field"
-                        />
+                    <div>
+                      <label className="label-text">Stats to show</label>
+                      <div className="mt-2 inline-flex rounded-xl border border-[#30363d] bg-[#161b22] p-[3px]">
+                        {([3, 4, 6] as const).map((n) => (
+                          <button
+                            key={n}
+                            onClick={() => setCompactCount(n)}
+                            className={`px-4 py-1.5 rounded-[9px] text-xs font-semibold tracking-wide transition-all duration-200 ease-out ${
+                              compactCount === n
+                                ? "bg-[#21262d] text-white shadow-sm border border-[#30363d]"
+                                : "text-[#8b949e] hover:text-[#c9d1d9]"
+                            }`}
+                          >
+                            {n}
+                          </button>
+                        ))}
                       </div>
-                      <div>
-                        <label className="label-text">Width</label>
-                        <input
-                          type="number"
-                          min={180}
-                          max={800}
-                          value={sparkWidth}
-                          onChange={(e) => setSparkWidth(e.target.value)}
-                          className="input-field"
-                        />
-                      </div>
-                      <div>
-                        <label className="label-text">Height</label>
-                        <input
-                          type="number"
-                          min={40}
-                          max={240}
-                          value={sparkHeight}
-                          onChange={(e) => setSparkHeight(e.target.value)}
-                          className="input-field"
-                        />
-                      </div>
-                      <div>
-                        <label className="label-text">Title (optional)</label>
-                        <input
-                          type="text"
-                          value={sparkTitle}
-                          onChange={(e) => setSparkTitle(e.target.value)}
-                          placeholder="Last 30 days"
-                          className="input-field"
-                        />
-                      </div>
+                      <p className="mt-1.5 text-[11px] text-[#484f58]">Shows the first {compactCount} visible stats in order</p>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="label-text">Line Colour (hex)</label>
-                        <input
-                          type="text"
-                          value={sparkLineColor}
-                          onChange={(e) => setSparkLineColor(e.target.value)}
-                          placeholder="58a6ff"
-                          className="input-field"
-                        />
-                      </div>
-                      <div>
-                        <label className="label-text">Fill Colour (hex)
-                        </label>
-                        <input
-                          type="text"
-                          value={sparkFillColor}
-                          onChange={(e) => setSparkFillColor(e.target.value)}
-                          placeholder="58a6ff"
-                          className="input-field"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-x-5 gap-y-2 items-center">
-                      <label className="toggle-label">
-                        <input
-                          type="checkbox"
-                          checked={sparkHideBorder}
-                          onChange={(e) => setSparkHideBorder(e.target.checked)}
-                          className="accent-[#58a6ff] w-4 h-4 rounded"
-                        />
-                        Hide Border
-                      </label>
-                      <div className="flex items-center gap-3">
-                        <label className="label-text">Border Radius</label>
-                        <input
-                          type="number"
-                          min={0}
-                          max={50}
-                          step={0.5}
-                          value={sparkBorderRadius}
-                          onChange={(e) => setSparkBorderRadius(e.target.value)}
-                          className="w-24 rounded border border-[#30363d] bg-[#161b22] px-3 py-1 text-sm text-[#c9d1d9]"
-                        />
-                      </div>
-                    </div>
+                    <label className="toggle-label">
+                      <input
+                        type="checkbox"
+                        checked={showEmoji}
+                        onChange={(e) => setShowEmoji(e.target.checked)}
+                        className="accent-[#58a6ff] w-4 h-4 rounded"
+                      />
+                      Use emojis instead of icons
+                    </label>
                   </div>
                 )}
 
-                {embedType === "card" && (
-                  <div>
-                    <label className="label-text">Hide Stats</label>
-                    <div className="flex flex-wrap gap-2 mt-1.5">
-                      {STAT_OPTIONS.map((stat) => (
-                        <button
-                          key={stat.key}
-                          onClick={() => toggleStat(stat.key)}
-                          className={`stat-pill ${
-                            hiddenStats.includes(stat.key)
-                              ? "stat-pill-hidden"
-                              : "stat-pill-visible"
-                          }`}
-                        >
-                          {stat.label}
-                        </button>
-                      ))}
+                <div className="flex flex-wrap gap-x-5 gap-y-2">
+                  {[{ label: "Show Icons", checked: showIcons, set: setShowIcons },
+                    { label: "Show Ring", checked: showRing, set: setShowRing },
+                    { label: "Hide Border", checked: hideBorder, set: setHideBorder },
+                    { label: "Hide Title", checked: hideTitle, set: setHideTitle },
+                  ].map((t) => (
+                    <label key={t.label} className="toggle-label">
+                      <input
+                        type="checkbox"
+                        checked={t.checked}
+                        onChange={(e) => t.set(e.target.checked)}
+                        className="accent-[#58a6ff] w-4 h-4 rounded"
+                      />
+                      {t.label}
+                    </label>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <label className="label-text mb-0">Advanced Options</label>
+                  <button
+                    type="button"
+                    onClick={() => setAdvancedMode((v) => !v)}
+                    className={`rounded-lg px-3 py-1 text-xs font-semibold border transition-all duration-200 ${
+                      advancedMode
+                        ? "bg-[#21262d] border-[#58a6ff]/50 text-white"
+                        : "bg-transparent border-[#30363d] text-[#8b949e] hover:text-[#c9d1d9]"
+                    }`}
+                  >
+                    {advancedMode ? "Hide advanced" : "Show advanced"}
+                  </button>
+                </div>
+
+                {advancedMode && (
+                  <div className="space-y-3 rounded-xl border border-[#30363d]/60 bg-[#0d1117] px-4 py-4">
+                    <div className="flex items-center justify-between">
+                      <label className="label-text mb-0">Reorder & hide stats</label>
+                      <span className="text-[11px] text-[#484f58]">Drag to reorder, click to hide</span>
+                    </div>
+                    <div className="space-y-2">
+                      {statsOrder.map((key, index) => {
+                        const stat = STAT_OPTIONS.find((s) => s.key === key);
+                        if (!stat) return null;
+                        const hidden = hiddenStats.includes(key);
+                        return (
+                          <div
+                            key={key}
+                            className={`flex items-center justify-between gap-3 rounded-lg border border-[#30363d] bg-[#0d1117] px-3 py-2 text-sm text-[#c9d1d9] ${
+                              dragOverIndex === index ? "border-[#58a6ff]/60 bg-[#0f1621]" : ""
+                            }`}
+                            draggable
+                            onDragStart={() => setDragIndex(index)}
+                            onDragOver={(e) => {
+                              e.preventDefault();
+                              if (dragOverIndex !== index) setDragOverIndex(index);
+                            }}
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              if (dragIndex !== null && dragIndex !== index) moveStat(dragIndex, index);
+                              setDragIndex(null);
+                              setDragOverIndex(null);
+                            }}
+                            onDragEnd={() => {
+                              setDragIndex(null);
+                              setDragOverIndex(null);
+                            }}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="cursor-grab text-[#8b949e]">⋮⋮</span>
+                              <span className={hidden ? "line-through text-[#484f58]" : ""}>{stat.label}</span>
+                            </div>
+                            <button
+                              onClick={() => toggleStat(key)}
+                              className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-all duration-200 ${
+                                hidden
+                                  ? "border-[#30363d] text-[#8b949e] bg-transparent"
+                                  : "border-[#58a6ff]/40 text-[#58a6ff] bg-[#58a6ff]/10"
+                              }`}
+                            >
+                              {hidden ? "Hidden" : "Visible"}
+                            </button>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
               </>
+            )}
+
+            {embedType === "langs" && (
+              <div className="space-y-4 rounded-xl border border-[#30363d]/60 bg-[#0d1117] px-4 py-4">
+                <div>
+                  <label className="label-text">Layout</label>
+                  <div className="mt-2 inline-flex rounded-xl border border-[#30363d] bg-[#161b22] p-[3px]">
+                    {(["bar", "stacked"] as const).map((opt) => (
+                      <button
+                        key={opt}
+                        onClick={() => setLangLayout(opt)}
+                        className={`px-4 py-1.5 rounded-[9px] text-xs font-semibold tracking-wide transition-all duration-200 ease-out ${
+                          langLayout === opt
+                            ? "bg-[#21262d] text-white shadow-sm border border-[#30363d]"
+                            : "text-[#8b949e] hover:text-[#c9d1d9]"
+                        }`}
+                      >
+                        {opt === "bar" ? "Bar" : "Stacked"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="label-text">
+                    Max languages: <span className="text-[#58a6ff] font-semibold">{maxLangs}</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="12"
+                    value={maxLangs}
+                    onChange={(e) => setMaxLangs(Number(e.target.value))}
+                    className="w-full accent-[#58a6ff] mt-1"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-x-5 gap-y-2">
+                  {[{ label: "Hide Border", checked: hideBorder, set: setHideBorder },
+                    { label: "Hide Title", checked: hideTitle, set: setHideTitle }].map((t) => (
+                    <label key={t.label} className="toggle-label">
+                      <input
+                        type="checkbox"
+                        checked={t.checked}
+                        onChange={(e) => t.set(e.target.checked)}
+                        className="accent-[#58a6ff] w-4 h-4 rounded"
+                      />
+                      {t.label}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {embedType === "mini" && (
+              <div className="space-y-4 rounded-xl border border-[#30363d]/60 bg-[#0d1117] px-4 py-4">
+                <div>
+                  <label className="label-text">Metric</label>
+                  <select
+                    value={miniMetric}
+                    onChange={(e) => setMiniMetric(e.target.value)}
+                    className="input-field"
+                  >
+                    {["stars","commits","prs","issues","streak","week","followers","repos","contributions"].map((m) => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="label-text">Custom Label (optional)</label>
+                  <input
+                    type="text"
+                    value={miniLabel}
+                    onChange={(e) => setMiniLabel(e.target.value)}
+                    placeholder="Stars"
+                    className="input-field"
+                  />
+                </div>
+                <div>
+                  <label className="label-text">Accent Colour (hex, no #)</label>
+                  <input
+                    type="text"
+                    value={miniColor}
+                    onChange={(e) => setMiniColor(e.target.value)}
+                    placeholder="f59e0b"
+                    className="input-field"
+                  />
+                </div>
+              </div>
+            )}
+
+            {embedType === "sparkline" && (
+              <div className="space-y-4 rounded-xl border border-[#30363d]/60 bg-[#0d1117] px-4 py-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="label-text">Days (7-90)</label>
+                    <input
+                      type="number"
+                      min={7}
+                      max={90}
+                      value={sparkDays}
+                      onChange={(e) => setSparkDays(e.target.value)}
+                      className="input-field"
+                    />
+                  </div>
+                  <div>
+                    <label className="label-text">Width</label>
+                    <input
+                      type="number"
+                      min={180}
+                      max={800}
+                      value={sparkWidth}
+                      onChange={(e) => setSparkWidth(e.target.value)}
+                      className="input-field"
+                    />
+                  </div>
+                  <div>
+                    <label className="label-text">Height</label>
+                    <input
+                      type="number"
+                      min={40}
+                      max={240}
+                      value={sparkHeight}
+                      onChange={(e) => setSparkHeight(e.target.value)}
+                      className="input-field"
+                    />
+                  </div>
+                  <div>
+                    <label className="label-text">Title (optional)</label>
+                    <input
+                      type="text"
+                      value={sparkTitle}
+                      onChange={(e) => setSparkTitle(e.target.value)}
+                      placeholder="Last 30 days"
+                      className="input-field"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="label-text">Line Colour (hex)</label>
+                    <input
+                      type="text"
+                      value={sparkLineColor}
+                      onChange={(e) => setSparkLineColor(e.target.value)}
+                      placeholder="58a6ff"
+                      className="input-field"
+                    />
+                  </div>
+                  <div>
+                    <label className="label-text">Fill Colour (hex)
+                    </label>
+                    <input
+                      type="text"
+                      value={sparkFillColor}
+                      onChange={(e) => setSparkFillColor(e.target.value)}
+                      placeholder="58a6ff"
+                      className="input-field"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-x-5 gap-y-2 items-center">
+                  <label className="toggle-label">
+                    <input
+                      type="checkbox"
+                      checked={sparkHideBorder}
+                      onChange={(e) => setSparkHideBorder(e.target.checked)}
+                      className="accent-[#58a6ff] w-4 h-4 rounded"
+                    />
+                    Hide Border
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <label className="label-text">Border Radius</label>
+                    <input
+                      type="number"
+                      min={0}
+                      max={50}
+                      step={0.5}
+                      value={sparkBorderRadius}
+                      onChange={(e) => setSparkBorderRadius(e.target.value)}
+                      className="w-24 rounded border border-[#30363d] bg-[#161b22] px-3 py-1 text-sm text-[#c9d1d9]"
+                    />
+                  </div>
+                </div>
+              </div>
             )}
           </div>
 
