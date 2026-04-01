@@ -1,7 +1,7 @@
 ![Users](https://ghstats.dev/api/badge)
 ![Repo Views](https://ghstats.dev/api/visits?username=rowkav09&repo=GitHub-profile-stats)
 
-# GitHub Profile Stats
+# GitHub Profile Stats — now with mini badges & sparklines
 
 Free, real-time GitHub stat cards, badges, and charts — drop a URL into your README and you're done. No tokens, no setup.
 

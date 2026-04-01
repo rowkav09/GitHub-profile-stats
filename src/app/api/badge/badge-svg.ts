@@ -4,10 +4,16 @@ import { escapeXml } from "@/lib/sanitize";
  * Render a small shields.io-style SVG badge.
  * Label on the left (dark), value on the right (accent colour).
  */
+type BadgeColors = {
+  accent?: string;
+  labelBg?: string;
+  text?: string;
+};
+
 export function renderBadge(
   label: string,
   value: string,
-  color = "4c8eda",
+  color: string | BadgeColors = "4c8eda",
 ): string {
   const safeLabel = escapeXml(label);
   const safeValue = escapeXml(value);
@@ -18,6 +24,10 @@ export function renderBadge(
   const valueWidth = Math.round(safeValue.length * CHAR_WIDTH + PAD * 2);
   const totalWidth = labelWidth + valueWidth;
 
+  const accent = typeof color === "string" ? color : color.accent ?? "4c8eda";
+  const labelBg = typeof color === "string" ? "555" : (color.labelBg ?? "555");
+  const text = typeof color === "string" ? "fff" : (color.text ?? "fff");
+
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="20" role="img" aria-label="${safeLabel}: ${safeValue}">
   <title>${safeLabel}: ${safeValue}</title>
   <linearGradient id="s" x2="0" y2="100%">
@@ -26,11 +36,11 @@ export function renderBadge(
   </linearGradient>
   <clipPath id="r"><rect width="${totalWidth}" height="20" rx="3" fill="#fff"/></clipPath>
   <g clip-path="url(#r)">
-    <rect width="${labelWidth}" height="20" fill="#555"/>
-    <rect x="${labelWidth}" width="${valueWidth}" height="20" fill="#${color}"/>
+    <rect width="${labelWidth}" height="20" fill="#${labelBg}"/>
+    <rect x="${labelWidth}" width="${valueWidth}" height="20" fill="#${accent}"/>
     <rect width="${totalWidth}" height="20" fill="url(#s)"/>
   </g>
-  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="11">
+  <g fill="#${text}" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="11">
     <text x="${labelWidth / 2}" y="14">${safeLabel}</text>
     <text x="${labelWidth + valueWidth / 2}" y="14">${safeValue}</text>
   </g>
