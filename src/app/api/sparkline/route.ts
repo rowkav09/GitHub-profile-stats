@@ -1,11 +1,14 @@
 import { NextRequest } from "next/server";
 import { fetchGitHubStats } from "@/lib/github";
-import { renderLanguageChart, renderErrorCard } from "@/lib/svg";
+import { renderErrorCard, renderSparkline } from "@/lib/svg";
 import { resolveTheme } from "@/lib/themes";
 import { sanitizeUsername, sanitizeHexParam } from "@/lib/sanitize";
-import { LangChartOptions } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
+
+function clamp(num: number, min: number, max: number): number {
+  return Math.min(Math.max(num, min), max);
+}
 
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
@@ -22,33 +25,19 @@ export async function GET(request: NextRequest) {
     border_color: sanitizeHexParam(params.get("border_color")),
   });
 
-  const maxLangs = Math.min(
-    Math.max(parseInt(params.get("max_langs") ?? "8") || 8, 1),
-    12,
-  );
-
-  const options: LangChartOptions = {
-    hide_border: params.get("hide_border") === "true",
-    hide_title: params.get("hide_title") === "true",
-    custom_title: params.get("custom_title") ?? undefined,
-    border_radius: Math.min(
-      Math.max(parseFloat(params.get("border_radius") ?? "4.5") || 4.5, 0),
-      50,
-    ),
-    max_langs: maxLangs,
-    layout:
-      params.get("layout") === "stacked"
-        ? "stacked"
-        : params.get("layout") === "donut"
-          ? "donut"
-          : "bar",
-  };
+  const days = clamp(parseInt(params.get("days") ?? "30", 10) || 30, 7, 90);
+  const width = clamp(parseInt(params.get("width") ?? "320", 10) || 320, 180, 800);
+  const height = clamp(parseInt(params.get("height") ?? "80", 10) || 80, 40, 240);
+  const borderRadius = clamp(parseFloat(params.get("border_radius") ?? "6") || 6, 0, 50);
+  const hideBorder = params.get("hide_border") === "true";
+  const lineColor = sanitizeHexParam(params.get("line_color"));
+  const fillColor = sanitizeHexParam(params.get("fill_color"));
+  const customTitle = params.get("title") ?? undefined;
 
   const headers = {
     "Content-Type": "image/svg+xml",
-    "Cache-Control":
-      "public, max-age=300, s-maxage=300, stale-while-revalidate=600",
-  };
+    "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=600",
+  } as const;
 
   if (!username) {
     return new Response(
@@ -59,10 +48,18 @@ export async function GET(request: NextRequest) {
 
   try {
     const stats = await fetchGitHubStats(username);
-    return new Response(renderLanguageChart(stats.languages, theme, options), {
-      status: 200,
-      headers,
+    const svg = renderSparkline(stats.contributionDays, theme, {
+      days,
+      width,
+      height,
+      hide_border: hideBorder,
+      border_radius: borderRadius,
+      line_color: lineColor,
+      fill_color: fillColor,
+      custom_title: customTitle,
     });
+
+    return new Response(svg, { status: 200, headers });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "An unexpected error occurred.";

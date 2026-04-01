@@ -250,5 +250,6 @@ export async function fetchGitHubStats(
     activityLevel,
     grade: calculateGrade(activityLevel, current, thisWeek),
     languages,
+    contributionDays: allDays,
   };
 }

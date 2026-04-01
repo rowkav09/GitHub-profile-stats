@@ -1,4 +1,4 @@
-import { GitHubStats, ThemeConfig, CardOptions, LanguageStat, LangChartOptions } from "./types";
+import { GitHubStats, ThemeConfig, CardOptions, LanguageStat, LangChartOptions, ContributionDay } from "./types";
 import { escapeXml, formatNumber } from "./sanitize";
 
 // Octicon-style SVG paths (16x16 viewBox)
@@ -438,6 +438,12 @@ export function renderLanguageChart(
     return renderErrorCard("No language data available for this user.", theme);
   }
 
+  const totalSize = topLangs.reduce((s, l) => s + l.size, 0);
+
+  if (options.layout === "stacked") {
+    return renderStackedLanguageChart(topLangs, totalSize, theme, options);
+  }
+
   const W = 495;
   const PAD = 25;
   const TITLE_H = options.hide_title ? 0 : 30;
@@ -450,8 +456,6 @@ export function renderLanguageChart(
   const numRows = Math.ceil(topLangs.length / COLS);
   const H = NAMES_TOP + numRows * ROW_H + 16;
   const rx = options.border_radius;
-
-  const totalSize = topLangs.reduce((s, l) => s + l.size, 0);
 
   // Stacked colour bar (clipped to rounded rect for pill shape)
   let bx = PAD;
@@ -496,6 +500,155 @@ export function renderLanguageChart(
   ${titleSvg}
   <g clip-path="url(#lc-clip)">${barSegments.join("")}</g>
   ${langLabels.join("\n  ")}
+</svg>`;
+}
+
+function renderStackedLanguageChart(
+  languages: LanguageStat[],
+  totalSize: number,
+  theme: ThemeConfig,
+  options: LangChartOptions,
+): string {
+  const W = 495;
+  const PAD = 22;
+  const TITLE_H = options.hide_title ? 0 : 28;
+  const BAR_H = 16;
+  const BAR_Y = TITLE_H + 10;
+  const BAR_W = W - PAD * 2;
+  const COLS = 3;
+  const ROW_H = 20;
+  const COL_W = Math.floor(BAR_W / COLS);
+
+  const NAMES_TOP = BAR_Y + BAR_H + 18;
+  const numRows = Math.ceil(Math.min(languages.length, 12) / COLS);
+  const H = NAMES_TOP + numRows * ROW_H + 16;
+  const rx = options.border_radius;
+
+  // Compute stacked segments with widths that fill the bar exactly
+  let used = 0;
+  const segments = languages.map((lang, idx) => {
+    const pct = totalSize > 0 ? (lang.size / totalSize) * 100 : 0;
+    let w = Math.max(3, Math.round((pct / 100) * BAR_W));
+    if (idx === languages.length - 1) {
+      w = Math.max(0, BAR_W - used); // fill remaining width to avoid gaps
+    }
+    used += w;
+    return { lang, pct, w };
+  });
+
+  let bx = PAD;
+  const barSegments = segments.map(({ lang, pct, w }) => {
+    const rect = `<rect x="${bx}" y="${BAR_Y}" width="${w}" height="${BAR_H}" fill="${lang.color ?? "#586069"}"/>`;
+    const label = w >= 36
+      ? `<text x="${bx + w / 2}" y="${BAR_Y + BAR_H / 2 + 4}" text-anchor="middle" font="600 10px 'Segoe UI', Ubuntu, sans-serif" fill="#fff" opacity="0.9">${escapeXml(lang.name)}</text>`
+      : "";
+    bx += w;
+    return rect + label;
+  });
+
+  const langLabels = languages.slice(0, 12).map((lang, i) => {
+    const col = i % COLS;
+    const row = Math.floor(i / COLS);
+    const lx = PAD + col * COL_W;
+    const ly = NAMES_TOP + row * ROW_H;
+    const pct = totalSize > 0 ? (lang.size / totalSize) * 100 : 0;
+    const pctText = `${pct.toFixed(1)}%`;
+    const name = lang.name.length > 16 ? `${lang.name.slice(0, 15)}…` : lang.name;
+    return `<circle cx="${lx + 6}" cy="${ly + 5}" r="4" fill="${lang.color ?? "#586069"}"/>
+  <text x="${lx + 14}" y="${ly + 9}" class="lc-name">${escapeXml(name)}</text>
+  <text x="${lx + COL_W - 2}" y="${ly + 9}" class="lc-pct" text-anchor="end">${pctText}</text>`;
+  });
+
+  const titleSvg = options.hide_title
+    ? ""
+    : `<text x="${PAD}" y="${TITLE_H - 4}" class="lc-title">${escapeXml(options.custom_title ?? "Top Languages")}</text>`;
+
+  const border = options.hide_border ? "" : ` stroke="${theme.border}" stroke-width="1"`;
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Top Languages (stacked)">
+  <title>${escapeXml(options.custom_title ?? "Top Languages")}</title>
+  <style>
+    .lc-title { font: 600 14px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.title}; }
+    .lc-name  { font: 400 11px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; }
+    .lc-pct   { font: 600 11px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; opacity: 0.7; }
+  </style>
+  <rect x="0.5" y="0.5" rx="${rx}" ry="${rx}" width="${W - 1}" height="${H - 1}" fill="${theme.bg}"${border}/>
+  ${titleSvg}
+  <g>${barSegments.join("")}</g>
+  ${langLabels.join("\n  ")}
+</svg>`;
+}
+
+// ─── Sparkline (recent contributions) ──────────────────────────────────────
+
+export interface SparklineOptions {
+  days: number;
+  width: number;
+  height: number;
+  hide_border: boolean;
+  border_radius: number;
+  line_color?: string;
+  fill_color?: string;
+  custom_title?: string;
+}
+
+export function renderSparkline(
+  days: ContributionDay[],
+  theme: ThemeConfig,
+  options: SparklineOptions,
+): string {
+  const totalDays = Math.min(Math.max(options.days, 7), 90);
+  const sorted = [...days].sort((a, b) => a.date.localeCompare(b.date));
+  const recent = sorted.slice(-totalDays);
+
+  if (recent.length === 0) {
+    return renderErrorCard("No contribution data available.", theme);
+  }
+
+  const WIDTH = Math.max(180, Math.min(options.width, 800));
+  const HEIGHT = Math.max(40, Math.min(options.height, 240));
+  const PAD_X = 14;
+  const PAD_Y = 10;
+  const contentW = WIDTH - PAD_X * 2;
+  const contentH = HEIGHT - PAD_Y * 2;
+
+  const values = recent.map((d) => d.contributionCount);
+  const maxVal = Math.max(...values, 1);
+  const points = values.map((v, i) => {
+    const x = recent.length === 1 ? WIDTH / 2 : PAD_X + (i / (recent.length - 1)) * contentW;
+    const y = PAD_Y + contentH - (v / maxVal) * contentH;
+    return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10, v };
+  });
+
+  const lineColor = `#${options.line_color ?? theme.title.replace(/^#/, "")}`;
+  const fillColor = `#${options.fill_color ?? theme.title.replace(/^#/, "")}`;
+  const rx = options.border_radius;
+
+  const linePath = points
+    .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`)
+    .join(" ");
+
+  const firstX = points[0]?.x ?? PAD_X;
+  const lastPoint = points[points.length - 1];
+  const areaPath = `M ${firstX} ${HEIGHT - PAD_Y} ${linePath.replace(/^M/, "L")} L ${lastPoint.x} ${HEIGHT - PAD_Y} Z`;
+
+  const title = options.custom_title ?? `Last ${recent.length} days`; // fallback title
+  const latestVal = values[values.length - 1];
+
+  const border = options.hide_border ? "" : ` stroke="${theme.border}" stroke-width="1"`;
+
+  return `<svg width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Contributions sparkline (latest ${latestVal})">
+  <title>${escapeXml(title)}</title>
+  <style>
+    .sl-title { font: 600 12px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.title}; }
+    .sl-value { font: 600 11px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; opacity: 0.8; }
+  </style>
+  <rect x="0.5" y="0.5" rx="${rx}" ry="${rx}" width="${WIDTH - 1}" height="${HEIGHT - 1}" fill="${theme.bg}"${border}/>
+  <path d="${areaPath}" fill="${fillColor}" opacity="0.12" />
+  <path d="${linePath}" fill="none" stroke="${lineColor}" stroke-width="2.2" stroke-linecap="round" />
+  <circle cx="${lastPoint.x}" cy="${lastPoint.y}" r="3.6" fill="${lineColor}" stroke="${theme.bg}" stroke-width="1" />
+  <text x="${PAD_X}" y="${PAD_Y + 10}" class="sl-title">${escapeXml(title)}</text>
+  <text x="${WIDTH - PAD_X}" y="${PAD_Y + 10}" class="sl-value" text-anchor="end">Today: ${latestVal}</text>
 </svg>`;
 }
 
