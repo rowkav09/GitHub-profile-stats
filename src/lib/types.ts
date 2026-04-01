@@ -25,6 +25,8 @@ export interface GitHubStats {
   contributionsThisYear: number;
   activityLevel: number; // 0–100 percentage for the ring
   grade: string; // A+, A, B+, B, C, D
+  languages: LanguageStat[];
+  contributionDays: ContributionDay[]; // daily contributions used for sparklines and analytics
 }
 
 export interface ContributionDay {
@@ -62,7 +64,7 @@ export interface LangChartOptions {
   custom_title?: string;
   border_radius: number;
   max_langs: number; // max languages to show (default 8)
-  layout: "donut" | "bar"; // chart style
+  layout: "donut" | "bar" | "stacked"; // chart style
 }
 
 export type StatKey =
