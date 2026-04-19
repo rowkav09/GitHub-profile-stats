@@ -654,3 +654,320 @@ export function renderSparkline(
 </svg>`;
 }
 
+// ─── Streak Card ─────────────────────────────────────────────────────────────
+
+export interface StreakOptions {
+  hide_border: boolean;
+  hide_title: boolean;
+  custom_title?: string;
+  border_radius: number;
+  show_ring: boolean;
+}
+
+export function renderStreakCard(
+  stats: GitHubStats,
+  theme: ThemeConfig,
+  options: StreakOptions,
+): string {
+  const W = 495;
+  const PAD_X = 25;
+  const PAD_TOP = 20;
+  const TITLE_FS = 16;
+  const TITLE_H = options.hide_title ? 0 : TITLE_FS + 14;
+  const BODY_TOP = PAD_TOP + TITLE_H;
+  const RING_R = 48;
+  const RING_AREA = options.show_ring ? RING_R * 2 + 20 : 0;
+  const rx = options.border_radius;
+
+  const mainAreaW = W - PAD_X * 2 - (options.show_ring ? RING_AREA + 10 : 0);
+  const cardH = BODY_TOP + RING_R * 2 + 30;
+
+  const ringCx = W - PAD_X - RING_R - 5;
+  const ringCy = BODY_TOP + RING_R + 10;
+
+  const displayName = escapeXml(stats.name || stats.username);
+  const title = options.custom_title
+    ? escapeXml(options.custom_title)
+    : `${displayName}&apos;s Streak Stats`;
+
+  const titleSvg = options.hide_title
+    ? ""
+    : `<text x="${PAD_X}" y="${PAD_TOP + TITLE_FS}" class="sk-title">${title}</text>`;
+
+  const border = options.hide_border ? "" : ` stroke="${theme.border}" stroke-width="1"`;
+
+  // Current streak — big center display
+  const streakY = BODY_TOP + 18;
+  const streakNumY = streakY + 38;
+  const streakLabelY = streakNumY + 18;
+
+  // Two stats below
+  const statsY = streakLabelY + 28;
+  const col2X = PAD_X + mainAreaW / 2;
+
+  const ringSvg = options.show_ring
+    ? renderActivityRing(ringCx, ringCy, RING_R, stats.activityLevel, stats.grade, theme, 6)
+    : "";
+
+  // New-user guard: show a helpful message if no contribution data exists
+  if (stats.currentStreak === 0 && stats.longestStreak === 0 && stats.contributionsThisYear === 0) {
+    return renderErrorCard("No contribution data found. Start committing to see your streak!", theme);
+  }
+
+  return `<svg width="${W}" height="${cardH}" viewBox="0 0 ${W} ${cardH}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${title}">
+  <title>${title}</title>
+  <style>
+    .sk-title { font: 600 ${TITLE_FS}px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.title}; animation: fadeIn .8s ease-in-out forwards; }
+    .sk-big   { font: 800 36px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.title}; animation: fadeIn .6s ease-in-out forwards; }
+    .sk-unit  { font: 600 13px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; opacity: 0.7; }
+    .sk-label { font: 600 11px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; opacity: 0.45; text-transform: uppercase; letter-spacing: 0.5px; }
+    .sk-val   { font: 700 15px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; }
+    .ring-grade { font: 800 22px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.title}; }
+    .ring-pct   { font: 600 12px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; opacity: 0.7; }
+    .ring-progress { animation: ringFill 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+    @keyframes ringFill { from { stroke-dashoffset: ${2 * Math.PI * RING_R}; } }
+    @media (prefers-reduced-motion: reduce) {
+      .sk-title, .sk-big { animation: none !important; }
+      .ring-progress { animation: none !important; }
+    }
+  </style>
+  <rect x="0.5" y="0.5" rx="${rx}" ry="${rx}" width="${W - 1}" height="${cardH - 1}" fill="${theme.bg}"${border}/>
+  ${titleSvg}
+  <svg x="${PAD_X}" y="${streakY}" width="20" height="20" viewBox="0 0 16 16" fill="${theme.title}"><path d="${ICONS.fire}"/></svg>
+  <text x="${PAD_X + 24}" y="${streakY + 14}" class="sk-unit">Current Streak</text>
+  <text x="${PAD_X}" y="${streakNumY}" class="sk-big">${stats.currentStreak}<tspan class="sk-unit"> days</tspan></text>
+  <line x1="${PAD_X}" y1="${streakLabelY + 8}" x2="${W - PAD_X}" y2="${streakLabelY + 8}" stroke="${theme.border}" stroke-width="1" opacity="0.3"/>
+  <text x="${PAD_X}" y="${statsY}" class="sk-label">Longest Streak</text>
+  <text x="${PAD_X}" y="${statsY + 18}" class="sk-val">${stats.longestStreak} days</text>
+  <text x="${col2X}" y="${statsY}" class="sk-label">This Year</text>
+  <text x="${col2X}" y="${statsY + 18}" class="sk-val">${formatNumber(stats.contributionsThisYear)} contributions</text>
+  ${ringSvg}
+</svg>`;
+}
+
+// ─── Top Repos Card ──────────────────────────────────────────────────────────
+
+export interface RepoCardOptions {
+  hide_border: boolean;
+  hide_title: boolean;
+  custom_title?: string;
+  border_radius: number;
+  repo_count: number; // 1–6
+}
+
+export function renderRepoCard(
+  stats: GitHubStats,
+  theme: ThemeConfig,
+  options: RepoCardOptions,
+): string {
+  const repos = stats.topRepos.slice(0, options.repo_count);
+
+  if (repos.length === 0) {
+    return renderErrorCard("No public repositories found for this user.", theme);
+  }
+
+  const W = 495;
+  const PAD_X = 22;
+  const PAD_TOP = 18;
+  const TITLE_FS = 15;
+  const TITLE_H = options.hide_title ? 0 : TITLE_FS + 12;
+  const ROW_H = 58;
+  const PAD_BOT = 14;
+  const rx = options.border_radius;
+  const cardH = PAD_TOP + TITLE_H + repos.length * ROW_H + PAD_BOT;
+
+  const displayName = escapeXml(stats.name || stats.username);
+  const title = options.custom_title
+    ? escapeXml(options.custom_title)
+    : `${displayName}&apos;s Top Repos`;
+
+  const titleSvg = options.hide_title
+    ? ""
+    : `<text x="${PAD_X}" y="${PAD_TOP + TITLE_FS}" class="rp-title">${title}</text>`;
+
+  const border = options.hide_border ? "" : ` stroke="${theme.border}" stroke-width="1"`;
+
+  const repoRows = repos.map((repo, i) => {
+    const rowY = PAD_TOP + TITLE_H + i * ROW_H;
+    const nameY = rowY + 18;
+    const descY = nameY + 15;
+    const metaY = descY + 16;
+    const divider = i < repos.length - 1
+      ? `<line x1="${PAD_X}" y1="${rowY + ROW_H - 1}" x2="${W - PAD_X}" y2="${rowY + ROW_H - 1}" stroke="${theme.border}" stroke-width="1" opacity="0.25"/>`
+      : "";
+
+    const desc = repo.description
+      ? repo.description.length > 52 ? repo.description.slice(0, 51) + "…" : repo.description
+      : "";
+    const repoName = repo.name.length > 30 ? repo.name.slice(0, 29) + "…" : repo.name;
+
+    const langBadge = repo.primaryLanguage
+      ? `<circle cx="${W - PAD_X - 110 + 5}" cy="${metaY - 4}" r="4" fill="${repo.primaryLanguage.color}"/>
+         <text x="${W - PAD_X - 100}" y="${metaY}" class="rp-meta">${escapeXml(repo.primaryLanguage.name)}</text>`
+      : "";
+
+    return `<g style="animation:rp-fade .4s ${i * 80}ms ease-in-out both">
+  <svg x="${PAD_X}" y="${nameY - 13}" width="14" height="14" viewBox="0 0 16 16" fill="${theme.icon}"><path d="${ICONS.repo}"/></svg>
+  <text x="${PAD_X + 18}" y="${nameY}" class="rp-name">${escapeXml(repoName)}</text>
+  ${desc ? `<text x="${PAD_X}" y="${descY}" class="rp-desc">${escapeXml(desc)}</text>` : ""}
+  <svg x="${PAD_X}" y="${metaY - 11}" width="13" height="13" viewBox="0 0 16 16" fill="${theme.icon}"><path d="${ICONS.star}"/></svg>
+  <text x="${PAD_X + 17}" y="${metaY}" class="rp-meta">${formatNumber(repo.stars)}</text>
+  <svg x="${PAD_X + 60}" y="${metaY - 11}" width="13" height="13" viewBox="0 0 16 16" fill="${theme.icon}"><path d="M5 3.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0zm0 2.122a2.25 2.25 0 1 0-1.5 0v.878A2.25 2.25 0 0 0 5.75 8.5h1.5v2.128a2.251 2.251 0 1 0 1.5 0V8.5h1.5a2.25 2.25 0 0 0 2.25-2.25v-.878a2.25 2.25 0 1 0-1.5 0v.878a.75.75 0 0 1-.75.75h-4.5A.75.75 0 0 1 5 6.25v-.878zm3.75 7.378a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0zm3-8.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0z"/></svg>
+  <text x="${PAD_X + 77}" y="${metaY}" class="rp-meta">${formatNumber(repo.forks)}</text>
+  ${langBadge}
+</g>
+${divider}`;
+  }).join("\n");
+
+  return `<svg width="${W}" height="${cardH}" viewBox="0 0 ${W} ${cardH}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${title}">
+  <title>${title}</title>
+  <style>
+    .rp-title { font: 600 ${TITLE_FS}px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.title}; }
+    .rp-name  { font: 700 13px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.title}; }
+    .rp-desc  { font: 400 11px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; opacity: 0.65; }
+    .rp-meta  { font: 400 11px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${theme.text}; opacity: 0.7; }
+    @keyframes rp-fade { from { opacity: 0; transform: translateY(4px) } to { opacity: 1; transform: translateY(0) } }
+    @media (prefers-reduced-motion: reduce) { g[style*="rp-fade"] { animation: none !important; opacity: 1; } }
+  </style>
+  <rect x="0.5" y="0.5" rx="${rx}" ry="${rx}" width="${W - 1}" height="${cardH - 1}" fill="${theme.bg}"${border}/>
+  ${titleSvg}
+${repoRows}
+</svg>`;
+}
+
+// ─── Contribution Heatmap ────────────────────────────────────────────────────
+
+export interface HeatmapOptions {
+  hide_border: boolean;
+  hide_title: boolean;
+  custom_title?: string;
+  border_radius: number;
+  weeks: number; // 4–52 weeks to display (default 16)
+  color_scheme: "default" | "halloween" | "winter" | "pink";
+}
+
+export function renderHeatmapCard(
+  days: ContributionDay[],
+  theme: ThemeConfig,
+  options: HeatmapOptions,
+): string {
+  const numWeeks = Math.min(Math.max(options.weeks, 4), 52);
+  const totalDays = numWeeks * 7;
+
+  // Sort and take recent days
+  const sorted = [...days].sort((a, b) => a.date.localeCompare(b.date));
+  const recent = sorted.slice(-totalDays);
+
+  if (recent.length === 0) {
+    return renderErrorCard("No contribution data available.", theme);
+  }
+
+  // Color schemes: levels 0-4
+  const COLOR_SCHEMES: Record<HeatmapOptions["color_scheme"], string[]> = {
+    default:    ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"],
+    halloween:  ["#161b22", "#631c03", "#bd561d", "#fa7a18", "#fddf68"],
+    winter:     ["#161b22", "#023e8a", "#0077b6", "#0096c7", "#90e0ef"],
+    pink:       ["#161b22", "#5c0c3f", "#a61d4c", "#e05897", "#f9a8d4"],
+  };
+  const levelColors = COLOR_SCHEMES[options.color_scheme] ?? COLOR_SCHEMES.default;
+
+  // For light theme use lighter versions
+  const isLight = theme.bg.toLowerCase() === "#ffffff" || theme.bg.toLowerCase() === "#fff";
+  const lightScheme = ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"];
+  const colors = isLight ? lightScheme : levelColors;
+
+  const CELL = 11;
+  const GAP = 2;
+  const STEP = CELL + GAP;
+  const PAD_X = 14;
+  const MONTH_H = 14;
+  const PAD_TOP = 14;
+  const TITLE_FS = 13;
+  const TITLE_H = options.hide_title ? 0 : TITLE_FS + 8;
+  const DAY_LABEL_W = 0; // no day labels (keep it compact)
+
+  const gridW = numWeeks * STEP - GAP;
+  const W = PAD_X * 2 + DAY_LABEL_W + gridW;
+  const gridStartX = PAD_X + DAY_LABEL_W;
+  const gridStartY = PAD_TOP + TITLE_H + MONTH_H;
+  const H = gridStartY + 7 * STEP - GAP + 12;
+  const rx = options.border_radius;
+
+  // Pad `recent` to start on a Sunday boundary so weeks align
+  const firstDate = recent[0]?.date ?? "";
+  const firstDow = firstDate ? new Date(firstDate + "T00:00:00").getDay() : 0;
+  const cells: { count: number; date: string }[] = [];
+  for (let p = 0; p < firstDow; p++) cells.push({ count: -1, date: "" }); // empty padding
+  for (const d of recent) cells.push({ count: d.contributionCount, date: d.date });
+
+  // Build weeks array
+  const grid: typeof cells[] = [];
+  for (let i = 0; i < cells.length; i += 7) {
+    grid.push(cells.slice(i, i + 7));
+  }
+
+  const maxCount = Math.max(...recent.map((d) => d.contributionCount), 1);
+
+  function levelFor(count: number): number {
+    if (count <= 0) return 0;
+    if (count >= maxCount) return 4;
+    return Math.ceil((count / maxCount) * 3);
+  }
+
+  // Month labels — detect when month changes across weeks
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monthLabels: string[] = [];
+  let lastMonth = -1;
+  for (let wi = 0; wi < grid.length; wi++) {
+    const firstDay = grid[wi]?.find((d) => d.date);
+    if (firstDay?.date) {
+      const m = new Date(firstDay.date + "T00:00:00").getMonth();
+      if (m !== lastMonth) {
+        monthLabels.push(`<text x="${gridStartX + wi * STEP}" y="${gridStartY - 3}" class="hm-month">${monthNames[m]}</text>`);
+        lastMonth = m;
+      } else {
+        monthLabels.push("");
+      }
+    } else {
+      monthLabels.push("");
+    }
+  }
+
+  // Render cells
+  const cellSvgs: string[] = [];
+  for (let wi = 0; wi < grid.length; wi++) {
+    const week = grid[wi];
+    for (let di = 0; di < week.length; di++) {
+      const cell = week[di];
+      if (!cell || cell.count < 0) continue;
+      const cx = gridStartX + wi * STEP;
+      const cy = gridStartY + di * STEP;
+      const level = levelFor(cell.count);
+      const fill = colors[level];
+      const tip = cell.date ? `<title>${cell.date}: ${cell.count} contributions</title>` : "";
+      cellSvgs.push(`<rect x="${cx}" y="${cy}" width="${CELL}" height="${CELL}" rx="2" fill="${fill}">${tip}</rect>`);
+    }
+  }
+
+  const titleText = options.custom_title
+    ? escapeXml(options.custom_title)
+    : "Contribution Heatmap";
+  const titleSvg = options.hide_title
+    ? ""
+    : `<text x="${PAD_X}" y="${PAD_TOP + TITLE_FS}" class="hm-title">${titleText}</text>`;
+
+  const border = options.hide_border ? "" : ` stroke="${theme.border}" stroke-width="1"`;
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${titleText}">
+  <title>${titleText}</title>
+  <style>
+    .hm-title  { font: 600 ${TITLE_FS}px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.title}; }
+    .hm-month  { font: 400 9px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; opacity: 0.55; }
+  </style>
+  <rect x="0.5" y="0.5" rx="${rx}" ry="${rx}" width="${W - 1}" height="${H - 1}" fill="${theme.bg}"${border}/>
+  ${titleSvg}
+  ${monthLabels.join("\n  ")}
+  ${cellSvgs.join("\n  ")}
+</svg>`;
+}

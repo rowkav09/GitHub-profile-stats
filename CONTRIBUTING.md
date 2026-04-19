@@ -99,8 +99,16 @@ Add the key and a short display name to the `STAT_OPTIONS` array so it appears a
 | Area | Where to look |
 |---|---|
 | Bug fixes | [Open an issue](https://github.com/rowkav09/GitHub-profile-stats/issues) first so we can confirm it, then submit a PR |
-| New card layouts | `src/lib/svg.ts` — add a new render function and wire it up via `options.size` |
+| New card layouts | `src/lib/svg.ts` — add a new render function and a matching route under `src/app/api/` |
+| New API endpoint | Create `src/app/api/<name>/route.ts`, add a renderer to `src/lib/svg.ts`, document in `README.md` |
 | Visual editor improvements | `src/components/CardPreview.tsx` |
 | Homepage / hero section | `src/components/HeroCard.tsx` and `src/app/page.tsx` |
 | API / caching | `src/app/api/` |
 | Docs | Edit `README.md` directly |
+
+### Beginner-friendly tasks
+
+Look for issues labelled **good first issue** — these are small, well-scoped tasks with clear instructions. Examples:
+- Adding a new theme (see *Adding a Colour Scheme* above)
+- Adding a new mini-badge metric in `src/app/api/mini/route.ts`
+- Improving error messages for edge cases (new users, private accounts)

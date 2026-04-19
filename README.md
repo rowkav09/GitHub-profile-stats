@@ -1,7 +1,7 @@
 ![Users](https://ghstats.dev/api/badge)
 ![Repo Views](https://ghstats.dev/api/visits?username=rowkav09&repo=GitHub-profile-stats)
 
-# GitHub Profile Stats — now with mini badges & sparklines
+# GitHub Profile Stats — stats cards, badges, streaks & heatmaps
 
 Free, real-time GitHub stat cards, badges, and charts — drop a URL into your README and you're done. No tokens, no setup.
 
@@ -36,6 +36,28 @@ https://ghstats.dev/api/card?username=YOUR_USERNAME&size=compact&compact_count=6
 ```
 ![Top Languages](https://ghstats.dev/api/langs?username=YOUR_USERNAME&layout=bar)
 ![Top Languages](https://ghstats.dev/api/langs?username=YOUR_USERNAME&layout=stacked)
+```
+
+**Streak card** ✨ new
+
+[![](https://ghstats.dev/api/streak?username=rowkav09&theme=tokyonight)](https://github.com/rowkav09/GitHub-profile-stats)
+```
+![Streak](https://ghstats.dev/api/streak?username=YOUR_USERNAME&theme=tokyonight)
+```
+
+**Top repositories card** ✨ new
+
+[![](https://ghstats.dev/api/repos?username=rowkav09&theme=dracula&repo_count=3)](https://github.com/rowkav09/GitHub-profile-stats)
+```
+![Top Repos](https://ghstats.dev/api/repos?username=YOUR_USERNAME&repo_count=3)
+```
+
+**Contribution heatmap** ✨ new
+
+[![](https://ghstats.dev/api/heatmap?username=rowkav09&weeks=16)](https://github.com/rowkav09/GitHub-profile-stats)
+```
+![Heatmap](https://ghstats.dev/api/heatmap?username=YOUR_USERNAME&weeks=16)
+![Heatmap](https://ghstats.dev/api/heatmap?username=YOUR_USERNAME&weeks=52&color_scheme=halloween)
 ```
 
 **Mini badges (drop anywhere)**
@@ -85,6 +107,19 @@ Need tweaks? Use the on-page editor to toggle stats, themes, borders, titles, an
 - `layout=bar|stacked`, `max_langs` (1–12)
 - `hide_border`, `hide_title`, `custom_title`, `border_radius`, theme overrides as above
 
+**Streak ( /api/streak )** ✨ new
+- `show_ring` (default true) — show activity grade ring
+- `hide_border`, `hide_title`, `custom_title`, `border_radius`, theme overrides as above
+
+**Top Repos ( /api/repos )** ✨ new
+- `repo_count` (1–6, default 3) — number of repos to display
+- `hide_border`, `hide_title`, `custom_title`, `border_radius`, theme overrides as above
+
+**Contribution Heatmap ( /api/heatmap )** ✨ new
+- `weeks` (4–52, default 16) — number of weeks to display
+- `color_scheme=default|halloween|winter|pink` — cell color palette
+- `hide_border`, `hide_title`, `custom_title`, `border_radius`, theme overrides as above
+
 **Mini badges ( /api/mini )**
 - `metric=stars|commits|prs|issues|streak|week|followers|repos|contributions`
 - `label` (override text), `color` (value side), `theme` (for errors)
@@ -98,6 +133,24 @@ Need tweaks? Use the on-page editor to toggle stats, themes, borders, titles, an
 
 Default, Light, Radical, Tokyo Night, Dracula, Nord, Gruvbox, Catppuccin, Ocean, Sunset, Forest, Midnight.
 
+All theme names work on every endpoint via the `theme=` parameter.
+
+---
+
+## Why ghstats.dev?
+
+| Feature | ghstats.dev | Alternatives |
+|---|---|---|
+| No token required | ✅ | ❌ most require a PAT |
+| Streak card | ✅ `/api/streak` | Limited |
+| Top repos card | ✅ `/api/repos` | Few |
+| Contribution heatmap | ✅ `/api/heatmap` | Very few |
+| Mini inline badges | ✅ `/api/mini` | Rare |
+| Activity sparkline | ✅ `/api/sparkline` | Rare |
+| Profile view counter | ✅ `/api/visits` | Rare |
+| Visual drag-and-drop editor | ✅ on ghstats.dev | Rare |
+| MIT licensed & self-hostable | ✅ | Varies |
+
 ---
 
 ## FAQ
@@ -106,6 +159,7 @@ Default, Light, Radical, Tokyo Night, Dracula, Nord, Gruvbox, Catppuccin, Ocean,
 - **Refresh rate?** Cached ~30 minutes at the edge.
 - **Free?** Yes. MIT licensed.
 - **Where to tweak without URLs?** [ghstats.dev/builder](https://ghstats.dev/builder).
+- **New user with no data?** Cards degrade gracefully and show a helpful message.
 
 ---
 

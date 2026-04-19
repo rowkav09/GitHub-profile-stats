@@ -1,6 +1,8 @@
-import { GitHubStats, ContributionDay, LanguageStat } from "./types";
+import { GitHubStats, ContributionDay, LanguageStat, RepoStat } from "./types";
 
 const GITHUB_GRAPHQL = "https://api.github.com/graphql";
+
+const DEFAULT_LANGUAGE_COLOR = "#858585";
 
 const QUERY = `
 query($username: String!) {
@@ -19,7 +21,14 @@ query($username: String!) {
     ) {
       totalCount
       nodes {
+        name
+        description
         stargazerCount
+        forkCount
+        primaryLanguage {
+          name
+          color
+        }
         languages(first: 10, orderBy: { field: SIZE, direction: DESC }) {
           edges {
             size
@@ -194,21 +203,24 @@ export async function fetchGitHubStats(
     (w: { contributionDays: ContributionDay[] }) => w.contributionDays,
   );
 
-  const totalStars = user.repositories.nodes.reduce(
-    (sum: number, repo: { stargazerCount: number }) =>
-      sum + repo.stargazerCount,
-    0,
-  );
-
-  // Aggregate language sizes across all repos
-  const langTotals: Record<string, { size: number; color: string }> = {};
-  for (const repo of user.repositories.nodes as Array<{
+  // Aggregate language sizes across all repos, and collect top repos
+  type RepoNode = {
+    name: string;
+    description: string | null;
     stargazerCount: number;
+    forkCount: number;
+    primaryLanguage: { name: string; color: string } | null;
     languages: { edges: Array<{ size: number; node: { name: string; color: string } }> };
-  }>) {
+  };
+  const repoNodes = user.repositories.nodes as RepoNode[];
+
+  const totalStars = repoNodes.reduce((sum, repo) => sum + repo.stargazerCount, 0);
+
+  const langTotals: Record<string, { size: number; color: string }> = {};
+  for (const repo of repoNodes) {
     for (const edge of repo.languages?.edges ?? []) {
       const { name, color } = edge.node;
-      if (!langTotals[name]) langTotals[name] = { size: 0, color: color ?? "#858585" };
+      if (!langTotals[name]) langTotals[name] = { size: 0, color: color ?? DEFAULT_LANGUAGE_COLOR };
       langTotals[name].size += edge.size;
     }
   }
@@ -217,7 +229,7 @@ export async function fetchGitHubStats(
     .map(([name, { size, color }]) => ({
       name,
       size,
-      color: color || "#858585",
+      color: color || DEFAULT_LANGUAGE_COLOR,
       percentage: totalLangSize > 0 ? Math.round((size / totalLangSize) * 1000) / 10 : 0,
     }))
     .sort((a, b) => b.size - a.size)
@@ -228,6 +240,19 @@ export async function fetchGitHubStats(
   const weeklyTrend =
     lastWeek > 0 ? Math.round(((thisWeek - lastWeek) / lastWeek) * 100) : thisWeek > 0 ? 100 : 0;
   const activityLevel = calculateActivityLevel(allDays);
+
+  const topRepos: RepoStat[] = repoNodes
+    .sort((a, b) => b.stargazerCount - a.stargazerCount)
+    .slice(0, 6)
+    .map((r) => ({
+      name: r.name,
+      description: r.description,
+      stars: r.stargazerCount,
+      forks: r.forkCount,
+      primaryLanguage: r.primaryLanguage
+        ? { name: r.primaryLanguage.name, color: r.primaryLanguage.color ?? DEFAULT_LANGUAGE_COLOR }
+        : null,
+    }));
 
   return {
     username: user.login,
@@ -251,6 +276,7 @@ export async function fetchGitHubStats(
     grade: calculateGrade(activityLevel, current, thisWeek),
     languages,
     contributionDays: allDays,
+    topRepos,
   };
 }
 
@@ -316,7 +342,7 @@ export async function fetchLanguageStats(
   }>) {
     for (const edge of repo.languages?.edges ?? []) {
       const { name, color } = edge.node;
-      if (!langTotals[name]) langTotals[name] = { size: 0, color: color ?? "#858585" };
+      if (!langTotals[name]) langTotals[name] = { size: 0, color: color ?? DEFAULT_LANGUAGE_COLOR };
       langTotals[name].size += edge.size;
     }
   }
@@ -326,7 +352,7 @@ export async function fetchLanguageStats(
     .map(([name, { size, color }]) => ({
       name,
       size,
-      color: color || "#858585",
+      color: color || DEFAULT_LANGUAGE_COLOR,
       percentage: totalLangSize > 0 ? Math.round((size / totalLangSize) * 1000) / 10 : 0,
     }))
     .sort((a, b) => b.size - a.size)
