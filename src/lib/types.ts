@@ -5,6 +5,14 @@ export interface LanguageStat {
   percentage: number; // 0-100
 }
 
+export interface RepoStat {
+  name: string;
+  description: string | null;
+  stars: number;
+  forks: number;
+  primaryLanguage: { name: string; color: string } | null;
+}
+
 export interface GitHubStats {
   username: string;
   name: string | null;
@@ -27,6 +35,7 @@ export interface GitHubStats {
   grade: string; // A+, A, B+, B, C, D
   languages: LanguageStat[];
   contributionDays: ContributionDay[]; // daily contributions used for sparklines and analytics
+  topRepos: RepoStat[]; // top repos by star count (up to 6)
 }
 
 export interface ContributionDay {
