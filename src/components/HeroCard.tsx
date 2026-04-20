@@ -2,6 +2,57 @@
 
 import { useState, useEffect, useMemo } from "react";
 
+const HERO_EXAMPLES = [
+  {
+    key: "default",
+    label: "Classic",
+    cardTitle: "Classic Stats",
+    cardSubtitle: "Balanced default starter",
+    markdown:
+      "![GitHub Stats](https://ghstats.dev/api/card?username=octocat)",
+  },
+  {
+    key: "tokyonight",
+    label: "Tokyo Night",
+    cardTitle: "Tokyo Night",
+    cardSubtitle: "Popular dark mode look",
+    markdown:
+      "![GitHub Stats](https://ghstats.dev/api/card?username=octocat&theme=tokyonight)",
+  },
+  {
+    key: "radical",
+    label: "Radical",
+    cardTitle: "Radical Accent",
+    cardSubtitle: "Bold contrast colors",
+    markdown:
+      "![GitHub Stats](https://ghstats.dev/api/card?username=octocat&theme=radical)",
+  },
+  {
+    key: "dracula",
+    label: "Dracula",
+    cardTitle: "Dracula Minimal",
+    cardSubtitle: "No icons, cleaner rows",
+    markdown:
+      "![GitHub Stats](https://ghstats.dev/api/card?username=octocat&theme=dracula&show_icons=false)",
+  },
+  {
+    key: "catppuccin",
+    label: "Catppuccin",
+    cardTitle: "Catppuccin",
+    cardSubtitle: "Soft pastel palette",
+    markdown:
+      "![GitHub Stats](https://ghstats.dev/api/card?username=octocat&theme=catppuccin)",
+  },
+  {
+    key: "ocean",
+    label: "Ocean",
+    cardTitle: "Ocean",
+    cardSubtitle: "Cool blue gradient vibe",
+    markdown:
+      "![GitHub Stats](https://ghstats.dev/api/card?username=octocat&theme=ocean)",
+  },
+];
+
 const HERO_THEMES = [
   { key: "default", bg: "#0d1117", title: "#58a6ff", text: "#c9d1d9", icon: "#58a6ff", border: "#30363d" },
   { key: "radical", bg: "#141321", title: "#fe428e", text: "#a9fef7", icon: "#f8d847", border: "#fe428e" },
@@ -65,28 +116,49 @@ function buildDemoSvg(t: (typeof HERO_THEMES)[number]): string {
 
 export default function HeroCard() {
   const [index, setIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    if (isPaused) return;
     const id = setInterval(
-      () => setIndex((p) => (p + 1) % HERO_THEMES.length),
-      4000,
+      () => setIndex((p) => (p + 1) % HERO_EXAMPLES.length),
+      6500,
     );
     return () => clearInterval(id);
-  }, []);
+  }, [isPaused]);
 
   const uris = useMemo(
     () =>
-      HERO_THEMES.map(
-        (t) =>
-          `data:image/svg+xml;charset=utf-8,${encodeURIComponent(buildDemoSvg(t))}`,
-      ),
+      HERO_EXAMPLES.map((example) => {
+        const theme = HERO_THEMES.find((t) => t.key === example.key) ?? HERO_THEMES[0];
+        return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(buildDemoSvg(theme))}`;
+      }),
     [],
   );
 
-  const theme = HERO_THEMES[index];
+  const current = HERO_EXAMPLES[index];
+  const theme = HERO_THEMES.find((t) => t.key === current.key) ?? HERO_THEMES[0];
+
+  async function copyCurrentExample() {
+    try {
+      await navigator.clipboard.writeText(current.markdown);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1400);
+    } catch {
+      setCopied(false);
+    }
+  }
 
   return (
-    <div className="relative mx-auto" style={{ maxWidth: 495 }}>
+    <div
+      className="relative mx-auto group"
+      style={{ maxWidth: 495 }}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onFocusCapture={() => setIsPaused(true)}
+      onBlurCapture={() => setIsPaused(false)}
+    >
       {uris.map((uri, i) => (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -99,18 +171,32 @@ export default function HeroCard() {
           style={{ opacity: i === index ? 1 : 0 }}
         />
       ))}
+      <button
+        onClick={copyCurrentExample}
+        className="absolute inset-0 flex flex-col items-center justify-center bg-black/65 px-5 text-center opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100"
+        aria-label={`Copy ${current.cardTitle} embed snippet`}
+      >
+        <span className="rounded-full border border-[#58a6ff]/50 bg-[#0d1117]/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-[#79c0ff]">
+          {copied ? "Copied!" : "Click to copy"}
+        </span>
+        <p className="mt-3 text-sm font-semibold text-white">{current.cardTitle}</p>
+        <p className="mt-1 text-xs text-[#c9d1d9]">{current.cardSubtitle}</p>
+        <code className="mt-3 max-w-full truncate rounded border border-[#30363d] bg-[#0d1117]/90 px-3 py-1.5 text-[11px] text-[#8b949e]">
+          {current.markdown}
+        </code>
+      </button>
       <div className="flex items-center justify-center gap-2 mt-5">
-        {HERO_THEMES.map((t, i) => (
+        {HERO_EXAMPLES.map((example, i) => (
           <button
-            key={t.key}
+            key={example.key}
             onClick={() => setIndex(i)}
             className="w-2.5 h-2.5 rounded-full transition-all duration-300 ring-1 ring-white/10"
             style={{
-              backgroundColor: i === index ? t.title : "#30363d",
+              backgroundColor: i === index ? theme.title : "#30363d",
               transform: i === index ? "scale(1.4)" : "scale(1)",
-              boxShadow: i === index ? `0 0 8px ${t.title}60` : "none",
+              boxShadow: i === index ? `0 0 8px ${theme.title}60` : "none",
             }}
-            aria-label={`Theme: ${t.key}`}
+            aria-label={`Example: ${example.label}`}
           />
         ))}
       </div>
@@ -118,7 +204,7 @@ export default function HeroCard() {
         className="text-center mt-2 text-xs font-medium tracking-wide transition-colors duration-500"
         style={{ color: theme.title }}
       >
-        {theme.key}
+        {current.label}
       </p>
     </div>
   );
