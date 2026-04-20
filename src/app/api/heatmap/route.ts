@@ -1,11 +1,18 @@
 import { NextRequest } from "next/server";
-import { fetchLanguageStats } from "@/lib/github";
-import { renderLanguageChart, renderErrorCard } from "@/lib/svg";
+import { fetchGitHubStats } from "@/lib/github";
+import { renderHeatmapCard, renderErrorCard } from "@/lib/svg";
 import { resolveTheme } from "@/lib/themes";
 import { sanitizeUsername, sanitizeHexParam } from "@/lib/sanitize";
-import { LangChartOptions } from "@/lib/types";
+import { HeatmapOptions } from "@/lib/svg";
 
 export const dynamic = "force-dynamic";
+
+const VALID_COLOR_SCHEMES: HeatmapOptions["color_scheme"][] = [
+  "default",
+  "halloween",
+  "winter",
+  "pink",
+];
 
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
@@ -22,12 +29,17 @@ export async function GET(request: NextRequest) {
     border_color: sanitizeHexParam(params.get("border_color")),
   });
 
-  const maxLangs = Math.min(
-    Math.max(parseInt(params.get("max_langs") ?? "8") || 8, 1),
-    12,
-  );
+  const rawWeeks = parseInt(params.get("weeks") ?? "16", 10);
+  const weeks = Math.min(Math.max(isNaN(rawWeeks) ? 16 : rawWeeks, 4), 52);
 
-  const options: LangChartOptions = {
+  const rawScheme = params.get("color_scheme") ?? "default";
+  const color_scheme: HeatmapOptions["color_scheme"] = VALID_COLOR_SCHEMES.includes(
+    rawScheme as HeatmapOptions["color_scheme"],
+  )
+    ? (rawScheme as HeatmapOptions["color_scheme"])
+    : "default";
+
+  const options: HeatmapOptions = {
     hide_border: params.get("hide_border") === "true",
     hide_title: params.get("hide_title") === "true",
     custom_title: params.get("custom_title") ?? undefined,
@@ -35,13 +47,8 @@ export async function GET(request: NextRequest) {
       Math.max(parseFloat(params.get("border_radius") ?? "4.5") || 4.5, 0),
       50,
     ),
-    max_langs: maxLangs,
-    layout:
-      params.get("layout") === "stacked"
-        ? "stacked"
-        : params.get("layout") === "donut"
-          ? "donut"
-          : "bar",
+    weeks,
+    color_scheme,
   };
 
   const headers = {
@@ -58,11 +65,11 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const languages = await fetchLanguageStats(username);
-    return new Response(renderLanguageChart(languages, theme, options), {
-      status: 200,
-      headers,
-    });
+    const stats = await fetchGitHubStats(username);
+    return new Response(
+      renderHeatmapCard(stats.contributionDays, theme, options),
+      { status: 200, headers },
+    );
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "An unexpected error occurred.";
