@@ -3,6 +3,7 @@ import { fetchGitHubStats } from "@/lib/github";
 import { renderCard, renderErrorCard } from "@/lib/svg";
 import { resolveTheme } from "@/lib/themes";
 import { sanitizeUsername, sanitizeHexParam } from "@/lib/sanitize";
+import { getCacheHeaders } from "@/lib/cache";
 
 export const dynamic = "force-dynamic";
 
@@ -47,8 +48,7 @@ export async function GET(request: NextRequest) {
 
   const headers = {
     "Content-Type": "image/svg+xml",
-    "Cache-Control":
-      "public, max-age=300, s-maxage=300, stale-while-revalidate=600",
+    ...getCacheHeaders("default"),
   };
 
   if (!username) {
