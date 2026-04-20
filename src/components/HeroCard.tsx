@@ -188,7 +188,6 @@ export default function HeroCard() {
         aria-label={`Copy ${current.cardTitle} embed snippet`}
         title="Click to copy this snippet"
       >
-        <span className="sr-only">{current.markdown}</span>
         <span
           className="rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-widest"
           style={{
@@ -234,7 +233,7 @@ export default function HeroCard() {
         {current.label}
       </p>
       <p className="mt-1 text-center text-[11px] text-[#8b949e]">
-        Hover card, then click to copy
+        Hover or focus card, then click to copy
       </p>
     </div>
   );
