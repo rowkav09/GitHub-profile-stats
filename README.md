@@ -103,9 +103,16 @@ Default, Light, Radical, Tokyo Night, Dracula, Nord, Gruvbox, Catppuccin, Ocean,
 ## FAQ
 
 - **Token needed?** No — public GraphQL only.
-- **Refresh rate?** Cached ~30 minutes at the edge.
+- **Refresh rate?** Tiered by endpoint so slower-moving badges can stay cached longer while activity-focused embeds refresh sooner.
 - **Free?** Yes. MIT licensed.
 - **Where to tweak without URLs?** [ghstats.dev/builder](https://ghstats.dev/builder).
+
+## Cache policy
+
+- **`/api/card`** and **activity-oriented mini badges** (`commits`, `prs`, `issues`, `streak`, `week`, `contributions`) are cached for about **30 minutes** at the edge.
+- **`/api/langs`**, **`/api/badge`**, and slower-moving mini badges like **`followers`** and **`repos`** are cached for about **6 hours** at the edge.
+- **`stars` mini badges** are cached for about **24 hours** at the edge.
+- **`/api/visits`** is intentionally uncached so counters increment on every request.
 
 ---
 

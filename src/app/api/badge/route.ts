@@ -1,5 +1,6 @@
 import { getUserCount } from "@/lib/tracking";
 import { renderBadge } from "./badge-svg";
+import { getCacheHeaders } from "@/lib/cache";
 
 export const dynamic = "force-dynamic";
 
@@ -11,8 +12,7 @@ export async function GET() {
     status: 200,
     headers: {
       "Content-Type": "image/svg+xml",
-      "Cache-Control":
-        "public, max-age=300, s-maxage=300, stale-while-revalidate=600",
+      ...getCacheHeaders("slow"),
     },
   });
 }
