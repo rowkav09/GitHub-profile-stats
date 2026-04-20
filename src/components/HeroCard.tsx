@@ -184,10 +184,11 @@ export default function HeroCard() {
       ))}
       <button
         onClick={copyCurrentExample}
-        className="absolute inset-0 flex flex-col items-center justify-center bg-black/65 px-5 text-center opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100"
+        className="absolute inset-0 flex flex-col items-center justify-center bg-black/65 px-5 text-center opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100 focus-visible:opacity-100"
         aria-label={`Copy ${current.cardTitle} embed snippet`}
         title="Click to copy this snippet"
       >
+        <span className="sr-only">{current.markdown}</span>
         <span
           className="rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-widest"
           style={{
@@ -201,7 +202,7 @@ export default function HeroCard() {
         <p className="mt-3 text-sm font-semibold text-white">{current.cardTitle}</p>
         <p className="mt-1 text-xs text-[#c9d1d9]">{current.cardSubtitle}</p>
         <code
-          className="mt-3 max-w-full truncate rounded px-3 py-1.5 text-[11px]"
+          className="mt-3 max-w-full break-all rounded px-3 py-1.5 text-[11px]"
           style={{
             border: `1px solid ${theme.border}`,
             backgroundColor: `${theme.bg}e6`,
