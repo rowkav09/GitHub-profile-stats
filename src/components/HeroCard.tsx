@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 const ROTATION_INTERVAL_MS = 6500;
 const COPY_FEEDBACK_DURATION_MS = 1400;
@@ -121,6 +121,7 @@ export default function HeroCard() {
   const [index, setIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [copied, setCopied] = useState(false);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (isPaused) return;
@@ -143,11 +144,18 @@ export default function HeroCard() {
   const current = HERO_EXAMPLES[index];
   const theme = HERO_THEMES.find((t) => t.key === current.key) ?? HERO_THEMES[0];
 
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
+  }, []);
+
   async function copyCurrentExample() {
     try {
       await navigator.clipboard.writeText(current.markdown);
       setCopied(true);
-      setTimeout(() => setCopied(false), COPY_FEEDBACK_DURATION_MS);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+      copyTimerRef.current = setTimeout(() => setCopied(false), COPY_FEEDBACK_DURATION_MS);
     } catch {
       setCopied(false);
     }
@@ -180,12 +188,26 @@ export default function HeroCard() {
         aria-label={`Copy ${current.cardTitle} embed snippet`}
         title="Click to copy this snippet"
       >
-        <span className="rounded-full border border-[#58a6ff]/50 bg-[#0d1117]/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-[#79c0ff]">
+        <span
+          className="rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-widest"
+          style={{
+            border: `1px solid ${theme.title}80`,
+            backgroundColor: `${theme.bg}cc`,
+            color: theme.title,
+          }}
+        >
           {copied ? "Copied!" : "Click to copy"}
         </span>
         <p className="mt-3 text-sm font-semibold text-white">{current.cardTitle}</p>
         <p className="mt-1 text-xs text-[#c9d1d9]">{current.cardSubtitle}</p>
-        <code className="mt-3 max-w-full truncate rounded border border-[#30363d] bg-[#0d1117]/90 px-3 py-1.5 text-[11px] text-[#8b949e]">
+        <code
+          className="mt-3 max-w-full truncate rounded px-3 py-1.5 text-[11px]"
+          style={{
+            border: `1px solid ${theme.border}`,
+            backgroundColor: `${theme.bg}e6`,
+            color: theme.text,
+          }}
+        >
           {current.markdown}
         </code>
       </button>
