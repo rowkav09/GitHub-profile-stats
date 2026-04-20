@@ -155,7 +155,10 @@ export default function HeroCard() {
       await navigator.clipboard.writeText(current.markdown);
       setCopied(true);
       if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
-      copyTimerRef.current = setTimeout(() => setCopied(false), COPY_FEEDBACK_DURATION_MS);
+      copyTimerRef.current = setTimeout(() => {
+        setCopied(false);
+        copyTimerRef.current = null;
+      }, COPY_FEEDBACK_DURATION_MS);
     } catch {
       setCopied(false);
     }
@@ -233,7 +236,7 @@ export default function HeroCard() {
         {current.label}
       </p>
       <p className="mt-1 text-center text-[11px] text-[#8b949e]">
-        Hover or focus card, then click to copy
+        Hover over or focus on card, then click to copy
       </p>
     </div>
   );
