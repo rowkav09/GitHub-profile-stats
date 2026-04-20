@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useMemo } from "react";
 
+const ROTATION_INTERVAL_MS = 6500;
+const COPY_FEEDBACK_DURATION_MS = 1400;
+
 const HERO_EXAMPLES = [
   {
     key: "default",
@@ -123,7 +126,7 @@ export default function HeroCard() {
     if (isPaused) return;
     const id = setInterval(
       () => setIndex((p) => (p + 1) % HERO_EXAMPLES.length),
-      6500,
+      ROTATION_INTERVAL_MS,
     );
     return () => clearInterval(id);
   }, [isPaused]);
@@ -144,7 +147,7 @@ export default function HeroCard() {
     try {
       await navigator.clipboard.writeText(current.markdown);
       setCopied(true);
-      setTimeout(() => setCopied(false), 1400);
+      setTimeout(() => setCopied(false), COPY_FEEDBACK_DURATION_MS);
     } catch {
       setCopied(false);
     }
@@ -173,8 +176,9 @@ export default function HeroCard() {
       ))}
       <button
         onClick={copyCurrentExample}
-        className="absolute inset-0 flex flex-col items-center justify-center bg-black/65 px-5 text-center opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100"
+        className="absolute inset-0 flex flex-col items-center justify-center bg-black/65 px-5 text-center opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100"
         aria-label={`Copy ${current.cardTitle} embed snippet`}
+        title="Click to copy this snippet"
       >
         <span className="rounded-full border border-[#58a6ff]/50 bg-[#0d1117]/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-[#79c0ff]">
           {copied ? "Copied!" : "Click to copy"}
@@ -205,6 +209,9 @@ export default function HeroCard() {
         style={{ color: theme.title }}
       >
         {current.label}
+      </p>
+      <p className="mt-1 text-center text-[11px] text-[#8b949e]">
+        Hover card, then click to copy
       </p>
     </div>
   );
