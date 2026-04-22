@@ -13,16 +13,16 @@ Free, real-time GitHub stat cards, badges, and charts — drop a URL into your R
 
 **Standard card**
 
-[![](https://ghstats.dev/api/card?username=octocat&theme=tokyonight)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/card?username=rowkav09&theme=tokyonight)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
 ![GitHub Stats](https://ghstats.dev/api/card?username=YOUR_USERNAME&theme=tokyonight)
 ```
 
 **Compact grids (3 / 4 / 6)**
 
-[![](https://ghstats.dev/api/card?username=octocat&theme=radical&size=compact&compact_count=3)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/card?username=octocat&theme=catppuccin&size=compact&compact_count=4)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/card?username=octocat&theme=forest&size=compact&compact_count=6)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/card?username=rowkav09&theme=radical&size=compact&compact_count=3)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/card?username=rowkav09&theme=catppuccin&size=compact&compact_count=4)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/card?username=rowkav09&theme=forest&size=compact&compact_count=6)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
 https://ghstats.dev/api/card?username=YOUR_USERNAME&size=compact&compact_count=3
 https://ghstats.dev/api/card?username=YOUR_USERNAME&size=compact&compact_count=4
@@ -31,8 +31,8 @@ https://ghstats.dev/api/card?username=YOUR_USERNAME&size=compact&compact_count=6
 
 **Languages (bar + stacked)**
 
-[![](https://ghstats.dev/api/langs?username=octocat&theme=dracula&layout=bar)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/langs?username=octocat&theme=ocean&layout=stacked)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/langs?username=rowkav09&theme=dracula&layout=bar)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/langs?username=rowkav09&theme=ocean&layout=stacked)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
 ![Top Languages](https://ghstats.dev/api/langs?username=YOUR_USERNAME&layout=bar)
 ![Top Languages](https://ghstats.dev/api/langs?username=YOUR_USERNAME&layout=stacked)
@@ -40,9 +40,9 @@ https://ghstats.dev/api/card?username=YOUR_USERNAME&size=compact&compact_count=6
 
 **Mini badges (drop anywhere)**
 
-[![](https://ghstats.dev/api/mini?username=octocat&metric=stars)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/mini?username=octocat&metric=commits&color=0ea5e9)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/mini?username=octocat&metric=streak&color=f97316)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/mini?username=rowkav09&metric=stars)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/mini?username=rowkav09&metric=commits&color=0ea5e9)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/mini?username=rowkav09&metric=streak&color=f97316)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
 https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=stars
 https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=commits&color=0ea5e9
@@ -51,7 +51,7 @@ https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=streak
 
 **Activity sparkline (7–90 days)**
 
-[![](https://ghstats.dev/api/sparkline?username=octocat&days=30&width=420)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/sparkline?username=rowkav09&days=30&width=420)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
 ![Activity Sparkline](https://ghstats.dev/api/sparkline?username=YOUR_USERNAME&days=30&width=420)
 ```
@@ -105,9 +105,16 @@ Default, Light, Radical, Tokyo Night, Dracula, Nord, Gruvbox, Catppuccin, Ocean,
 ## FAQ
 
 - **Token needed?** No — public GraphQL only.
-- **Refresh rate?** Cached ~30 minutes at the edge.
+- **Refresh rate?** Tiered by endpoint so slower-moving badges can stay cached longer while activity-focused embeds refresh sooner.
 - **Free?** Yes. MIT licensed.
 - **Where to tweak without URLs?** [ghstats.dev/builder](https://ghstats.dev/builder).
+
+## Cache policy
+
+- **`/api/card`** and **activity-oriented mini badges** (`commits`, `prs`, `issues`, `streak`, `week`, `contributions`) are cached for about **30 minutes** at the edge.
+- **`/api/langs`**, **`/api/badge`**, and slower-moving mini badges like **`followers`** and **`repos`** are cached for about **6 hours** at the edge.
+- **`stars` mini badges** are cached for about **24 hours** at the edge.
+- **`/api/visits`** is intentionally uncached so counters increment on every request.
 
 ---
 

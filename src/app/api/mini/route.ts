@@ -5,6 +5,7 @@ import { renderErrorCard } from "@/lib/svg";
 import { resolveTheme } from "@/lib/themes";
 import { sanitizeUsername, sanitizeHexParam, formatNumber } from "@/lib/sanitize";
 import { GitHubStats } from "@/lib/types";
+import { getCacheHeaders, getMiniMetricCacheProfile } from "@/lib/cache";
 
 export const dynamic = "force-dynamic";
 
@@ -51,7 +52,7 @@ export async function GET(request: NextRequest) {
 
   const headers = {
     "Content-Type": "image/svg+xml",
-    "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=600",
+    ...getCacheHeaders(getMiniMetricCacheProfile(metricKey)),
   } as const;
 
   if (!username) {
