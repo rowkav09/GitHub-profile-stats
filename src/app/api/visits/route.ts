@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { trackView, trackVisit } from "@/lib/tracking";
 import { renderBadge } from "../badge/badge-svg";
 import { sanitizeUsername } from "@/lib/sanitize";
+import { getCacheHeaders } from "@/lib/cache";
 
 export const dynamic = "force-dynamic";
 
@@ -10,11 +11,7 @@ export const dynamic = "force-dynamic";
 // so Redis.incr is always called and the count always increments.
 const NO_CACHE_HEADERS = {
   "Content-Type": "image/svg+xml",
-  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
-  "CDN-Cache-Control": "no-store",
-  "Vercel-CDN-Cache-Control": "no-store",
-  Pragma: "no-cache",
-  Expires: "0",
+  ...getCacheHeaders("no-store"),
 };
 
 // Only allow safe repo name chars (alphanumeric, hyphens, underscores, dots)
