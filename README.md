@@ -86,8 +86,10 @@ Need tweaks? Use the on-page editor to toggle stats, themes, borders, titles, an
 - `hide_border`, `hide_title`, `custom_title`, `border_radius`, theme overrides as above
 
 **Mini badges ( /api/mini )**
-- `metric=stars|commits|prs|issues|streak|week|followers|repos|contributions`
+- `metric=stars|commits|prs|issues|hours|streak|week|followers|repos|contributions`
 - `label` (override text), `color` (value side), `theme` (for errors)
+
+> Note: `hours` is currently WIP and is an estimate, not exact tracked coding time.
 
 **Sparkline ( /api/sparkline )**
 - `days` (7–90), `width` (180–800), `height` (40–240), `line_color`, `fill_color`, `title`, `hide_border`, `border_radius`

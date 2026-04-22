@@ -77,6 +77,13 @@ function getVisibleStats(
       icon: "issue",
     },
     {
+      key: "hours",
+      label: "Estimated Coding Hours",
+      short: "Hours",
+      value: `${formatNumber(stats.estimatedCodingHours)}h`,
+      icon: "clock",
+    },
+    {
       key: "streak",
       label: "Current Streak",
       short: "Streak",
