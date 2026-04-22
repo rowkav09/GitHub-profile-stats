@@ -25,6 +25,7 @@ const ALL_STATS = [
   { key: "commits", label: "Total Commits (Year)" },
   { key: "prs", label: "Pull Requests" },
   { key: "issues", label: "Issues Opened" },
+  { key: "hours", label: "Estimated Coding Hours" },
   { key: "streak", label: "Current Streak" },
   { key: "week", label: "Commits This Week" },
   { key: "trend", label: "Weekly Trend" },

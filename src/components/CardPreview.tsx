@@ -8,6 +8,7 @@ const STAT_OPTIONS = [
   { key: "commits", label: "Commits" },
   { key: "prs", label: "PRs" },
   { key: "issues", label: "Issues" },
+  { key: "hours", label: "Hours" },
   { key: "streak", label: "Streak" },
   { key: "week", label: "This Week" },
   { key: "trend", label: "Trend" },
@@ -503,7 +504,7 @@ export default function CardPreview() {
                     onChange={(e) => setMiniMetric(e.target.value)}
                     className="input-field"
                   >
-                    {["stars","commits","prs","issues","streak","week","followers","repos","contributions"].map((m) => (
+                    {["stars","commits","prs","issues","hours","streak","week","followers","repos","contributions"].map((m) => (
                       <option key={m} value={m}>{m}</option>
                     ))}
                   </select>

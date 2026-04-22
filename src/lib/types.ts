@@ -13,6 +13,7 @@ export interface GitHubStats {
   totalCommits: number;
   totalPRs: number;
   totalIssues: number;
+  estimatedCodingHours: number;
   currentStreak: number;
   longestStreak: number;
   commitsThisWeek: number;
@@ -72,6 +73,7 @@ export type StatKey =
   | "commits"
   | "prs"
   | "issues"
+  | "hours"
   | "streak"
   | "week"
   | "trend"

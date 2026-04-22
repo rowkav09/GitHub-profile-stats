@@ -19,6 +19,7 @@ const METRICS: Record<string, MetricDef> = {
   commits: { label: "Commits", color: "4c8eda", get: (s) => s.totalCommits },
   prs: { label: "PRs", color: "8b5cf6", get: (s) => s.totalPRs },
   issues: { label: "Issues", color: "ef4444", get: (s) => s.totalIssues },
+  hours: { label: "Hours", color: "f59e0b", get: (s) => `${formatNumber(s.estimatedCodingHours)}h` },
   streak: { label: "Streak", color: "f97316", get: (s) => `${s.currentStreak}d` },
   week: { label: "This Week", color: "10b981", get: (s) => s.commitsThisWeek },
   followers: { label: "Followers", color: "22c55e", get: (s) => s.followers },

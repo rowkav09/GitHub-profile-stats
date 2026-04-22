@@ -152,6 +152,18 @@ function calculateGrade(activityLevel: number, streak: number, commitsThisWeek: 
   return "D";
 }
 
+function calculateEstimatedCodingHours(
+  commits: number,
+  prs: number,
+  issues: number,
+): number {
+  // Estimated hours based on yearly GitHub contribution events.
+  const commitHours = commits * 0.5;
+  const prHours = prs * 1.5;
+  const issueHours = issues * 0.4;
+  return Math.round((commitHours + prHours + issueHours) * 10) / 10;
+}
+
 export async function fetchGitHubStats(
   username: string,
 ): Promise<GitHubStats> {
@@ -228,6 +240,11 @@ export async function fetchGitHubStats(
   const weeklyTrend =
     lastWeek > 0 ? Math.round(((thisWeek - lastWeek) / lastWeek) * 100) : thisWeek > 0 ? 100 : 0;
   const activityLevel = calculateActivityLevel(allDays);
+  const estimatedCodingHours = calculateEstimatedCodingHours(
+    contrib.totalCommitContributions,
+    contrib.totalPullRequestContributions,
+    contrib.totalIssueContributions,
+  );
 
   return {
     username: user.login,
@@ -237,6 +254,7 @@ export async function fetchGitHubStats(
     totalCommits: contrib.totalCommitContributions,
     totalPRs: contrib.totalPullRequestContributions,
     totalIssues: contrib.totalIssueContributions,
+    estimatedCodingHours,
     currentStreak: current,
     longestStreak: longest,
     commitsThisWeek: thisWeek,
