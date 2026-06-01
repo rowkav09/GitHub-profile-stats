@@ -1,5 +1,6 @@
 ![Users](https://ghstats.dev/api/badge)
 ![Repo Views](https://ghstats.dev/api/visits?username=rowkav09&repo=GitHub-profile-stats)
+[![CodeFactor](https://www.codefactor.io/repository/github/rowkav09/github-profile-stats/badge)](https://www.codefactor.io/repository/github/rowkav09/github-profile-stats)
 
 # GitHub Profile Stats — now with mini badges & sparklines
 
