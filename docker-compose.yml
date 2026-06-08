@@ -1,0 +1,13 @@
+services:
+  webapp:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - 3000:3000
+      # - ${FRONTEND_PORT}:3000
+    # environment:
+    #   - ENV_VAR=SOMETHING
