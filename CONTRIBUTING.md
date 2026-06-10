@@ -8,7 +8,7 @@ Contributions of all kinds are welcome — whether you want to add a new colour 
 git clone https://github.com/rowkav09/GitHub-profile-stats.git
 cd GitHub-profile-stats
 npm install
-cp .env.example .env.local   # add your GITHUB_TOKEN
+cp .env.example .env.local   # add your GITHUB_TOKEN, GH_TOKEN, or GITHUB_ACCESS_TOKEN
 npm run dev                  # http://localhost:3000
 ```
 

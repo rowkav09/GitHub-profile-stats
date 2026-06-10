@@ -105,7 +105,7 @@ Default, Light, Radical, Tokyo Night, Dracula, Nord, Gruvbox, Catppuccin, Ocean,
 
 ## FAQ
 
-- **Token needed?** No — public GraphQL only.
+- **Token needed?** Yes — the GitHub GraphQL API requires a valid token. Set `GITHUB_TOKEN`, `GH_TOKEN`, or `GITHUB_ACCESS_TOKEN`.
 - **Refresh rate?** Tiered by endpoint so slower-moving badges can stay cached longer while activity-focused embeds refresh sooner.
 - **Free?** Yes. MIT licensed.
 - **Where to tweak without URLs?** [ghstats.dev/builder](https://ghstats.dev/builder).
