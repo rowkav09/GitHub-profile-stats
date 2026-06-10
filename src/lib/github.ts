@@ -1,6 +1,34 @@
 import { GitHubStats, ContributionDay, LanguageStat } from "./types";
 
 const GITHUB_GRAPHQL = "https://api.github.com/graphql";
+const GITHUB_TOKEN_ENV_KEYS = [
+  "GITHUB_TOKEN",
+  "GH_TOKEN",
+  "GITHUB_ACCESS_TOKEN",
+] as const;
+
+function getGitHubToken(): string | undefined {
+  for (const key of GITHUB_TOKEN_ENV_KEYS) {
+    const token = process.env[key];
+    if (token && token.trim().length > 0) {
+      return token.trim();
+    }
+  }
+
+  return undefined;
+}
+
+function getGitHubAuthError(status: number): string {
+  if (status === 401) {
+    return "GitHub API authentication failed (401). Check that GITHUB_TOKEN, GH_TOKEN, or GITHUB_ACCESS_TOKEN is set and still valid.";
+  }
+
+  if (status === 403) {
+    return "GitHub API access was forbidden (403). Your token may be missing required access or you may have hit a secondary rate limit.";
+  }
+
+  return `GitHub API responded with status ${status}`;
+}
 
 const QUERY = `
 query($username: String!) {
@@ -167,9 +195,11 @@ function calculateEstimatedCodingHours(
 export async function fetchGitHubStats(
   username: string,
 ): Promise<GitHubStats> {
-  const token = process.env.GITHUB_TOKEN;
+  const token = getGitHubToken();
   if (!token) {
-    throw new Error("GITHUB_TOKEN environment variable is not set");
+    throw new Error(
+      "GitHub API token is not set. Configure GITHUB_TOKEN, GH_TOKEN, or GITHUB_ACCESS_TOKEN.",
+    );
   }
 
   const response = await fetch(GITHUB_GRAPHQL, {
@@ -184,7 +214,7 @@ export async function fetchGitHubStats(
   });
 
   if (!response.ok) {
-    throw new Error(`GitHub API responded with status ${response.status}`);
+    throw new Error(getGitHubAuthError(response.status));
   }
 
   const json = await response.json();
@@ -296,9 +326,11 @@ query($username: String!) {
 export async function fetchLanguageStats(
   username: string,
 ): Promise<LanguageStat[]> {
-  const token = process.env.GITHUB_TOKEN;
+  const token = getGitHubToken();
   if (!token) {
-    throw new Error("GITHUB_TOKEN environment variable is not set");
+    throw new Error(
+      "GitHub API token is not set. Configure GITHUB_TOKEN, GH_TOKEN, or GITHUB_ACCESS_TOKEN.",
+    );
   }
 
   const response = await fetch(GITHUB_GRAPHQL, {
@@ -313,7 +345,7 @@ export async function fetchLanguageStats(
   });
 
   if (!response.ok) {
-    throw new Error(`GitHub API responded with status ${response.status}`);
+    throw new Error(getGitHubAuthError(response.status));
   }
 
   const json = await response.json();
