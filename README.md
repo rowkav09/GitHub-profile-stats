@@ -30,7 +30,9 @@ Free, real-time GitHub stat cards, badges, and charts — drop a URL into your R
 **Compact grids (3 / 4 / 6)**
 
 [![](https://ghstats.dev/api/card?username=rowkav09&theme=radical&size=compact&compact_count=3)](https://github.com/rowkav09/GitHub-profile-stats)
+
 [![](https://ghstats.dev/api/card?username=rowkav09&theme=catppuccin&size=compact&compact_count=4)](https://github.com/rowkav09/GitHub-profile-stats)
+
 [![](https://ghstats.dev/api/card?username=rowkav09&theme=forest&size=compact&compact_count=6)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
 [![](https://ghstats.dev/api/card?username=YOUR_USERNAME&theme=radical&size=compact&compact_count=3)](https://github.com/rowkav09/GitHub-profile-stats)
@@ -41,6 +43,7 @@ Free, real-time GitHub stat cards, badges, and charts — drop a URL into your R
 **Languages (bar + stacked)**
 
 [![](https://ghstats.dev/api/langs?username=rowkav09&theme=dracula&layout=bar)](https://github.com/rowkav09/GitHub-profile-stats)
+
 [![](https://ghstats.dev/api/langs?username=rowkav09&theme=ocean&layout=stacked)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
 [![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=dracula&layout=bar)](https://github.com/rowkav09/GitHub-profile-stats)
@@ -50,7 +53,9 @@ Free, real-time GitHub stat cards, badges, and charts — drop a URL into your R
 **Mini badges (drop anywhere)**
 
 [![](https://ghstats.dev/api/mini?username=rowkav09&metric=stars)](https://github.com/rowkav09/GitHub-profile-stats)
+
 [![](https://ghstats.dev/api/mini?username=rowkav09&metric=commits&color=0ea5e9)](https://github.com/rowkav09/GitHub-profile-stats)
+
 [![](https://ghstats.dev/api/mini?username=rowkav09&metric=streak&color=f97316)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
 [![](https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=stars)](https://github.com/rowkav09/GitHub-profile-stats)
