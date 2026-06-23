@@ -7,7 +7,15 @@
 Free, real-time GitHub stat cards, badges, and charts — drop a URL into your README and you're done. No tokens, no setup.
 
 **[ghstats.dev](https://ghstats.dev)**
+## Star History
 
+<a href="https://www.star-history.com/?repos=rowkav09%2FGitHub-profile-stats&type=date&logscale=&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=rowkav09/GitHub-profile-stats&type=date&theme=dark&logscale&legend=bottom-right" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=rowkav09/GitHub-profile-stats&type=date&logscale&legend=bottom-right" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=rowkav09/GitHub-profile-stats&type=date&logscale&legend=bottom-right" />
+ </picture>
+</a>
 ---
 
 ## Copy-paste gallery
