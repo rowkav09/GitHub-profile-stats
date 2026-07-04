@@ -50,7 +50,9 @@ yourtheme: {
 
 **3. Add it to `src/components/HeroCard.tsx`** (`HERO_THEMES` array) if you'd like it to appear in the homepage demo carousel.
 
-**4. Add it to the themes table** in `README.md`.
+**4. Add it to `src/components/VisualBuilder.tsx`** (`THEMES` constant) so it appears in the on-page visual editor dropdown.
+
+**5. Add it to the themes table** in `README.md`.
 
 That's it — no other changes needed.
 
@@ -94,13 +96,60 @@ Add the key and a short display name to the `STAT_OPTIONS` array so it appears a
 
 ---
 
+## Adding a Badge Style
+
+Badge styles control the visual appearance of `/api/mini`, `/api/badge`, and `/api/visits` output. Five styles are supported: `flat`, `flat-square`, `for-the-badge`, `plastic`, and `minimal`.
+
+**1. Define the style config — `src/app/api/badge/badge-svg.ts`**
+
+Add a new entry to the `STYLE_CONFIGS` object with the shape configuration:
+
+```ts
+mystyle: {
+  height: 20,        // badge height in px
+  charWidth: 6.6,    // estimated width per character
+  pad: 10,           // horizontal padding
+  rx: 3,             // corner radius (0 for sharp corners)
+  fontSize: 11,      // font size
+  fontWeight: 400,   // font weight
+  letterSpacing: 0,  // letter spacing
+  textY: 14,         // vertical text position
+  uppercase: false,  // uppercase all text
+  transparent: false, // transparent background
+  gradient: "shields", // "shields" | "plastic" | "none"
+  clipId: "r_my",    // unique clip-path ID
+  gradientId: "s_my", // unique gradient ID
+},
+```
+
+**2. Add preview data — `src/app/page.tsx`**
+
+Add an entry to the `BADGE_STYLES` array at the top of the file so it appears in the Badge Styles section on the landing page:
+
+```ts
+{ key: "mystyle", label: "My Style", desc: "Description shown in the docs table." },
+```
+
+**3. Add picker option — `src/components/CardPreview.tsx`**
+
+Add an entry to the `BADGE_STYLES` array so it appears in the visual editor badge picker:
+
+```ts
+{ key: "mystyle", label: "My Style" },
+```
+
+**4. Document it** — add a row to the badge styles table in `README.md`.
+
+---
+
 ## Other Ways to Contribute
 
 | Area | Where to look |
 |---|---|
 | Bug fixes | [Open an issue](https://github.com/rowkav09/GitHub-profile-stats/issues) first so we can confirm it, then submit a PR |
 | New card layouts | `src/lib/svg.ts` — add a new render function and wire it up via `options.size` |
-| Visual editor improvements | `src/components/CardPreview.tsx` |
+| Badge styles | `src/app/api/badge/badge-svg.ts` — add a config entry and update the page picker |
+| Visual editor improvements | `src/components/CardPreview.tsx` and `src/components/VisualBuilder.tsx` |
 | Homepage / hero section | `src/components/HeroCard.tsx` and `src/app/page.tsx` |
 | API / caching | `src/app/api/` |
 | Docs | Edit `README.md` directly |
