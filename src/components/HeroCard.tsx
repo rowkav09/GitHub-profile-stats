@@ -11,6 +11,12 @@ const HERO_THEMES = [
   { key: "ocean", bg: "#0b1929", title: "#00bfff", text: "#a3c4e0", icon: "#00e5ff", border: "#1a3a5c" },
   { key: "sunset", bg: "#1a1025", title: "#ff6b6b", text: "#e8d5c4", icon: "#ffa07a", border: "#4a2040" },
   { key: "forest", bg: "#0d1f0d", title: "#4ec9b0", text: "#b5cea8", icon: "#6a9955", border: "#1e3a1e" },
+  { key: "nightowl", bg: "#011627", title: "#7fdbca", text: "#d6deeb", icon: "#c792ea", border: "#1d3b53" },
+  { key: "solarized", bg: "#002b36", title: "#2aa198", text: "#839496", icon: "#b58900", border: "#073642" },
+  { key: "ayu", bg: "#0d1017", title: "#e6b450", text: "#bfbdb6", icon: "#ff8f40", border: "#1b1f29" },
+  { key: "rosepine", bg: "#191724", title: "#ebbcba", text: "#e0def4", icon: "#c4a7e7", border: "#26233a" },
+  { key: "kanagawa", bg: "#1F1F28", title: "#7E9CD8", text: "#DCD7BA", icon: "#E6C384", border: "#2A2A37" },
+  { key: "palenight", bg: "#292D3E", title: "#82AAFF", text: "#A6ACCD", icon: "#C792EA", border: "#2b2a3e" },
 ];
 
 const ICONS: Record<string, string> = {

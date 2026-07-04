@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { trackView, trackVisit } from "@/lib/tracking";
-import { renderBadge } from "../badge/badge-svg";
+import { renderBadge, resolveBadgeStyle } from "../badge/badge-svg";
 import { sanitizeUsername } from "@/lib/sanitize";
 import { getCacheHeaders } from "@/lib/cache";
 
@@ -41,6 +41,6 @@ export async function GET(request: NextRequest) {
     label = "visits";
   }
 
-  const svg = renderBadge(label, count.toLocaleString("en-US"), "44cc11");
+  const svg = renderBadge(label, count.toLocaleString("en-US"), "44cc11", resolveBadgeStyle(params.get("style")));
   return new Response(svg, { status: 200, headers: NO_CACHE_HEADERS });
 }

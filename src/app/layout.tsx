@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: "%s | GitHub Profile Stats",
   },
   description:
-    "Generate beautiful, dynamically generated GitHub stats cards for your profile README. 13 stats, 12 themes, fully customizable SVG cards — just paste one line. No tokens, no setup, no deployment needed. Free and open source.",
+    "Generate beautiful, dynamically generated GitHub stats cards for your profile README. 13 stats, 18 themes, fully customizable SVG cards — just paste one line. No tokens, no setup, no deployment needed. Free and open source.",
   keywords: [
     "github stats",
     "github profile stats",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     title:
       "GitHub Profile Stats — Beautiful Stats Cards for Your README",
     description:
-      "Generate beautiful, dynamically generated GitHub stats cards for your profile README. 13 stats, 12 themes, fully customizable SVG cards — just paste one line. No tokens, no setup, no deployment needed. Free and open source.",
+      "Generate beautiful, dynamically generated GitHub stats cards for your profile README. 13 stats, 18 themes, fully customizable SVG cards — just paste one line. No tokens, no setup, no deployment needed. Free and open source.",
     url: "https://ghstats.dev",
     siteName: "GitHub Profile Stats",
     type: "website",
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     title:
       "GitHub Profile Stats — Beautiful Stats Cards for Your README",
     description:
-      "Generate beautiful, dynamically generated GitHub stats cards for your profile README. 13 stats, 12 themes, fully customizable SVG cards — just paste one line. No tokens, no setup, no deployment needed. Free and open source.",
+      "Generate beautiful, dynamically generated GitHub stats cards for your profile README. 13 stats, 18 themes, fully customizable SVG cards — just paste one line. No tokens, no setup, no deployment needed. Free and open source.",
     images: ["/opengraph-image"],
     creator: "@rowkav09",
   },
@@ -79,7 +79,7 @@ const jsonLd = {
   "@type": "WebApplication",
   name: "GitHub Profile Stats",
   description:
-    "Generate beautiful, dynamically generated GitHub stats cards for your profile README. 13 stats, 12 themes, fully customizable SVG cards — just paste one line. No tokens, no setup, no deployment needed. Free and open source.",
+    "Generate beautiful, dynamically generated GitHub stats cards for your profile README. 13 stats, 18 themes, fully customizable SVG cards — just paste one line. No tokens, no setup, no deployment needed. Free and open source.",
   url: "https://ghstats.dev",
   applicationCategory: "DeveloperApplication",
   operatingSystem: "All",
