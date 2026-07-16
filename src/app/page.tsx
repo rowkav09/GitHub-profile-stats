@@ -92,6 +92,20 @@ const PARAMS = [
     default: '"default"',
     desc: 'Card density — "default" or "compact" (smaller fonts & tighter rows)',
   },
+  {
+    name: "style",
+    type: "string",
+    default: '"flat"',
+    desc: 'Badge style for /api/mini and /api/badge — "flat", "flat-square", "for-the-badge", "plastic", or "minimal"',
+  },
+];
+
+const BADGE_STYLES = [
+  { key: "flat", label: "Flat", desc: "Default shields.io look with subtle gradient and rounded corners." },
+  { key: "flat-square", label: "Flat Square", desc: "Same as Flat, but with sharp square corners." },
+  { key: "for-the-badge", label: "For The Badge", desc: "Large, bold, uppercase — built to stand out in a README." },
+  { key: "plastic", label: "Plastic", desc: "Glossy plastic finish with a top-light, bottom-shadow gradient." },
+  { key: "minimal", label: "Minimal", desc: "Just text on a transparent background — clean and unobtrusive." },
 ];
 
 const HIDE_KEYS = [
@@ -299,6 +313,53 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ─── Badge Styles ─── */}
+      <section className="border-b border-[#21262d]">
+        <div className="mx-auto max-w-6xl px-6 py-16">
+          <h2 className="text-2xl font-bold mb-2">Badge Styles</h2>
+          <p className="text-[#8b949e] mb-6">
+            Pass <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-sm text-[#79c0ff]">style</code>{" "}
+            to <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-sm text-[#79c0ff]">/api/mini</code>{" "}
+            or <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-sm text-[#79c0ff]">/api/badge</code>{" "}
+            to switch the badge look.
+          </p>
+          <pre className="overflow-x-auto rounded-lg border border-[#30363d] bg-[#161b22] px-5 py-3 text-sm text-[#c9d1d9] mb-6">
+            ?style=for-the-badge
+          </pre>
+          <div className="overflow-x-auto rounded-lg border border-[#30363d]">
+            <table className="w-full text-sm">
+              <thead className="bg-[#161b22] text-left text-[#8b949e]">
+                <tr>
+                  <th className="px-4 py-3 font-medium">Style</th>
+                  <th className="px-4 py-3 font-medium">Preview</th>
+                  <th className="px-4 py-3 font-medium">Description</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#21262d]">
+                {BADGE_STYLES.map((s) => (
+                  <tr key={s.key} className="hover:bg-[#161b22]/50">
+                    <td className="px-4 py-3 align-top">
+                      <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-xs text-[#79c0ff]">
+                        {s.key}
+                      </code>
+                      <div className="text-xs text-[#8b949e] mt-1">{s.label}</div>
+                    </td>
+                    <td className="px-4 py-3 align-top">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={`/api/badge?style=${s.key}`}
+                        alt={`${s.label} badge preview`}
+                        className="h-5"
+                      />
+                    </td>
+                    <td className="px-4 py-3 text-[#c9d1d9] align-top">{s.desc}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
 
 
       {/* ─── Footer ─── */}
