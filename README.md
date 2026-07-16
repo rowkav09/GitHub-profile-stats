@@ -40,13 +40,19 @@ Free, real-time GitHub stat cards, badges, and charts -- drop a URL into your RE
 [![](https://ghstats.dev/api/card?username=YOUR_USERNAME&theme=forest&size=compact&compact_count=6)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
 
-**Languages (bar + stacked)**
+**Languages (bar, stacked, grid, horizontal list, vertical list)**
 
 [![](https://ghstats.dev/api/langs?username=rowkav09&theme=dracula&layout=bar)](https://github.com/rowkav09/GitHub-profile-stats)
 [![](https://ghstats.dev/api/langs?username=rowkav09&theme=ocean&layout=stacked)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/langs?username=rowkav09&theme=radical&layout=horizontal_list)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/langs?username=rowkav09&theme=catppuccin&layout=vertical_list)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/langs?username=rowkav09&theme=tokyonight&layout=grid)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
 [![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=dracula&layout=bar)](https://github.com/rowkav09/GitHub-profile-stats)
 [![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=ocean&layout=stacked)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=radical&layout=horizontal_list)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=catppuccin&layout=vertical_list)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=tokyonight&layout=grid)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
 
 **Mini badges (drop anywhere)**
@@ -111,7 +117,7 @@ Need tweaks? Use the on-page editor to toggle stats, themes, borders, titles, an
 - Styling: `bg`, `text`, `title_color`, `icon_color`, `border_color`, `border_radius`, `custom_title`, `order`
 
 **Languages ( /api/langs )**
-- `layout=bar|stacked`, `max_langs` (1--12)
+- `layout=bar|stacked|horizontal_list|vertical_list|grid`, `max_langs` (1--12)
 - `hide_border`, `hide_title`, `custom_title`, `border_radius`, theme overrides as above
 
 **Mini badges ( /api/mini )**

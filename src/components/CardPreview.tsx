@@ -103,7 +103,7 @@ export default function CardPreview() {
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   // Languages options
-  const [langLayout, setLangLayout] = useState<"bar" | "stacked">("bar");
+  const [langLayout, setLangLayout] = useState<"bar" | "stacked" | "horizontal_list" | "vertical_list" | "grid">("bar");
   const [maxLangs, setMaxLangs] = useState(8);
 
   // Mini badge options
@@ -505,7 +505,7 @@ export default function CardPreview() {
                 <div>
                   <label className="label-text">Layout</label>
                   <div className="mt-2 inline-flex rounded-xl border border-[#30363d] bg-[#161b22] p-[3px]">
-                    {(["bar", "stacked"] as const).map((opt) => (
+                    {(["bar", "stacked", "horizontal_list", "vertical_list", "grid"] as const).map((opt) => (
                       <button
                         key={opt}
                         onClick={() => setLangLayout(opt)}
@@ -515,7 +515,7 @@ export default function CardPreview() {
                             : "text-[#8b949e] hover:text-[#c9d1d9]"
                         }`}
                       >
-                        {opt === "bar" ? "Bar" : "Stacked"}
+                        {opt === "bar" ? "Bar" : opt === "stacked" ? "Stacked" : opt === "horizontal_list" ? "Horizontal List" : opt === "vertical_list" ? "Vertical List" : "Grid"}
                       </button>
                     ))}
                   </div>
@@ -719,8 +719,39 @@ export default function CardPreview() {
           </div>
         </div>
 
+        {/* ─── Embed Code ─── */}
+        <div className="grid gap-4 sm:grid-cols-3 animate-slide-up" style={{ animationDelay: "160ms" }}>
+          {[
+            { label: "Link", code: embedUrl, id: "link" },
+            { label: "Markdown", code: markdownCode, id: "md" },
+            { label: "HTML", code: htmlCode, id: "html" },
+          ].map((block) => (
+            <div key={block.id} className="embed-block">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-semibold text-[#8b949e] uppercase tracking-widest">
+                  {block.label}
+                </span>
+                <button
+                  onClick={() => copyToClipboard(block.code, block.id)}
+                  disabled={!embedUrl}
+                  className="copy-btn"
+                >
+                  {copiedField === block.id ? (
+                    <span className="text-[#3fb950] transition-colors duration-200">Copied!</span>
+                  ) : (
+                    "Copy"
+                  )}
+                </button>
+              </div>
+              <pre className="text-xs text-[#c9d1d9] whitespace-pre-wrap break-all leading-relaxed">
+                {block.code}
+              </pre>
+            </div>
+          ))}
+        </div>
+
         {/* ─── Theme Grid ─── */}
-        <div className="animate-slide-up" style={{ animationDelay: "160ms" }}>
+        <div className="animate-slide-up" style={{ animationDelay: "240ms" }}>
           <label className="label-text mb-3 block">Theme</label>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {themeEntries.map(([key, t]) => {
@@ -765,36 +796,6 @@ export default function CardPreview() {
               );
             })}
           </div>
-        </div>
-
-        {/* ─── Embed Code ─── */}
-        <div className="grid gap-4 sm:grid-cols-2 animate-slide-up" style={{ animationDelay: "240ms" }}>
-          {[
-            { label: "Markdown", code: markdownCode, id: "md" },
-            { label: "HTML", code: htmlCode, id: "html" },
-          ].map((block) => (
-            <div key={block.id} className="embed-block">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-semibold text-[#8b949e] uppercase tracking-widest">
-                  {block.label}
-                </span>
-                <button
-                  onClick={() => copyToClipboard(block.code, block.id)}
-                  disabled={!embedUrl}
-                  className="copy-btn"
-                >
-                  {copiedField === block.id ? (
-                    <span className="text-[#3fb950] transition-colors duration-200">Copied!</span>
-                  ) : (
-                    "Copy"
-                  )}
-                </button>
-              </div>
-              <pre className="text-xs text-[#c9d1d9] whitespace-pre-wrap break-all leading-relaxed">
-                {block.code}
-              </pre>
-            </div>
-          ))}
         </div>
       </div>
     </section>
