@@ -2,11 +2,12 @@
 ![Repo Views](https://ghstats.dev/api/visits?username=rowkav09&repo=GitHub-profile-stats)
 [![CodeFactor](https://www.codefactor.io/repository/github/rowkav09/github-profile-stats/badge)](https://www.codefactor.io/repository/github/rowkav09/github-profile-stats)
 
-# GitHub Profile Stats — now with mini badges & sparklines
+# GitHub Profile Stats -- mini badges, sparklines, and badge styles
 
-Free, real-time GitHub stat cards, badges, and charts — drop a URL into your README and you're done. No tokens, no setup.
+Free, real-time GitHub stat cards, badges, and charts -- drop a URL into your README and you're done. No tokens, no setup.
 
 **[ghstats.dev](https://ghstats.dev)**
+
 ## Star History
 
 <a href="https://www.star-history.com/?repos=rowkav09%2FGitHub-profile-stats&type=timeline&logscale=&legend=top-left">
@@ -16,6 +17,7 @@ Free, real-time GitHub stat cards, badges, and charts — drop a URL into your R
    <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=rowkav09/GitHub-profile-stats&type=timeline&logscale&legend=top-left&sealed_token=K7ehQ1OSS0BQZeCxmP7eYlVuQLuvBhZhkiUgzwBmJQM-nCWRN-0hDvroEw3e8-r6tzElRBg7H5J57AWa-QW14kMMXfnrOo6SkTdrOx-jgAqt6JhKDZ4HIswcQB1pppVsLq61qXdD2rc7dBxMBlRl9gtVJW2BccrSVSFGQqpg5g7xWlwBt8i8OTSMXe6A" />
  </picture>
 </a>
+
 ---
 
 ## Copy-paste gallery
@@ -30,9 +32,7 @@ Free, real-time GitHub stat cards, badges, and charts — drop a URL into your R
 **Compact grids (3 / 4 / 6)**
 
 [![](https://ghstats.dev/api/card?username=rowkav09&theme=radical&size=compact&compact_count=3)](https://github.com/rowkav09/GitHub-profile-stats)
-
 [![](https://ghstats.dev/api/card?username=rowkav09&theme=catppuccin&size=compact&compact_count=4)](https://github.com/rowkav09/GitHub-profile-stats)
-
 [![](https://ghstats.dev/api/card?username=rowkav09&theme=forest&size=compact&compact_count=6)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
 [![](https://ghstats.dev/api/card?username=YOUR_USERNAME&theme=radical&size=compact&compact_count=3)](https://github.com/rowkav09/GitHub-profile-stats)
@@ -43,7 +43,6 @@ Free, real-time GitHub stat cards, badges, and charts — drop a URL into your R
 **Languages (bar + stacked)**
 
 [![](https://ghstats.dev/api/langs?username=rowkav09&theme=dracula&layout=bar)](https://github.com/rowkav09/GitHub-profile-stats)
-
 [![](https://ghstats.dev/api/langs?username=rowkav09&theme=ocean&layout=stacked)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
 [![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=dracula&layout=bar)](https://github.com/rowkav09/GitHub-profile-stats)
@@ -52,25 +51,41 @@ Free, real-time GitHub stat cards, badges, and charts — drop a URL into your R
 
 **Mini badges (drop anywhere)**
 
-[![](https://ghstats.dev/api/mini?username=rowkav09&metric=stars)](https://github.com/rowkav09/GitHub-profile-stats)
+Any metric, any colour, any style -- perfect for sprinkling through a README.
 
-[![](https://ghstats.dev/api/mini?username=rowkav09&metric=commits&color=0ea5e9)](https://github.com/rowkav09/GitHub-profile-stats)
-
-[![](https://ghstats.dev/api/mini?username=rowkav09&metric=streak&color=f97316)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/mini?username=rowkav09&metric=stars&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/mini?username=rowkav09&metric=commits&color=0ea5e9&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/mini?username=rowkav09&metric=streak&color=f97316&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/mini?username=rowkav09&metric=followers&label=Community&color=22c55e&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
-[![](https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=stars)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=commits&color=0ea5e9)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=streak&color=f97316)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=stars&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=commits&color=0ea5e9&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=streak&color=f97316&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=followers&label=Community&color=22c55e&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
 
-**Activity sparkline (7–90 days)**
+Pass `label=...` to override the default label text and `style=...` to switch between `flat`, `flat-square`, `for-the-badge`, `plastic`, and `minimal` (see the table below).
+
+**Badge styles -- pick a look**
+
+| Style | Preview |
+| --- | --- |
+| `flat` | ![](https://ghstats.dev/api/badge?style=flat) |
+| `flat-square` | ![](https://ghstats.dev/api/badge?style=flat-square) |
+| `for-the-badge` | ![](https://ghstats.dev/api/badge?style=for-the-badge) |
+| `plastic` | ![](https://ghstats.dev/api/badge?style=plastic) |
+| `minimal` | ![](https://ghstats.dev/api/badge?style=minimal) |
+
+Apply with `?style=for-the-badge` on `/api/mini` or `/api/badge`. Works alongside `color` and `label`.
+
+**Activity sparkline (7--90 days)**
 
 [![](https://ghstats.dev/api/sparkline?username=rowkav09&days=30&width=420)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
 [![](https://ghstats.dev/api/sparkline?username=YOUR_USERNAME&days=30&width=420)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
 
-**Quick color override**
+**Quick colour override**
 ```
 https://ghstats.dev/api/card?username=YOUR_USERNAME&bg=0f0f23&text=cccccc&title_color=ffff66&icon_color=ff6644
 ```
@@ -96,29 +111,36 @@ Need tweaks? Use the on-page editor to toggle stats, themes, borders, titles, an
 - Styling: `bg`, `text`, `title_color`, `icon_color`, `border_color`, `border_radius`, `custom_title`, `order`
 
 **Languages ( /api/langs )**
-- `layout=bar|stacked`, `max_langs` (1–12)
+- `layout=bar|stacked`, `max_langs` (1--12)
 - `hide_border`, `hide_title`, `custom_title`, `border_radius`, theme overrides as above
 
 **Mini badges ( /api/mini )**
 - `metric=stars|commits|prs|issues|hours|streak|week|followers|repos|contributions`
 - `label` (override text), `color` (value side), `theme` (for errors)
+- `style=flat|flat-square|for-the-badge|plastic|minimal` (default `flat`)
+
+**Counter badge ( /api/badge )**
+- `style=flat|flat-square|for-the-badge|plastic|minimal` (default `flat`)
+
+**Visits badge ( /api/visits )**
+- `style=flat|flat-square|for-the-badge|plastic|minimal` (default `flat`)
 
 > Note: `hours` is currently WIP and is an estimate, not exact tracked coding time.
 
 **Sparkline ( /api/sparkline )**
-- `days` (7–90), `width` (180–800), `height` (40–240), `line_color`, `fill_color`, `title`, `hide_border`, `border_radius`
+- `days` (7--90), `width` (180--800), `height` (40--240), `line_color`, `fill_color`, `title`, `hide_border`, `border_radius`
 
 ---
 
 ## Themes
 
-Default, Light, Radical, Tokyo Night, Dracula, Nord, Gruvbox, Catppuccin, Ocean, Sunset, Forest, Midnight.
+Default, Light, Radical, Tokyo Night, Dracula, Nord, Gruvbox, Catppuccin, Ocean, Sunset, Forest, Midnight, Night Owl, Solarized, Ayu, Rose Pine, Kanagawa, Material Palenight.
 
 ---
 
 ## FAQ
 
-- **Token needed?** Yes — the GitHub GraphQL API requires a valid token. Set `GITHUB_TOKEN`, `GH_TOKEN`, or `GITHUB_ACCESS_TOKEN`.
+- **Token needed?** Yes -- the GitHub GraphQL API requires a valid token. Set `GITHUB_TOKEN`, `GH_TOKEN`, or `GITHUB_ACCESS_TOKEN`.
 - **Refresh rate?** Tiered by endpoint so slower-moving badges can stay cached longer while activity-focused embeds refresh sooner.
 - **Free?** Yes. MIT licensed.
 - **Where to tweak without URLs?** [ghstats.dev/builder](https://ghstats.dev/builder).
@@ -134,8 +156,8 @@ Default, Light, Radical, Tokyo Night, Dracula, Nord, Gruvbox, Catppuccin, Ocean,
 
 ## Contributing & support
 
-- PRs welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
-- Like it? Drop a ⭐ on the repo: [GitHub](https://github.com/rowkav09/GitHub-profile-stats).
+- PRs welcome -- see [CONTRIBUTING.md](CONTRIBUTING.md).
+- Like it? Drop a star on the repo: [GitHub](https://github.com/rowkav09/GitHub-profile-stats).
 
 ---
 

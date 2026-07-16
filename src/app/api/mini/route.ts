@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { fetchGitHubStats } from "@/lib/github";
-import { renderBadge } from "../badge/badge-svg";
+import { renderBadge, resolveBadgeStyle } from "../badge/badge-svg";
 import { renderErrorCard } from "@/lib/svg";
 import { resolveTheme } from "@/lib/themes";
 import { sanitizeUsername, sanitizeHexParam, formatNumber } from "@/lib/sanitize";
@@ -49,6 +49,7 @@ export async function GET(request: NextRequest) {
   const color = sanitizeHexParam(params.get("color")) ?? theme.title.replace(/^#/, "") ?? metric.color;
   const customLabel = params.get("label")?.trim();
   const label = customLabel && customLabel.length > 0 ? customLabel.slice(0, 32) : metric.label;
+  const style = resolveBadgeStyle(params.get("style"));
 
   const headers = {
     "Content-Type": "image/svg+xml",
@@ -70,7 +71,7 @@ export async function GET(request: NextRequest) {
     const labelBg = theme.border?.replace(/^#/, "") ?? "555";
     const text = theme.text?.replace(/^#/, "") ?? "fff";
 
-    return new Response(renderBadge(label, value, { accent: color, labelBg, text }), {
+    return new Response(renderBadge(label, value, { accent: color, labelBg, text }, style), {
       status: 200,
       headers,
     });
