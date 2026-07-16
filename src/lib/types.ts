@@ -65,7 +65,7 @@ export interface LangChartOptions {
   custom_title?: string;
   border_radius: number;
   max_langs: number; // max languages to show (default 8)
-  layout: "donut" | "bar" | "stacked"; // chart style
+  layout: "donut" | "bar" | "stacked" | "horizontal_list" | "vertical_list" | "grid"; // chart style
 }
 
 export type StatKey =

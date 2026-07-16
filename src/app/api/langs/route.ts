@@ -40,9 +40,15 @@ export async function GET(request: NextRequest) {
     layout:
       params.get("layout") === "stacked"
         ? "stacked"
-        : params.get("layout") === "donut"
-          ? "donut"
-          : "bar",
+        : params.get("layout") === "horizontal_list"
+          ? "horizontal_list"
+          : params.get("layout") === "vertical_list"
+            ? "vertical_list"
+            : params.get("layout") === "grid"
+              ? "grid"
+              : params.get("layout") === "donut"
+                ? "donut"
+                : "bar",
   };
 
   const headers = {

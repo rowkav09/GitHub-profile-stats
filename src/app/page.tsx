@@ -93,6 +93,18 @@ const PARAMS = [
     desc: 'Card density — "default" or "compact" (smaller fonts & tighter rows)',
   },
   {
+    name: "layout",
+    type: "string",
+    default: '"bar"',
+    desc: 'Languages chart style — "bar", "stacked", "horizontal_list", "vertical_list", or "grid"',
+  },
+  {
+    name: "max_langs",
+    type: "number",
+    default: "8",
+    desc: "Max languages to show in the chart (1–12)",
+  },
+  {
     name: "style",
     type: "string",
     default: '"flat"',
