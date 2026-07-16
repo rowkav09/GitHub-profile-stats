@@ -1,6 +1,6 @@
-![Users](https://gh-profile-stats.up.railway.app/api/badge?style=for-the-badge&v=2)
-![Repo Views](https://gh-profile-stats.up.railway.app/api/visits?username=rowkav09&repo=GitHub-profile-stats&style=for-the-badge&v=2)
-[![CodeFactor](https://www.codefactor.io/repository/github/rowkav09/github-profile-stats/badge?style=for-the-badge)](https://www.codefactor.io/repository/github/rowkav09/github-profile-stats)
+![Users](https://ghstats.dev/api/badge)
+![Repo Views](https://ghstats.dev/api/visits?username=rowkav09&repo=GitHub-profile-stats)
+[![CodeFactor](https://www.codefactor.io/repository/github/rowkav09/github-profile-stats/badge)](https://www.codefactor.io/repository/github/rowkav09/github-profile-stats)
 
 # GitHub Profile Stats -- mini badges, sparklines, and badge styles
 
@@ -12,9 +12,9 @@ Free, real-time GitHub stat cards, badges, and charts -- drop a URL into your RE
 
 <a href="https://www.star-history.com/?repos=rowkav09%2FGitHub-profile-stats&type=timeline&logscale=&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=rowkav09/GitHub-profile-stats&type=timeline&theme=dark&logscale&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=rowkav09/GitHub-profile-stats&type=timeline&logscale&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=rowkav09/GitHub-profile-stats&type=timeline&logscale&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=rowkav09/GitHub-profile-stats&type=timeline&theme=dark&logscale&legend=top-left&sealed_token=K7ehQ1OSS0BQZeCxmP7eYlVuQLuvBhZhkiUgzwBmJQM-nCWRN-0hDvroEw3e8-r6tzElRBg7H5J57AWa-QW14kMMXfnrOo6SkTdrOx-jgAqt6JhKDZ4HIswcQB1pppVsLq61qXdD2rc7dBxMBlRl9gtVJW2BccrSVSFGQqpg5g7xWlwBt8i8OTSMXe6A" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=rowkav09/GitHub-profile-stats&type=timeline&logscale&legend=top-left&sealed_token=K7ehQ1OSS0BQZeCxmP7eYlVuQLuvBhZhkiUgzwBmJQM-nCWRN-0hDvroEw3e8-r6tzElRBg7H5J57AWa-QW14kMMXfnrOo6SkTdrOx-jgAqt6JhKDZ4HIswcQB1pppVsLq61qXdD2rc7dBxMBlRl9gtVJW2BccrSVSFGQqpg5g7xWlwBt8i8OTSMXe6A" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=rowkav09/GitHub-profile-stats&type=timeline&logscale&legend=top-left&sealed_token=K7ehQ1OSS0BQZeCxmP7eYlVuQLuvBhZhkiUgzwBmJQM-nCWRN-0hDvroEw3e8-r6tzElRBg7H5J57AWa-QW14kMMXfnrOo6SkTdrOx-jgAqt6JhKDZ4HIswcQB1pppVsLq61qXdD2rc7dBxMBlRl9gtVJW2BccrSVSFGQqpg5g7xWlwBt8i8OTSMXe6A" />
  </picture>
 </a>
 
