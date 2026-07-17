@@ -41,6 +41,49 @@ function formatTrend(pct: number): { direction: "up" | "down" | "neutral"; text:
   return { direction: "neutral", text: "0%" };
 }
 
+function charWidth(ch: string, fontSize: number): number {
+  const c = ch.toLowerCase();
+  if ("ijlt!:;|".includes(c)) return fontSize * 0.27;
+  if ("frskce".includes(c)) return fontSize * 0.42;
+  if ("adgnoquvxyzsbhkp".includes(c)) return fontSize * 0.50;
+  if ("mwW".includes(c)) return fontSize * 0.58;
+  if ("MQ@".includes(c)) return fontSize * 0.69;
+  return fontSize * 0.50;
+}
+
+function truncateToWidth(text: string, maxWidth: number, fontSize: number): string {
+  let width = 0;
+  let lastFit = 0;
+  for (let i = 0; i < text.length; i++) {
+    const w = charWidth(text[i], fontSize);
+    if (width + w > maxWidth) break;
+    width += w;
+    lastFit = i + 1;
+  }
+  if (lastFit === text.length) return text;
+  if (lastFit === 0) return "\u2026";
+  const ellipsisW = charWidth("\u2026", fontSize);
+  while (lastFit > 0 && width + ellipsisW > maxWidth) {
+    width -= charWidth(text[lastFit - 1], fontSize);
+    lastFit--;
+  }
+  if (lastFit === 0) return "\u2026";
+  return text.slice(0, lastFit) + "\u2026";
+}
+
+function estimateTextWidth(text: string, fontSize: number): number {
+  let width = 0;
+  for (const ch of text) width += charWidth(ch, fontSize);
+  return width;
+}
+
+function formatLangPct(size: number, total: number): string {
+  if (total <= 0) return "0.0%";
+  const pct = (size / total) * 100;
+  if (pct > 0 && pct < 0.05) return "0.1%";
+  return `${pct.toFixed(1)}%`;
+}
+
 function getVisibleStats(
   stats: GitHubStats,
   hide: string[],
@@ -447,6 +490,18 @@ export function renderLanguageChart(
 
   const totalSize = topLangs.reduce((s, l) => s + l.size, 0);
 
+  if (options.layout === "grid") {
+    return renderGridLanguageChart(topLangs, totalSize, theme, options);
+  }
+
+  if (options.layout === "vertical_list") {
+    return renderVerticalListLanguageChart(topLangs, totalSize, theme, options);
+  }
+
+  if (options.layout === "horizontal_list") {
+    return renderHorizontalListLanguageChart(topLangs, totalSize, theme, options);
+  }
+
   if (options.layout === "stacked") {
     return renderStackedLanguageChart(topLangs, totalSize, theme, options);
   }
@@ -482,11 +537,11 @@ export function renderLanguageChart(
     const row = Math.floor(i / COLS);
     const lx = PAD + col * COL_W;
     const ly = NAMES_TOP + row * ROW_H;
-    const pct = ((lang.size / totalSize) * 100).toFixed(1);
-    const name = lang.name.length > 16 ? lang.name.slice(0, 15) + "…" : lang.name;
+    const pct = formatLangPct(lang.size, totalSize);
+    const name = truncateToWidth(lang.name, COL_W - 22, 11);
     return `<circle cx="${lx + 6}" cy="${ly + 5}" r="4" fill="${lang.color ?? "#586069"}"/>
   <text x="${lx + 14}" y="${ly + 9}" class="lc-name">${escapeXml(name)}</text>
-  <text x="${lx + COL_W - 2}" y="${ly + 9}" class="lc-pct" text-anchor="end">${pct}%</text>`;
+  <text x="${lx + COL_W - 2}" y="${ly + 9}" class="lc-pct" text-anchor="end">${escapeXml(pct)}</text>`;
   });
 
   const titleSvg = options.hide_title
@@ -583,6 +638,293 @@ function renderStackedLanguageChart(
   ${titleSvg}
   <g>${barSegments.join("")}</g>
   ${langLabels.join("\n  ")}
+</svg>`;
+}
+
+function renderBaseCard(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  rx: number,
+  theme: ThemeConfig,
+  borderColor?: string,
+  borderOpacity?: number,
+): string {
+  const stroke = borderColor ?? theme.border;
+  const opacity = borderOpacity !== undefined ? ` stroke-opacity="${borderOpacity}"` : "";
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" ry="${rx}" fill="${theme.bg}" stroke="${stroke}" stroke-width="1"${opacity}/>`;
+}
+
+function renderLanguageCard(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  lang: { name: string; color: string },
+  pct: string,
+  rx: number,
+  theme: ThemeConfig,
+  isHero: boolean,
+): string {
+  const CIRCLE_R = isHero ? 6 : 5;
+  const NAME_FONT = isHero ? 15 : 13;
+  const PCT_FONT = isHero ? 24 : 20;
+
+  const PAD_TOP = 16;
+  const NAME_AREA = 24;
+  const PAD_BOTTOM = 16;
+
+  const headerY = y + PAD_TOP + CIRCLE_R;
+  const CIRCLE_SPACE = 14 + CIRCLE_R + 6;
+  const TEXT_AREA = w - CIRCLE_SPACE - 8;
+  const nameText = truncateToWidth(lang.name, TEXT_AREA, NAME_FONT);
+
+  const pctContentTop = y + PAD_TOP + NAME_AREA;
+  const pctContentH = h - PAD_TOP - NAME_AREA - PAD_BOTTOM;
+  const pctY = pctContentTop + pctContentH / 2 + PCT_FONT * 0.35;
+
+  return [
+    renderBaseCard(x, y, w, h, rx, theme, theme.text, 0.15),
+    `<circle cx="${x + 14}" cy="${headerY}" r="${CIRCLE_R}" fill="${lang.color ?? "#586069"}"/>`,
+    `<text x="${x + 14 + CIRCLE_R + 6}" y="${headerY + 4}" class="gl-name" font-size="${NAME_FONT}">${escapeXml(nameText)}</text>`,
+    `<text x="${x + w / 2}" y="${pctY}" text-anchor="middle" class="gl-pct" font-size="${PCT_FONT}" fill="${lang.color ?? "#586069"}">${escapeXml(pct)}</text>`,
+  ].join("\n    ");
+}
+
+function renderGridLanguageChart(
+  languages: LanguageStat[],
+  totalSize: number,
+  theme: ThemeConfig,
+  options: LangChartOptions,
+): string {
+  const filteredLangs = languages.filter((l) => l.size > 0.0);
+  const filteredTotal = filteredLangs.reduce(
+    (sum: number, l: LanguageStat) => sum + l.size,
+    0,
+  );
+
+  const W = 495;
+  const PAD = 25;
+  const TITLE_H = options.hide_title ? 0 : 28;
+  const BAR_H = 10;
+  const BAR_Y = TITLE_H + 12;
+  const BAR_W = W - PAD * 2;
+  const GAP = 12;
+  const rx = options.border_radius;
+
+  const numLangs = filteredLangs.length;
+  const COLS = numLangs <= 1 ? 1 : numLangs <= 4 ? 2 : 4;
+  const CARD_W = Math.floor((BAR_W - (COLS - 1) * GAP) / COLS);
+  const CARD_H = numLangs === 1 ? 80 : 72;
+  const GRID_TOP = BAR_Y + BAR_H + 16;
+  const numRows = Math.ceil(numLangs / COLS);
+  const H = GRID_TOP + numRows * (CARD_H + GAP) - GAP + 16;
+
+  let bx = PAD;
+  const barSegments = filteredLangs.map((lang) => {
+    const w = Math.max(2, Math.round((lang.size / filteredTotal) * BAR_W));
+    const el = `<rect x="${bx}" y="${BAR_Y}" width="${w}" height="${BAR_H}" fill="${lang.color ?? "#586069"}"/>`;
+    bx += w;
+    return el;
+  });
+
+  const barClip = `<clipPath id="gl-clip"><rect x="${PAD}" y="${BAR_Y}" width="${BAR_W}" height="${BAR_H}" rx="${BAR_H / 2}"/></clipPath>`;
+  const cardClips = filteredLangs
+    .map((_, i) => {
+      const col = i % COLS;
+      const row = Math.floor(i / COLS);
+      const cx = PAD + col * (CARD_W + GAP);
+      const cy = GRID_TOP + row * (CARD_H + GAP);
+      return `<clipPath id="gl-card-${i}"><rect x="${cx}" y="${cy}" width="${CARD_W}" height="${CARD_H}" rx="${rx}"/></clipPath>`;
+    })
+    .join("\n    ");
+  const clipDef = `${barClip}\n    ${cardClips}`;
+
+  const langCards = filteredLangs.map((lang, i) => {
+    const col = i % COLS;
+    const row = Math.floor(i / COLS);
+    const cx = PAD + col * (CARD_W + GAP);
+    const cy = GRID_TOP + row * (CARD_H + GAP);
+    const pct = formatLangPct(lang.size, filteredTotal);
+    const cardContent = renderLanguageCard(cx, cy, CARD_W, CARD_H, lang, pct, rx, theme, numLangs === 1);
+    return `<g clip-path="url(#gl-card-${i})">${cardContent}</g>`;
+  });
+
+  const titleSvg = options.hide_title
+    ? ""
+    : `<text x="${PAD}" y="${TITLE_H - 4}" class="gl-title">${escapeXml(options.custom_title ?? "Top Languages")}</text>`;
+
+  const border = options.hide_border ? "" : ` stroke="${theme.border}" stroke-width="1"`;
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Top Languages (grid)">
+  <title>${escapeXml(options.custom_title ?? "Top Languages")}</title>
+  <defs>${clipDef}</defs>
+  <style>
+    .gl-title { font: 600 14px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.title}; }
+    .gl-name  { font: 400 13px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; }
+    .gl-pct   { font: 600 20px 'Segoe UI', Ubuntu, sans-serif; }
+  </style>
+  <rect x="0.5" y="0.5" rx="${rx}" ry="${rx}" width="${W - 1}" height="${H - 1}" fill="${theme.bg}"${border}/>
+  ${titleSvg}
+  <g clip-path="url(#gl-clip)">${barSegments.join("")}</g>
+  ${langCards.join("\n")}
+</svg>`;
+}
+
+function renderHorizontalListLanguageChart(
+  languages: LanguageStat[],
+  totalSize: number,
+  theme: ThemeConfig,
+  options: LangChartOptions,
+): string {
+  const W = 495;
+  const PAD = 25;
+  const TITLE_H = options.hide_title ? 0 : 28;
+  const BAR_H = 10;
+  const BAR_Y = TITLE_H + 12;
+  const BAR_W = W - PAD * 2;
+  const ITEM_GAP = 20;
+  const ROW_H = 22;
+  const CIRCLE_R = 4;
+  const CIRCLE_GAP = 10;
+  const rx = options.border_radius;
+
+  let bx = PAD;
+  const barSegments = languages.map((lang) => {
+    const w = Math.max(2, Math.round((lang.size / totalSize) * BAR_W));
+    const el = `<rect x="${bx}" y="${BAR_Y}" width="${w}" height="${BAR_H}" fill="${lang.color ?? "#586069"}"/>`;
+    bx += w;
+    return el;
+  });
+  const clipDef = `<clipPath id="hl-clip"><rect x="${PAD}" y="${BAR_Y}" width="${BAR_W}" height="${BAR_H}" rx="${BAR_H / 2}"/></clipPath>`;
+
+  const items = languages.map((lang) => {
+    const pct = formatLangPct(lang.size, totalSize);
+    const displayName = truncateToWidth(lang.name, BAR_W - 60, 11);
+    const itemTextWidth = CIRCLE_R * 2 + CIRCLE_GAP + estimateTextWidth(displayName, 11) + 14 + estimateTextWidth(pct, 11);
+    return { lang: { ...lang, displayName }, pct, itemTextWidth };
+  });
+
+  const rows: (typeof items[0])[][] = [];
+  let currentRow: typeof items[0][] = [];
+  let currentWidth = 0;
+
+  for (const item of items) {
+    const totalRowWidth = currentWidth + item.itemTextWidth + (currentRow.length > 0 ? ITEM_GAP : 0);
+    if (currentRow.length > 0 && totalRowWidth > BAR_W) {
+      rows.push(currentRow);
+      currentRow = [item];
+      currentWidth = item.itemTextWidth;
+    } else {
+      currentRow.push(item);
+      currentWidth = totalRowWidth;
+    }
+  }
+  if (currentRow.length > 0) rows.push(currentRow);
+
+  const numRows = rows.length;
+  const ITEMS_TOP = BAR_Y + BAR_H + 18;
+  const H = ITEMS_TOP + numRows * ROW_H + 16;
+
+  const itemSvgs = rows.map((row, rowIdx) => {
+    const y = ITEMS_TOP + rowIdx * ROW_H;
+    let x = PAD;
+    return row.map((item, colIdx) => {
+      const circleX = x + CIRCLE_R;
+      const textX = x + CIRCLE_R * 2 + CIRCLE_GAP;
+      const pctX = textX + estimateTextWidth(item.lang.displayName, 11) + 14;
+
+      const svg = `<circle cx="${circleX}" cy="${y + 5}" r="${CIRCLE_R}" fill="${item.lang.color ?? "#586069"}"/>
+    <text x="${textX}" y="${y + 9}" class="lc-name">${escapeXml(item.lang.displayName)}</text>
+    <text x="${pctX}" y="${y + 9}" class="lc-pct">${escapeXml(item.pct)}</text>`;
+
+      x += item.itemTextWidth + (colIdx < row.length - 1 ? ITEM_GAP : 0);
+      return svg;
+    }).join("\n  ");
+  }).join("\n");
+
+  const titleSvg = options.hide_title
+    ? ""
+    : `<text x="${PAD}" y="${TITLE_H - 4}" class="lc-title">${escapeXml(options.custom_title ?? "Top Languages")}</text>`;
+
+  const border = options.hide_border ? "" : ` stroke="${theme.border}" stroke-width="1"`;
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Top Languages (horizontal list)">
+  <title>${escapeXml(options.custom_title ?? "Top Languages")}</title>
+  <defs>${clipDef}</defs>
+  <style>
+    .lc-title { font: 600 14px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.title}; }
+    .lc-name  { font: 400 11px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; }
+    .lc-pct   { font: 600 11px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; opacity: 0.7; }
+  </style>
+  <rect x="0.5" y="0.5" rx="${rx}" ry="${rx}" width="${W - 1}" height="${H - 1}" fill="${theme.bg}"${border}/>
+  ${titleSvg}
+  <g clip-path="url(#hl-clip)">${barSegments.join("")}</g>
+  ${itemSvgs}
+</svg>`;
+}
+
+function renderVerticalListLanguageChart(
+  languages: LanguageStat[],
+  totalSize: number,
+  theme: ThemeConfig,
+  options: LangChartOptions,
+): string {
+  const W = 495;
+  const PAD = 25;
+  const TITLE_H = options.hide_title ? 0 : 28;
+  const BAR_H = 10;
+  const BAR_Y = TITLE_H + 12;
+  const BAR_W = W - PAD * 2;
+  const ROW_H = 32;
+  const CIRCLE_R = 4;
+  const NAMES_TOP = BAR_Y + BAR_H + 18;
+  const H = NAMES_TOP + languages.length * ROW_H + 16;
+  const rx = options.border_radius;
+
+  let bx = PAD;
+  const barSegments = languages.map((lang) => {
+    const w = Math.max(2, Math.round((lang.size / totalSize) * BAR_W));
+    const el = `<rect x="${bx}" y="${BAR_Y}" width="${w}" height="${BAR_H}" fill="${lang.color ?? "#586069"}"/>`;
+    bx += w;
+    return el;
+  });
+  const clipDef = `<clipPath id="vl-clip"><rect x="${PAD}" y="${BAR_Y}" width="${BAR_W}" height="${BAR_H}" rx="${BAR_H / 2}"/></clipPath>`;
+
+  const langRows = languages.map((lang, i) => {
+    const y = NAMES_TOP + i * ROW_H;
+    const pct = formatLangPct(lang.size, totalSize);
+    const name = truncateToWidth(lang.name, W - PAD * 2 - 60, 13);
+
+    const divider = i < languages.length - 1
+      ? `<line x1="${PAD}" y1="${y + ROW_H}" x2="${W - PAD}" y2="${y + ROW_H}" stroke="${theme.border}" stroke-width="1" opacity="0.2"/>`
+      : "";
+
+    return `${divider}
+    <circle cx="${PAD + CIRCLE_R}" cy="${y + ROW_H / 2}" r="${CIRCLE_R}" fill="${lang.color ?? "#586069"}"/>
+    <text x="${PAD + CIRCLE_R * 2 + 8}" y="${y + ROW_H / 2 + 4}" class="lc-name">${escapeXml(name)}</text>
+    <text x="${W - PAD}" y="${y + ROW_H / 2 + 4}" class="lc-pct" text-anchor="end">${escapeXml(pct)}</text>`;
+  });
+
+  const titleSvg = options.hide_title
+    ? ""
+    : `<text x="${PAD}" y="${TITLE_H - 4}" class="lc-title">${escapeXml(options.custom_title ?? "Top Languages")}</text>`;
+
+  const border = options.hide_border ? "" : ` stroke="${theme.border}" stroke-width="1"`;
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Top Languages (vertical list)">
+  <title>${escapeXml(options.custom_title ?? "Top Languages")}</title>
+  <defs>${clipDef}</defs>
+  <style>
+    .lc-title { font: 600 14px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.title}; }
+    .lc-name  { font: 400 13px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; }
+    .lc-pct   { font: 400 13px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; opacity: 0.7; }
+  </style>
+  <rect x="0.5" y="0.5" rx="${rx}" ry="${rx}" width="${W - 1}" height="${H - 1}" fill="${theme.bg}"${border}/>
+  ${titleSvg}
+  <g clip-path="url(#vl-clip)">${barSegments.join("")}</g>
+  ${langRows.join("\n")}
 </svg>`;
 }
 
