@@ -48,7 +48,13 @@ export async function GET(request: NextRequest) {
               ? "grid"
               : params.get("layout") === "donut"
                 ? "donut"
-                : "bar",
+                : params.get("layout") === "donut_vertical"
+                  ? "donut_vertical"
+                  : params.get("layout") === "pie_chart"
+                    ? "pie_chart"
+                    : params.get("layout") === "hidden"
+                      ? "hidden"
+                      : "bar",
   };
 
   const headers = {
