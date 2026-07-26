@@ -561,7 +561,7 @@ export default function CardPreview() {
               <div className="space-y-4 rounded-xl border border-[#30363d]/60 bg-[#0d1117] px-4 py-4">
                 <div>
                   <label className="label-text">Layout</label>
-                  <div className="mt-2 grid grid-cols-5 rounded-xl border border-[#30363d] bg-[#161b22] p-[3px]">
+                  <div className="mt-2 flex flex-wrap gap-1.5 rounded-xl border border-[#30363d] bg-[#161b22] p-1.5">
                     {" "}
                     {(
                       [
@@ -578,10 +578,10 @@ export default function CardPreview() {
                       <button
                         key={opt}
                         onClick={() => setLangLayout(opt)}
-                        className={`px-4 py-1.5 rounded-[9px] text-xs font-semibold tracking-wide transition-all duration-200 ease-out ${
+                        className={`px-3 py-1.5 rounded-[9px] text-xs font-semibold tracking-wide whitespace-nowrap transition-all duration-200 ease-out ${
                           langLayout === opt
                             ? "bg-[#21262d] text-white shadow-sm border border-[#30363d]"
-                            : "text-[#8b949e] hover:text-[#c9d1d9]"
+                            : "text-[#8b949e] hover:text-[#c9d1d9] border border-transparent"
                         }`}
                       >
                         {opt === "bar"
