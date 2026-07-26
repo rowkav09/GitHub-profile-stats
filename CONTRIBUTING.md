@@ -142,14 +142,64 @@ Add an entry to the `BADGE_STYLES` array so it appears in the visual editor badg
 
 ---
 
+## Adding a New Language Layout Style
+
+To add a new language chart layout style:
+
+**1. Add the layout style to `src/lib/types.ts`**
+
+- Add the new style entry to the `LANG_CHART_LAYOUTS` constant. This acts as the **single source of truth** for all supported language chart layouts. 
+
+```ts
+export const LANG_CHART_LAYOUTS = [
+  "donut",
+  "donut_vertical",
+  "compact",
+  "bar",
+  "stacked",
+  "horizontal_list",
+  "vertical_list",
+  "grid",
+  "pie_chart", // Newly added style
+] as const;
+```
+
+**2. Implement the renderer in `src/lib/svg.ts`**
+
+- Add the renderer function for the new layout.
+
+```ts
+function renderPieLanguageChart() {
+  // your Renderer implementation
+}
+```
+
+**3. Register the new layout**
+
+- Add the layout handler inside `renderLanguageChart()`.
+
+```ts
+export function renderLanguageChart() {
+  // Existing code
+
+  if (options.layout === "pie_chart") {
+    return renderPieLanguageChart();
+  }
+}
+```
+
 ## Other Ways to Contribute
 
-| Area | Where to look |
-|---|---|
-| Bug fixes | [Open an issue](https://github.com/rowkav09/GitHub-profile-stats/issues) first so we can confirm it, then submit a PR |
-| New card layouts | `src/lib/svg.ts` — add a new render function and wire it up via `options.size` |
-| Badge styles | `src/app/api/badge/badge-svg.ts` — add a config entry and update the page picker |
-| Visual editor improvements | `src/components/CardPreview.tsx` and `src/components/VisualBuilder.tsx` |
-| Homepage / hero section | `src/components/HeroCard.tsx` and `src/app/page.tsx` |
-| API / caching | `src/app/api/` |
-| Docs | Edit `README.md` directly |
+| Area                       | Where to look                                                                                                         |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Bug fixes                  | [Open an issue](https://github.com/rowkav09/GitHub-profile-stats/issues) first so we can confirm it, then submit a PR |
+| New card layouts           | `src/lib/svg.ts` — add a new render function and wire it up via `options.size`                                        |
+| Badge styles               | `src/app/api/badge/badge-svg.ts` — add a config entry and update the page picker                                      |
+| Visual editor improvements | `src/components/CardPreview.tsx` and `src/components/VisualBuilder.tsx`                                               |
+| Homepage / hero section    | `src/components/HeroCard.tsx` and `src/app/page.tsx`                                                                  |
+| API / caching              | `src/app/api/`                                                                                                        |
+| Docs                       | Edit `README.md` directly                                                                                             |
+
+```
+
+```
