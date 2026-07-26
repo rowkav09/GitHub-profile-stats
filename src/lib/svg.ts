@@ -1,4 +1,11 @@
-import { GitHubStats, ThemeConfig, CardOptions, LanguageStat, LangChartOptions, ContributionDay } from "./types";
+import {
+  GitHubStats,
+  ThemeConfig,
+  CardOptions,
+  LanguageStat,
+  LangChartOptions,
+  ContributionDay,
+} from "./types";
 import { escapeXml, formatNumber } from "./sanitize";
 
 // Octicon-style SVG paths (16x16 viewBox)
@@ -23,8 +30,7 @@ const ICONS: Record<string, string> = {
     "M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm.5 4.75v3.44l2.78 1.61a.75.75 0 1 1-.75 1.3l-3.16-1.83A.75.75 0 0 1 7 8.69V4.75a.75.75 0 0 1 1.5 0z",
   trophy:
     "M4.25 1a.25.25 0 0 0-.25.25v1h-1A1.75 1.75 0 0 0 1.25 4v1c0 .966.784 1.75 1.75 1.75h.25v.457a4.002 4.002 0 0 0 2.5 3.693V12h-1a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5h-1v-1.1a4.002 4.002 0 0 0 2.5-3.693V6.75h.25c.966 0 1.75-.784 1.75-1.75V4c0-.966-.784-1.75-1.75-1.75h-1v-1A.25.25 0 0 0 11.75 1zM3 4.25h1v2.5H3.25a.25.25 0 0 1-.25-.25V4.25zm10 0v2.25a.25.25 0 0 1-.25.25H12v-2.5z",
-  day:
-    "M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM1.5 8a6.5 6.5 0 1 1 13 0 6.5 6.5 0 0 1-13 0zm9.78-2.22-4.03 4.03-1.97-1.97a.75.75 0 0 0-1.06 1.06l2.5 2.5a.75.75 0 0 0 1.06 0l4.56-4.56a.75.75 0 0 0-1.06-1.06z",
+  day: "M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM1.5 8a6.5 6.5 0 1 1 13 0 6.5 6.5 0 0 1-13 0zm9.78-2.22-4.03 4.03-1.97-1.97a.75.75 0 0 0-1.06 1.06l2.5 2.5a.75.75 0 0 0 1.06 0l4.56-4.56a.75.75 0 0 0-1.06-1.06z",
 };
 
 interface StatItem {
@@ -35,7 +41,10 @@ interface StatItem {
   trend?: { direction: "up" | "down" | "neutral"; text: string };
 }
 
-function formatTrend(pct: number): { direction: "up" | "down" | "neutral"; text: string } {
+function formatTrend(pct: number): {
+  direction: "up" | "down" | "neutral";
+  text: string;
+} {
   if (pct > 0) return { direction: "up", text: `+${pct}%` };
   if (pct < 0) return { direction: "down", text: `${pct}%` };
   return { direction: "neutral", text: "0%" };
@@ -45,13 +54,17 @@ function charWidth(ch: string, fontSize: number): number {
   const c = ch.toLowerCase();
   if ("ijlt!:;|".includes(c)) return fontSize * 0.27;
   if ("frskce".includes(c)) return fontSize * 0.42;
-  if ("adgnoquvxyzsbhkp".includes(c)) return fontSize * 0.50;
+  if ("adgnoquvxyzsbhkp".includes(c)) return fontSize * 0.5;
   if ("mwW".includes(c)) return fontSize * 0.58;
   if ("MQ@".includes(c)) return fontSize * 0.69;
-  return fontSize * 0.50;
+  return fontSize * 0.5;
 }
 
-function truncateToWidth(text: string, maxWidth: number, fontSize: number): string {
+function truncateToWidth(
+  text: string,
+  maxWidth: number,
+  fontSize: number,
+): string {
   let width = 0;
   let lastFit = 0;
   for (let i = 0; i < text.length; i++) {
@@ -90,7 +103,14 @@ function getVisibleStats(
   order?: string[],
 ): StatItem[] {
   const year = new Date().getFullYear();
-  const all: { key: string; label: string; short: string; value: string; icon: string; trend?: StatItem["trend"] }[] = [
+  const all: {
+    key: string;
+    label: string;
+    short: string;
+    value: string;
+    icon: string;
+    trend?: StatItem["trend"];
+  }[] = [
     {
       key: "stars",
       label: "Total Stars Earned",
@@ -206,7 +226,13 @@ function getVisibleStats(
     });
   }
 
-  return filtered.map(({ label, short, value, icon, trend }) => ({ label, short, value, icon, trend }));
+  return filtered.map(({ label, short, value, icon, trend }) => ({
+    label,
+    short,
+    value,
+    icon,
+    trend,
+  }));
 }
 
 function renderActivityRing(
@@ -234,9 +260,19 @@ function renderActivityRing(
 }
 
 const EMOJIS: Record<string, string> = {
-  star: "⭐", commit: "💻", pr: "🔀", issue: "🐛",
-  fire: "🔥", calendar: "📅", trend: "📈", clock: "⏱",
-  day: "📆", trophy: "🏆", graph: "📊", repo: "📁", people: "👥",
+  star: "⭐",
+  commit: "💻",
+  pr: "🔀",
+  issue: "🐛",
+  fire: "🔥",
+  calendar: "📅",
+  trend: "📈",
+  clock: "⏱",
+  day: "📆",
+  trophy: "🏆",
+  graph: "📊",
+  repo: "📁",
+  people: "👥",
 };
 
 function renderCompactCard(
@@ -247,7 +283,10 @@ function renderCompactCard(
   const count = options.compact_count;
   // 4 stats → 2 cols; 3 or 6 → 3 cols
   const COLS = count === 4 ? 2 : 3;
-  const visible = getVisibleStats(stats, options.hide, options.order).slice(0, count);
+  const visible = getVisibleStats(stats, options.hide, options.order).slice(
+    0,
+    count,
+  );
   const useEmoji = options.show_emoji;
 
   const W = 495;
@@ -262,7 +301,8 @@ function renderCompactCard(
   const PAD_BOT = 14;
   const numRows = Math.ceil(visible.length / COLS);
   const statsStartY = PAD_TOP + TITLE_H;
-  const cardHeight = statsStartY + numRows * CELL_H + (numRows - 1) * ROW_GAP + PAD_BOT;
+  const cardHeight =
+    statsStartY + numRows * CELL_H + (numRows - 1) * ROW_GAP + PAD_BOT;
   const rx = options.border_radius;
 
   const title = options.custom_title
@@ -370,7 +410,9 @@ export function renderCard(
 
   const statsStartY = PAD_TOP + TITLE_H + GAP;
   const statsHeight = visible.length * ROW_H;
-  const minHeight = showRing ? RING_AREA + PAD_TOP + TITLE_H + GAP + PAD_BOT : 0;
+  const minHeight = showRing
+    ? RING_AREA + PAD_TOP + TITLE_H + GAP + PAD_BOT
+    : 0;
   const cardHeight = Math.max(statsStartY + statsHeight + PAD_BOT, minHeight);
   const rx = options.border_radius;
 
@@ -382,7 +424,9 @@ export function renderCard(
     ? ""
     : `<text x="${PAD_X}" y="${PAD_TOP + TITLE_FS}" class="title">${title}</text>`;
 
-  const statAreaWidth = showRing ? CARD_WIDTH - PAD_X - RING_AREA - 10 : CARD_WIDTH - PAD_X;
+  const statAreaWidth = showRing
+    ? CARD_WIDTH - PAD_X - RING_AREA - 10
+    : CARD_WIDTH - PAD_X;
 
   const rows = visible
     .map((stat, i) => {
@@ -399,14 +443,19 @@ export function renderCard(
       let trendSvg = "";
       if (stat.trend) {
         const arrowColor =
-          stat.trend.direction === "up" ? "#3fb950" : stat.trend.direction === "down" ? "#f85149" : theme.text;
+          stat.trend.direction === "up"
+            ? "#3fb950"
+            : stat.trend.direction === "down"
+              ? "#f85149"
+              : theme.text;
         const arrowPath =
           stat.trend.direction === "up"
             ? "M 0 6 L 4 0 L 8 6 L 5 6 L 5 10 L 3 10 L 3 6 Z"
             : stat.trend.direction === "down"
               ? "M 0 4 L 4 10 L 8 4 L 5 4 L 5 0 L 3 0 L 3 4 Z"
               : "M 0 4 L 8 4 L 8 6 L 0 6 Z";
-        const labelWidth = stat.value.length * CHAR_W + (showIcons ? TEXT_ICON_PAD : 0);
+        const labelWidth =
+          stat.value.length * CHAR_W + (showIcons ? TEXT_ICON_PAD : 0);
         const arrowX = textX + labelWidth + 60;
         trendSvg = `<g transform="translate(${arrowX}, ${y + 2})">
           <path d="${arrowPath}" fill="${arrowColor}"/>
@@ -428,9 +477,17 @@ export function renderCard(
     : ` stroke="${theme.border}" stroke-width="1"`;
 
   const ringCx = CARD_WIDTH - PAD_X - RING_R - 5;
-  const ringCy = statsStartY + (statsHeight / 2);
+  const ringCy = statsStartY + statsHeight / 2;
   const ringSvg = showRing
-    ? renderActivityRing(ringCx, ringCy, RING_R, stats.activityLevel, stats.grade, theme, RING_STROKE)
+    ? renderActivityRing(
+        ringCx,
+        ringCy,
+        RING_R,
+        stats.activityLevel,
+        stats.grade,
+        theme,
+        RING_STROKE,
+      )
     : "";
 
   return `<svg width="${CARD_WIDTH}" height="${cardHeight}" viewBox="0 0 ${CARD_WIDTH} ${cardHeight}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${title}">
@@ -483,6 +540,7 @@ export function renderLanguageChart(
 ): string {
   const maxLangs = Math.min(options.max_langs, 12);
   const topLangs = languages.slice(0, maxLangs);
+  console.log("DEBUG layout value:", JSON.stringify(options.layout));
 
   if (topLangs.length === 0) {
     return renderErrorCard("No language data available for this user.", theme);
@@ -499,11 +557,33 @@ export function renderLanguageChart(
   }
 
   if (options.layout === "horizontal_list") {
-    return renderHorizontalListLanguageChart(topLangs, totalSize, theme, options);
+    return renderHorizontalListLanguageChart(
+      topLangs,
+      totalSize,
+      theme,
+      options,
+    );
   }
 
   if (options.layout === "stacked") {
     return renderStackedLanguageChart(topLangs, totalSize, theme, options);
+  }
+
+  if (options.layout === "donut") {
+    return renderDonutLanguageChart(topLangs, totalSize, theme, options);
+  }
+
+  if (options.layout === "donut_vertical") {
+    return renderDonutVerticalLanguageChart(
+      topLangs,
+      totalSize,
+      theme,
+      options,
+    );
+  }
+
+  if (options.layout === "hidden") {
+    return renderCompact(topLangs, totalSize, theme, options);
   }
 
   const W = 495;
@@ -548,7 +628,9 @@ export function renderLanguageChart(
     ? ""
     : `<text x="${PAD}" y="${TITLE_H - 4}" class="lc-title">${escapeXml(options.custom_title ?? "Top Languages")}</text>`;
 
-  const border = options.hide_border ? "" : ` stroke="${theme.border}" stroke-width="1"`;
+  const border = options.hide_border
+    ? ""
+    : ` stroke="${theme.border}" stroke-width="1"`;
 
   return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Top Languages">
   <title>${escapeXml(options.custom_title ?? "Top Languages")}</title>
@@ -601,9 +683,10 @@ function renderStackedLanguageChart(
   let bx = PAD;
   const barSegments = segments.map(({ lang, pct, w }) => {
     const rect = `<rect x="${bx}" y="${BAR_Y}" width="${w}" height="${BAR_H}" fill="${lang.color ?? "#586069"}"/>`;
-    const label = w >= 36
-      ? `<text x="${bx + w / 2}" y="${BAR_Y + BAR_H / 2 + 4}" text-anchor="middle" font="600 10px 'Segoe UI', Ubuntu, sans-serif" fill="#fff" opacity="0.9">${escapeXml(lang.name)}</text>`
-      : "";
+    const label =
+      w >= 36
+        ? `<text x="${bx + w / 2}" y="${BAR_Y + BAR_H / 2 + 4}" text-anchor="middle" font="600 10px 'Segoe UI', Ubuntu, sans-serif" fill="#fff" opacity="0.9">${escapeXml(lang.name)}</text>`
+        : "";
     bx += w;
     return rect + label;
   });
@@ -615,7 +698,8 @@ function renderStackedLanguageChart(
     const ly = NAMES_TOP + row * ROW_H;
     const pct = totalSize > 0 ? (lang.size / totalSize) * 100 : 0;
     const pctText = `${pct.toFixed(1)}%`;
-    const name = lang.name.length > 16 ? `${lang.name.slice(0, 15)}…` : lang.name;
+    const name =
+      lang.name.length > 16 ? `${lang.name.slice(0, 15)}…` : lang.name;
     return `<circle cx="${lx + 6}" cy="${ly + 5}" r="4" fill="${lang.color ?? "#586069"}"/>
   <text x="${lx + 14}" y="${ly + 9}" class="lc-name">${escapeXml(name)}</text>
   <text x="${lx + COL_W - 2}" y="${ly + 9}" class="lc-pct" text-anchor="end">${pctText}</text>`;
@@ -625,7 +709,9 @@ function renderStackedLanguageChart(
     ? ""
     : `<text x="${PAD}" y="${TITLE_H - 4}" class="lc-title">${escapeXml(options.custom_title ?? "Top Languages")}</text>`;
 
-  const border = options.hide_border ? "" : ` stroke="${theme.border}" stroke-width="1"`;
+  const border = options.hide_border
+    ? ""
+    : ` stroke="${theme.border}" stroke-width="1"`;
 
   return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Top Languages (stacked)">
   <title>${escapeXml(options.custom_title ?? "Top Languages")}</title>
@@ -652,7 +738,8 @@ function renderBaseCard(
   borderOpacity?: number,
 ): string {
   const stroke = borderColor ?? theme.border;
-  const opacity = borderOpacity !== undefined ? ` stroke-opacity="${borderOpacity}"` : "";
+  const opacity =
+    borderOpacity !== undefined ? ` stroke-opacity="${borderOpacity}"` : "";
   return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" ry="${rx}" fill="${theme.bg}" stroke="${stroke}" stroke-width="1"${opacity}/>`;
 }
 
@@ -747,7 +834,17 @@ function renderGridLanguageChart(
     const cx = PAD + col * (CARD_W + GAP);
     const cy = GRID_TOP + row * (CARD_H + GAP);
     const pct = formatLangPct(lang.size, filteredTotal);
-    const cardContent = renderLanguageCard(cx, cy, CARD_W, CARD_H, lang, pct, rx, theme, numLangs === 1);
+    const cardContent = renderLanguageCard(
+      cx,
+      cy,
+      CARD_W,
+      CARD_H,
+      lang,
+      pct,
+      rx,
+      theme,
+      numLangs === 1,
+    );
     return `<g clip-path="url(#gl-card-${i})">${cardContent}</g>`;
   });
 
@@ -755,7 +852,9 @@ function renderGridLanguageChart(
     ? ""
     : `<text x="${PAD}" y="${TITLE_H - 4}" class="gl-title">${escapeXml(options.custom_title ?? "Top Languages")}</text>`;
 
-  const border = options.hide_border ? "" : ` stroke="${theme.border}" stroke-width="1"`;
+  const border = options.hide_border
+    ? ""
+    : ` stroke="${theme.border}" stroke-width="1"`;
 
   return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Top Languages (grid)">
   <title>${escapeXml(options.custom_title ?? "Top Languages")}</title>
@@ -802,16 +901,24 @@ function renderHorizontalListLanguageChart(
   const items = languages.map((lang) => {
     const pct = formatLangPct(lang.size, totalSize);
     const displayName = truncateToWidth(lang.name, BAR_W - 60, 11);
-    const itemTextWidth = CIRCLE_R * 2 + CIRCLE_GAP + estimateTextWidth(displayName, 11) + 14 + estimateTextWidth(pct, 11);
+    const itemTextWidth =
+      CIRCLE_R * 2 +
+      CIRCLE_GAP +
+      estimateTextWidth(displayName, 11) +
+      14 +
+      estimateTextWidth(pct, 11);
     return { lang: { ...lang, displayName }, pct, itemTextWidth };
   });
 
-  const rows: (typeof items[0])[][] = [];
-  let currentRow: typeof items[0][] = [];
+  const rows: (typeof items)[0][][] = [];
+  let currentRow: (typeof items)[0][] = [];
   let currentWidth = 0;
 
   for (const item of items) {
-    const totalRowWidth = currentWidth + item.itemTextWidth + (currentRow.length > 0 ? ITEM_GAP : 0);
+    const totalRowWidth =
+      currentWidth +
+      item.itemTextWidth +
+      (currentRow.length > 0 ? ITEM_GAP : 0);
     if (currentRow.length > 0 && totalRowWidth > BAR_W) {
       rows.push(currentRow);
       currentRow = [item];
@@ -827,28 +934,35 @@ function renderHorizontalListLanguageChart(
   const ITEMS_TOP = BAR_Y + BAR_H + 18;
   const H = ITEMS_TOP + numRows * ROW_H + 16;
 
-  const itemSvgs = rows.map((row, rowIdx) => {
-    const y = ITEMS_TOP + rowIdx * ROW_H;
-    let x = PAD;
-    return row.map((item, colIdx) => {
-      const circleX = x + CIRCLE_R;
-      const textX = x + CIRCLE_R * 2 + CIRCLE_GAP;
-      const pctX = textX + estimateTextWidth(item.lang.displayName, 11) + 14;
+  const itemSvgs = rows
+    .map((row, rowIdx) => {
+      const y = ITEMS_TOP + rowIdx * ROW_H;
+      let x = PAD;
+      return row
+        .map((item, colIdx) => {
+          const circleX = x + CIRCLE_R;
+          const textX = x + CIRCLE_R * 2 + CIRCLE_GAP;
+          const pctX =
+            textX + estimateTextWidth(item.lang.displayName, 11) + 14;
 
-      const svg = `<circle cx="${circleX}" cy="${y + 5}" r="${CIRCLE_R}" fill="${item.lang.color ?? "#586069"}"/>
+          const svg = `<circle cx="${circleX}" cy="${y + 5}" r="${CIRCLE_R}" fill="${item.lang.color ?? "#586069"}"/>
     <text x="${textX}" y="${y + 9}" class="lc-name">${escapeXml(item.lang.displayName)}</text>
     <text x="${pctX}" y="${y + 9}" class="lc-pct">${escapeXml(item.pct)}</text>`;
 
-      x += item.itemTextWidth + (colIdx < row.length - 1 ? ITEM_GAP : 0);
-      return svg;
-    }).join("\n  ");
-  }).join("\n");
+          x += item.itemTextWidth + (colIdx < row.length - 1 ? ITEM_GAP : 0);
+          return svg;
+        })
+        .join("\n  ");
+    })
+    .join("\n");
 
   const titleSvg = options.hide_title
     ? ""
     : `<text x="${PAD}" y="${TITLE_H - 4}" class="lc-title">${escapeXml(options.custom_title ?? "Top Languages")}</text>`;
 
-  const border = options.hide_border ? "" : ` stroke="${theme.border}" stroke-width="1"`;
+  const border = options.hide_border
+    ? ""
+    : ` stroke="${theme.border}" stroke-width="1"`;
 
   return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Top Languages (horizontal list)">
   <title>${escapeXml(options.custom_title ?? "Top Languages")}</title>
@@ -897,9 +1011,10 @@ function renderVerticalListLanguageChart(
     const pct = formatLangPct(lang.size, totalSize);
     const name = truncateToWidth(lang.name, W - PAD * 2 - 60, 13);
 
-    const divider = i < languages.length - 1
-      ? `<line x1="${PAD}" y1="${y + ROW_H}" x2="${W - PAD}" y2="${y + ROW_H}" stroke="${theme.border}" stroke-width="1" opacity="0.2"/>`
-      : "";
+    const divider =
+      i < languages.length - 1
+        ? `<line x1="${PAD}" y1="${y + ROW_H}" x2="${W - PAD}" y2="${y + ROW_H}" stroke="${theme.border}" stroke-width="1" opacity="0.2"/>`
+        : "";
 
     return `${divider}
     <circle cx="${PAD + CIRCLE_R}" cy="${y + ROW_H / 2}" r="${CIRCLE_R}" fill="${lang.color ?? "#586069"}"/>
@@ -911,7 +1026,9 @@ function renderVerticalListLanguageChart(
     ? ""
     : `<text x="${PAD}" y="${TITLE_H - 4}" class="lc-title">${escapeXml(options.custom_title ?? "Top Languages")}</text>`;
 
-  const border = options.hide_border ? "" : ` stroke="${theme.border}" stroke-width="1"`;
+  const border = options.hide_border
+    ? ""
+    : ` stroke="${theme.border}" stroke-width="1"`;
 
   return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Top Languages (vertical list)">
   <title>${escapeXml(options.custom_title ?? "Top Languages")}</title>
@@ -925,6 +1042,305 @@ function renderVerticalListLanguageChart(
   ${titleSvg}
   <g clip-path="url(#vl-clip)">${barSegments.join("")}</g>
   ${langRows.join("\n")}
+</svg>`;
+}
+
+// Contributed by ittzspsv
+
+function renderDonutVerticalLanguageChart(
+  languages: LanguageStat[],
+  totalSize: number,
+  theme: ThemeConfig,
+  options: LangChartOptions,
+): string {
+  const W = 300;
+  const PAD = 22;
+  const TITLE_H = options.hide_title ? 0 : 28;
+  const RADIUS = 72;
+  const RING = 0.62; // donut inner radius ratio — modern look, avoids "pie chart from Excel 2003"
+  const COLS = 1;
+  const ROW_H = 22;
+  const GAP_CIRCLE_LEGEND = 24; // vertical gap between donut and legend block instead of horizontal
+
+  const numRows = Math.ceil(Math.min(languages.length, 12) / COLS);
+  const legendH = numRows * ROW_H;
+
+  const CX = W / 2;
+  const CY = TITLE_H + 20 + RADIUS; // donut sits on top, centered horizontally
+
+  const LEGEND_X = PAD;
+  const LEGEND_W = W - PAD * 2;
+  const COL_W = Math.floor(LEGEND_W / COLS);
+  const legendTop = CY + RADIUS + GAP_CIRCLE_LEGEND;
+
+  const H = legendTop + legendH + 20;
+  const rx = options.border_radius;
+
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+
+  let cumulativeAngle = -90;
+  const slices = languages.map((lang) => {
+    const pct = totalSize > 0 ? lang.size / totalSize : 0;
+    const angle = pct * 360;
+    const startAngle = cumulativeAngle;
+    const endAngle = cumulativeAngle + angle;
+    cumulativeAngle = endAngle;
+
+    const innerR = RADIUS * RING;
+
+    if (angle >= 359.999) {
+      return `<circle cx="${CX}" cy="${CY}" r="${RADIUS}" fill="none" stroke="${lang.color ?? "#586069"}" stroke-width="${RADIUS - innerR}"/>`;
+    }
+
+    // Donut wedge: outer arc + inner arc, connected — reads cleaner than filled pie slices, especially for many small langs
+    const ox1 = CX + RADIUS * Math.cos(toRad(startAngle));
+    const oy1 = CY + RADIUS * Math.sin(toRad(startAngle));
+    const ox2 = CX + RADIUS * Math.cos(toRad(endAngle));
+    const oy2 = CY + RADIUS * Math.sin(toRad(endAngle));
+    const ix1 = CX + innerR * Math.cos(toRad(endAngle));
+    const iy1 = CY + innerR * Math.sin(toRad(endAngle));
+    const ix2 = CX + innerR * Math.cos(toRad(startAngle));
+    const iy2 = CY + innerR * Math.sin(toRad(startAngle));
+    const largeArc = angle > 180 ? 1 : 0;
+
+    const path = [
+      `M ${ox1.toFixed(2)} ${oy1.toFixed(2)}`,
+      `A ${RADIUS} ${RADIUS} 0 ${largeArc} 1 ${ox2.toFixed(2)} ${oy2.toFixed(2)}`,
+      `L ${ix1.toFixed(2)} ${iy1.toFixed(2)}`,
+      `A ${innerR} ${innerR} 0 ${largeArc} 0 ${ix2.toFixed(2)} ${iy2.toFixed(2)}`,
+      `Z`,
+    ].join(" ");
+
+    return `<path d="${path}" fill="${lang.color ?? "#586069"}" stroke="${theme.bg}" stroke-width="1.5"/>`;
+  });
+
+  // Center label: top language + total, since donut leaves a natural focal point
+  const topLang = languages[0];
+  const topPct =
+    topLang && totalSize > 0
+      ? ((topLang.size / totalSize) * 100).toFixed(0)
+      : "0";
+  const centerLabel = topLang
+    ? `<text x="${CX}" y="${CY - 4}" text-anchor="middle" class="lc-center-pct">${topPct}%</text>
+  <text x="${CX}" y="${CY + 12}" text-anchor="middle" class="lc-center-name">${escapeXml(topLang.name.length > 10 ? topLang.name.slice(0, 9) + "…" : topLang.name)}</text>`
+    : "";
+
+  const legend = languages.slice(0, 12).map((lang, i) => {
+    const col = i % COLS;
+    const row = Math.floor(i / COLS);
+    const lx = LEGEND_X + col * COL_W;
+    const ly = legendTop + row * ROW_H;
+    const pct = totalSize > 0 ? (lang.size / totalSize) * 100 : 0;
+    const maxNameLen = 16; // single column has more horizontal room than the 2-col layout
+    const name =
+      lang.name.length > maxNameLen
+        ? `${lang.name.slice(0, maxNameLen - 1)}…`
+        : lang.name;
+    return `<circle cx="${lx + 6}" cy="${ly + 10}" r="4" fill="${lang.color ?? "#586069"}"/>
+  <text x="${lx + 15}" y="${ly + 14}" class="lc-name">${escapeXml(name)}</text>
+  <text x="${lx + COL_W}" y="${ly + 14}" class="lc-pct" text-anchor="end">${pct.toFixed(1)}%</text>`;
+  });
+
+  const titleSvg = options.hide_title
+    ? ""
+    : `<text x="${PAD}" y="${TITLE_H - 4}" class="lc-title">${escapeXml(options.custom_title ?? "Top Languages")}</text>`;
+
+  const border = options.hide_border
+    ? ""
+    : ` stroke="${theme.border}" stroke-width="1"`;
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Top Languages (pie)">
+  <title>${escapeXml(options.custom_title ?? "Top Languages")}</title>
+  <style>
+    .lc-title       { font: 600 14px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.title}; }
+    .lc-name        { font: 400 11px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; }
+    .lc-pct         { font: 600 11px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; opacity: 0.7; }
+    .lc-center-pct  { font: 700 18px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.title}; }
+    .lc-center-name { font: 400 10px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; opacity: 0.7; }
+  </style>
+  <rect x="0.5" y="0.5" rx="${rx}" ry="${rx}" width="${W - 1}" height="${H - 1}" fill="${theme.bg}"${border}/>
+  ${titleSvg}
+  <g>${slices.join("")}</g>
+  ${centerLabel}
+  ${legend.join("\n  ")}
+</svg>`;
+}
+
+function renderDonutLanguageChart(
+  languages: LanguageStat[],
+  totalSize: number,
+  theme: ThemeConfig,
+  options: LangChartOptions,
+): string {
+  const W = 495;
+  const PAD = 22;
+  const TITLE_H = options.hide_title ? 0 : 28;
+  const RADIUS = 72;
+  const RING = 0.62; // donut inner radius ratio — modern look, avoids "pie chart from Excel 2003"
+  const COLS = 2;
+  const ROW_H = 22;
+  const GAP_CIRCLE_LEGEND = 40;
+
+  const numRows = Math.ceil(Math.min(languages.length, 12) / COLS);
+  const legendH = numRows * ROW_H;
+  const contentH = Math.max(RADIUS * 2, legendH);
+
+  const CX = PAD + RADIUS;
+  const CY = TITLE_H + 20 + contentH / 2; // pie vertically centered against whichever block (circle or legend) is taller
+
+  const LEGEND_X = CX + RADIUS + GAP_CIRCLE_LEGEND;
+  const LEGEND_W = W - LEGEND_X - PAD;
+  const COL_W = Math.floor(LEGEND_W / COLS);
+  const legendTop = CY - legendH / 2;
+
+  const H = TITLE_H + 20 + contentH + 20;
+  const rx = options.border_radius;
+
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+
+  let cumulativeAngle = -90;
+  const slices = languages.map((lang) => {
+    const pct = totalSize > 0 ? lang.size / totalSize : 0;
+    const angle = pct * 360;
+    const startAngle = cumulativeAngle;
+    const endAngle = cumulativeAngle + angle;
+    cumulativeAngle = endAngle;
+
+    const innerR = RADIUS * RING;
+
+    if (angle >= 359.999) {
+      return `<circle cx="${CX}" cy="${CY}" r="${RADIUS}" fill="none" stroke="${lang.color ?? "#586069"}" stroke-width="${RADIUS - innerR}"/>`;
+    }
+
+    // Donut wedge: outer arc + inner arc, connected — reads cleaner than filled pie slices, especially for many small langs
+    const ox1 = CX + RADIUS * Math.cos(toRad(startAngle));
+    const oy1 = CY + RADIUS * Math.sin(toRad(startAngle));
+    const ox2 = CX + RADIUS * Math.cos(toRad(endAngle));
+    const oy2 = CY + RADIUS * Math.sin(toRad(endAngle));
+    const ix1 = CX + innerR * Math.cos(toRad(endAngle));
+    const iy1 = CY + innerR * Math.sin(toRad(endAngle));
+    const ix2 = CX + innerR * Math.cos(toRad(startAngle));
+    const iy2 = CY + innerR * Math.sin(toRad(startAngle));
+    const largeArc = angle > 180 ? 1 : 0;
+
+    const path = [
+      `M ${ox1.toFixed(2)} ${oy1.toFixed(2)}`,
+      `A ${RADIUS} ${RADIUS} 0 ${largeArc} 1 ${ox2.toFixed(2)} ${oy2.toFixed(2)}`,
+      `L ${ix1.toFixed(2)} ${iy1.toFixed(2)}`,
+      `A ${innerR} ${innerR} 0 ${largeArc} 0 ${ix2.toFixed(2)} ${iy2.toFixed(2)}`,
+      `Z`,
+    ].join(" ");
+
+    return `<path d="${path}" fill="${lang.color ?? "#586069"}" stroke="${theme.bg}" stroke-width="1.5"/>`;
+  });
+
+  // Center label: top language + total, since donut leaves a natural focal point
+  const topLang = languages[0];
+  const topPct =
+    topLang && totalSize > 0
+      ? ((topLang.size / totalSize) * 100).toFixed(0)
+      : "0";
+  const centerLabel = topLang
+    ? `<text x="${CX}" y="${CY - 4}" text-anchor="middle" class="lc-center-pct">${topPct}%</text>
+  <text x="${CX}" y="${CY + 12}" text-anchor="middle" class="lc-center-name">${escapeXml(topLang.name.length > 10 ? topLang.name.slice(0, 9) + "…" : topLang.name)}</text>`
+    : "";
+
+  const legend = languages.slice(0, 12).map((lang, i) => {
+    const col = i % COLS;
+    const row = Math.floor(i / COLS);
+    const lx = LEGEND_X + col * COL_W;
+    const ly = legendTop + row * ROW_H;
+    const pct = totalSize > 0 ? (lang.size / totalSize) * 100 : 0;
+    const maxNameLen = 12; // shortened slightly to guarantee room for fixed-width pct column
+    const name =
+      lang.name.length > maxNameLen
+        ? `${lang.name.slice(0, maxNameLen - 1)}…`
+        : lang.name;
+    return `<circle cx="${lx + 6}" cy="${ly + 10}" r="4" fill="${lang.color ?? "#586069"}"/>
+  <text x="${lx + 15}" y="${ly + 14}" class="lc-name">${escapeXml(name)}</text>
+  <text x="${lx + COL_W}" y="${ly + 14}" class="lc-pct" text-anchor="end">${pct.toFixed(1)}%</text>`;
+  });
+
+  const titleSvg = options.hide_title
+    ? ""
+    : `<text x="${PAD}" y="${TITLE_H - 4}" class="lc-title">${escapeXml(options.custom_title ?? "Top Languages")}</text>`;
+
+  const border = options.hide_border
+    ? ""
+    : ` stroke="${theme.border}" stroke-width="1"`;
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Top Languages (pie)">
+  <title>${escapeXml(options.custom_title ?? "Top Languages")}</title>
+  <style>
+    .lc-title       { font: 600 14px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.title}; }
+    .lc-name        { font: 400 11px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; }
+    .lc-pct         { font: 600 11px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; opacity: 0.7; }
+    .lc-center-pct  { font: 700 18px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.title}; }
+    .lc-center-name { font: 400 10px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; opacity: 0.7; }
+  </style>
+  <rect x="0.5" y="0.5" rx="${rx}" ry="${rx}" width="${W - 1}" height="${H - 1}" fill="${theme.bg}"${border}/>
+  ${titleSvg}
+  <g>${slices.join("")}</g>
+  ${centerLabel}
+  ${legend.join("\n  ")}
+</svg>`;
+}
+
+function renderCompact(
+  languages: LanguageStat[],
+  totalSize: number,
+  theme: ThemeConfig,
+  options: LangChartOptions,
+): string {
+  const W = 300;
+  const PAD = 22;
+  const TITLE_H = options.hide_title ? 0 : 34;
+  const COLS = 2;
+  const ROW_H = 28;
+  const DOT_R = 5;
+
+  const numRows = Math.ceil(Math.min(languages.length, 12) / COLS);
+  const legendH = numRows * ROW_H;
+
+  const LEGEND_X = PAD;
+  const LEGEND_W = W - PAD * 2;
+  const COL_W = Math.floor(LEGEND_W / COLS);
+  const legendTop = TITLE_H + 8;
+
+  const H = legendTop + legendH + 16;
+  const rx = options.border_radius;
+
+  const legend = languages.slice(0, 12).map((lang, i) => {
+    const col = i % COLS;
+    const row = Math.floor(i / COLS);
+    const lx = LEGEND_X + col * COL_W;
+    const ly = legendTop + row * ROW_H;
+    const maxNameLen = 14; // room for dot + name within a single legend column
+    const name =
+      lang.name.length > maxNameLen
+        ? `${lang.name.slice(0, maxNameLen - 1)}…`
+        : lang.name;
+    return `<circle cx="${lx + DOT_R}" cy="${ly + 10}" r="${DOT_R}" fill="${lang.color ?? "#586069"}"/>
+  <text x="${lx + DOT_R * 2 + 8}" y="${ly + 14}" class="lc-name">${escapeXml(name)}</text>`;
+  });
+
+  const titleSvg = options.hide_title
+    ? ""
+    : `<text x="${PAD}" y="${TITLE_H - 12}" class="lc-title">${escapeXml(options.custom_title ?? "Most Used Languages")}</text>`;
+
+  const border = options.hide_border
+    ? ""
+    : ` stroke="${theme.border}" stroke-width="1"`;
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Most Used Languages">
+  <title>${escapeXml(options.custom_title ?? "Most Used Languages")}</title>
+  <style>
+    .lc-title { font: 600 15px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.title}; }
+    .lc-name  { font: 400 12px 'Segoe UI', Ubuntu, sans-serif; fill: ${theme.text}; }
+  </style>
+  <rect x="0.5" y="0.5" rx="${rx}" ry="${rx}" width="${W - 1}" height="${H - 1}" fill="${theme.bg}"${border}/>
+  ${titleSvg}
+  ${legend.join("\n  ")}
 </svg>`;
 }
 
@@ -966,7 +1382,10 @@ export function renderSparkline(
   const values = recent.map((d) => d.contributionCount);
   const maxVal = Math.max(...values, 1);
   const points = values.map((v, i) => {
-    const x = recent.length === 1 ? WIDTH / 2 : PAD_X + (i / (recent.length - 1)) * contentW;
+    const x =
+      recent.length === 1
+        ? WIDTH / 2
+        : PAD_X + (i / (recent.length - 1)) * contentW;
     const y = PAD_TOP + contentH - (v / maxVal) * contentH;
     return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10, v };
   });
@@ -986,7 +1405,9 @@ export function renderSparkline(
   const title = options.custom_title ?? `Last ${recent.length} days`; // fallback title
   const latestVal = values[values.length - 1];
 
-  const border = options.hide_border ? "" : ` stroke="${theme.border}" stroke-width="1"`;
+  const border = options.hide_border
+    ? ""
+    : ` stroke="${theme.border}" stroke-width="1"`;
 
   return `<svg width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Contributions sparkline (latest ${latestVal})">
   <title>${escapeXml(title)}</title>
@@ -1002,4 +1423,3 @@ export function renderSparkline(
   <text x="${WIDTH - PAD_X}" y="${TITLE_Y}" class="sl-value" text-anchor="end">Today: ${latestVal}</text>
 </svg>`;
 }
-
