@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { themes } from "@/lib/themes";
 import { renderBadge } from "@/app/api/badge/badge-svg";
+import { LANG_CHART_LAYOUTS, LangChartLayout } from "@/lib/types";
 
 const STAT_OPTIONS = [
   { key: "stars", label: "Stars" },
@@ -83,6 +84,14 @@ function BadgeStylePicker({
   );
 }
 
+//Helper function to conver the layout key (snake_case) into Title case.
+function formatLayoutLabel(layout: string): string {
+  return layout
+    .split("_")
+    .map((word) => word[0].toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 export default function CardPreview() {
   const [embedType, setEmbedType] = useState<EmbedType>("card");
   const [username, setUsername] = useState("octocat");
@@ -107,16 +116,7 @@ export default function CardPreview() {
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   // Languages options
-  const [langLayout, setLangLayout] = useState<
-    | "bar"
-    | "stacked"
-    | "horizontal_list"
-    | "vertical_list"
-    | "grid"
-    | "donut"
-    | "donut_vertical"
-    | "compact"
-  >("bar");
+  const [langLayout, setLangLayout] = useState<LangChartLayout>("bar");
   const [maxLangs, setMaxLangs] = useState(8);
 
   // Mini badge options
@@ -563,18 +563,7 @@ export default function CardPreview() {
                   <label className="label-text">Layout</label>
                   <div className="mt-2 flex flex-wrap gap-1.5 rounded-xl border border-[#30363d] bg-[#161b22] p-1.5">
                     {" "}
-                    {(
-                      [
-                        "donut",
-                        "donut_vertical",
-                        "compact",
-                        "bar",
-                        "stacked",
-                        "horizontal_list",
-                        "vertical_list",
-                        "grid",
-                      ] as const
-                    ).map((opt) => (
+                    {LANG_CHART_LAYOUTS.map((opt) => (
                       <button
                         key={opt}
                         onClick={() => setLangLayout(opt)}
@@ -584,21 +573,7 @@ export default function CardPreview() {
                             : "text-[#8b949e] hover:text-[#c9d1d9] border border-transparent"
                         }`}
                       >
-                        {opt === "bar"
-                          ? "Bar"
-                          : opt === "stacked"
-                            ? "Stacked"
-                            : opt === "horizontal_list"
-                              ? "Horizontal List"
-                              : opt === "vertical_list"
-                                ? "Vertical List"
-                                : opt === "grid"
-                                  ? "Grid"
-                                  : opt === "donut"
-                                    ? "Donut"
-                                    : opt === "donut_vertical"
-                                      ? "Donut Vertical"
-                                      : "Compact"}
+                        {formatLayoutLabel(opt)}
                       </button>
                     ))}
                   </div>
