@@ -115,7 +115,7 @@ export default function CardPreview() {
     | "grid"
     | "donut"
     | "donut_vertical"
-    | "hidden"
+    | "compact"
   >("bar");
   const [maxLangs, setMaxLangs] = useState(8);
 
@@ -567,7 +567,7 @@ export default function CardPreview() {
                       [
                         "donut",
                         "donut_vertical",
-                        "hidden",
+                        "compact",
                         "bar",
                         "stacked",
                         "horizontal_list",

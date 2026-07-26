@@ -68,7 +68,7 @@ export interface LangChartOptions {
   layout:
     | "donut"
     | "donut_vertical"
-    | "hidden"
+    | "compact"
     | "bar"
     | "stacked"
     | "horizontal_list"

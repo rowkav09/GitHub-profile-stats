@@ -50,11 +50,9 @@ export async function GET(request: NextRequest) {
                 ? "donut"
                 : params.get("layout") === "donut_vertical"
                   ? "donut_vertical"
-                  : params.get("layout") === "pie_chart"
-                    ? "pie_chart"
-                    : params.get("layout") === "hidden"
-                      ? "hidden"
-                      : "bar",
+                  : params.get("layout") === "compact"
+                    ? "compact"
+                    : "bar",
   };
 
   const headers = {

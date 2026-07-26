@@ -582,7 +582,7 @@ export function renderLanguageChart(
     );
   }
 
-  if (options.layout === "hidden") {
+  if (options.layout === "compact") {
     return renderCompact(topLangs, totalSize, theme, options);
   }
 
