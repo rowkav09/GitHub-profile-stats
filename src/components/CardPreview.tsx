@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { themes } from "@/lib/themes";
 import { renderBadge } from "@/app/api/badge/badge-svg";
+import { LANG_CHART_LAYOUTS, LangChartLayout } from "@/lib/types";
 
 const STAT_OPTIONS = [
   { key: "stars", label: "Stars" },
@@ -69,7 +70,9 @@ function BadgeStylePicker({
             />
             <span
               className={`text-[10px] font-semibold uppercase tracking-wider transition-colors ${
-                isActive ? "text-[#58a6ff]" : "text-[#8b949e] group-hover:text-[#c9d1d9]"
+                isActive
+                  ? "text-[#58a6ff]"
+                  : "text-[#8b949e] group-hover:text-[#c9d1d9]"
               }`}
             >
               {opt.label}
@@ -79,6 +82,14 @@ function BadgeStylePicker({
       })}
     </div>
   );
+}
+
+//Helper function to conver the layout key (snake_case) into Title case.
+function formatLayoutLabel(layout: string): string {
+  return layout
+    .split("_")
+    .map((word) => word[0].toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 export default function CardPreview() {
@@ -98,12 +109,14 @@ export default function CardPreview() {
   const [compactCount, setCompactCount] = useState<3 | 4 | 6>(6);
   const [showEmoji, setShowEmoji] = useState(false);
   const [hiddenStats, setHiddenStats] = useState<string[]>([]);
-  const [statsOrder, setStatsOrder] = useState<string[]>(STAT_OPTIONS.map((s) => s.key));
+  const [statsOrder, setStatsOrder] = useState<string[]>(
+    STAT_OPTIONS.map((s) => s.key),
+  );
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   // Languages options
-  const [langLayout, setLangLayout] = useState<"bar" | "stacked" | "horizontal_list" | "vertical_list" | "grid">("bar");
+  const [langLayout, setLangLayout] = useState<LangChartLayout>("bar");
   const [maxLangs, setMaxLangs] = useState(8);
 
   // Mini badge options
@@ -175,12 +188,15 @@ export default function CardPreview() {
       if (borderRadius !== "4.5") p.set("border_radius", borderRadius);
       if (customTitle.trim()) p.set("custom_title", customTitle.trim());
       if (size === "compact") p.set("size", "compact");
-      if (size === "compact" && compactCount !== 6) p.set("compact_count", String(compactCount));
+      if (size === "compact" && compactCount !== 6)
+        p.set("compact_count", String(compactCount));
       if (size === "compact" && showEmoji) p.set("show_emoji", "true");
       if (hiddenStats.length > 0) p.set("hide", hiddenStats.join(","));
 
       const visibleOrder = statsOrder.filter((k) => !hiddenStats.includes(k));
-      const defaultVisible = STAT_OPTIONS.map((s) => s.key).filter((k) => !hiddenStats.includes(k));
+      const defaultVisible = STAT_OPTIONS.map((s) => s.key).filter(
+        (k) => !hiddenStats.includes(k),
+      );
       const isReordered =
         visibleOrder.length === defaultVisible.length &&
         visibleOrder.some((k, i) => k !== defaultVisible[i]);
@@ -282,7 +298,9 @@ export default function CardPreview() {
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h2 className="text-2xl font-bold">Try it out</h2>
-            <p className="text-sm text-[#8b949e]">Generate your embed, preview it, then copy a single line.</p>
+            <p className="text-sm text-[#8b949e]">
+              Generate your embed, preview it, then copy a single line.
+            </p>
           </div>
           <div className="flex items-center gap-2 text-xs text-[#8b949e] bg-[#0b1117] border border-[#30363d] rounded-lg px-3 py-1.5">
             <span className="h-2 w-2 rounded-full bg-[#238636]" />
@@ -296,12 +314,14 @@ export default function CardPreview() {
             <div>
               <label className="label-text">Embed Type</label>
               <div className="mt-2 inline-flex rounded-xl border border-[#30363d] bg-[#0d1117] p-[3px] flex-wrap">
-                {([
-                  { key: "card", label: "Stats Card" },
-                  { key: "langs", label: "Languages" },
-                  { key: "mini", label: "Mini Badge" },
-                  { key: "sparkline", label: "Sparkline" },
-                ] as const).map((opt) => (
+                {(
+                  [
+                    { key: "card", label: "Stats Card" },
+                    { key: "langs", label: "Languages" },
+                    { key: "mini", label: "Mini Badge" },
+                    { key: "sparkline", label: "Sparkline" },
+                  ] as const
+                ).map((opt) => (
                   <button
                     key={opt.key}
                     onClick={() => setEmbedType(opt.key)}
@@ -332,7 +352,10 @@ export default function CardPreview() {
               <>
                 <div>
                   <label className="label-text">
-                    Custom Title <span className="text-[#484f58] font-normal">(optional)</span>
+                    Custom Title{" "}
+                    <span className="text-[#484f58] font-normal">
+                      (optional)
+                    </span>
                   </label>
                   <input
                     type="text"
@@ -345,7 +368,10 @@ export default function CardPreview() {
 
                 <div>
                   <label className="label-text">
-                    Border Radius: <span className="text-[#58a6ff] font-semibold">{borderRadius}</span>
+                    Border Radius:{" "}
+                    <span className="text-[#58a6ff] font-semibold">
+                      {borderRadius}
+                    </span>
                   </label>
                   <input
                     type="range"
@@ -371,7 +397,7 @@ export default function CardPreview() {
                             : "text-[#8b949e] hover:text-[#c9d1d9]"
                         }`}
                       >
-                        {s === "default" ? "Standard" : "Compact"}
+                        {s === "default" ? "Standard" : "Hidden"}
                       </button>
                     ))}
                   </div>
@@ -396,7 +422,9 @@ export default function CardPreview() {
                           </button>
                         ))}
                       </div>
-                      <p className="mt-1.5 text-[11px] text-[#484f58]">Shows the first {compactCount} visible stats in order</p>
+                      <p className="mt-1.5 text-[11px] text-[#484f58]">
+                        Shows the first {compactCount} visible stats in order
+                      </p>
                     </div>
                     <label className="toggle-label">
                       <input
@@ -411,10 +439,23 @@ export default function CardPreview() {
                 )}
 
                 <div className="flex flex-wrap gap-x-5 gap-y-2">
-                  {[{ label: "Show Icons", checked: showIcons, set: setShowIcons },
+                  {[
+                    {
+                      label: "Show Icons",
+                      checked: showIcons,
+                      set: setShowIcons,
+                    },
                     { label: "Show Ring", checked: showRing, set: setShowRing },
-                    { label: "Hide Border", checked: hideBorder, set: setHideBorder },
-                    { label: "Hide Title", checked: hideTitle, set: setHideTitle },
+                    {
+                      label: "Hide Border",
+                      checked: hideBorder,
+                      set: setHideBorder,
+                    },
+                    {
+                      label: "Hide Title",
+                      checked: hideTitle,
+                      set: setHideTitle,
+                    },
                   ].map((t) => (
                     <label key={t.label} className="toggle-label">
                       <input
@@ -446,8 +487,12 @@ export default function CardPreview() {
                 {advancedMode && (
                   <div className="space-y-3 rounded-xl border border-[#30363d]/60 bg-[#0d1117] px-4 py-4">
                     <div className="flex items-center justify-between">
-                      <label className="label-text mb-0">Reorder & hide stats</label>
-                      <span className="text-[11px] text-[#484f58]">Drag to reorder, click to hide</span>
+                      <label className="label-text mb-0">
+                        Reorder & hide stats
+                      </label>
+                      <span className="text-[11px] text-[#484f58]">
+                        Drag to reorder, click to hide
+                      </span>
                     </div>
                     <div className="space-y-2">
                       {statsOrder.map((key, index) => {
@@ -458,17 +503,21 @@ export default function CardPreview() {
                           <div
                             key={key}
                             className={`flex items-center justify-between gap-3 rounded-lg border border-[#30363d] bg-[#0d1117] px-3 py-2 text-sm text-[#c9d1d9] ${
-                              dragOverIndex === index ? "border-[#58a6ff]/60 bg-[#0f1621]" : ""
+                              dragOverIndex === index
+                                ? "border-[#58a6ff]/60 bg-[#0f1621]"
+                                : ""
                             }`}
                             draggable
                             onDragStart={() => setDragIndex(index)}
                             onDragOver={(e) => {
                               e.preventDefault();
-                              if (dragOverIndex !== index) setDragOverIndex(index);
+                              if (dragOverIndex !== index)
+                                setDragOverIndex(index);
                             }}
                             onDrop={(e) => {
                               e.preventDefault();
-                              if (dragIndex !== null && dragIndex !== index) moveStat(dragIndex, index);
+                              if (dragIndex !== null && dragIndex !== index)
+                                moveStat(dragIndex, index);
                               setDragIndex(null);
                               setDragOverIndex(null);
                             }}
@@ -478,8 +527,16 @@ export default function CardPreview() {
                             }}
                           >
                             <div className="flex items-center gap-3">
-                              <span className="cursor-grab text-[#8b949e]">⋮⋮</span>
-                              <span className={hidden ? "line-through text-[#484f58]" : ""}>{stat.label}</span>
+                              <span className="cursor-grab text-[#8b949e]">
+                                ⋮⋮
+                              </span>
+                              <span
+                                className={
+                                  hidden ? "line-through text-[#484f58]" : ""
+                                }
+                              >
+                                {stat.label}
+                              </span>
                             </div>
                             <button
                               onClick={() => toggleStat(key)}
@@ -504,25 +561,29 @@ export default function CardPreview() {
               <div className="space-y-4 rounded-xl border border-[#30363d]/60 bg-[#0d1117] px-4 py-4">
                 <div>
                   <label className="label-text">Layout</label>
-                  <div className="mt-2 inline-flex rounded-xl border border-[#30363d] bg-[#161b22] p-[3px]">
-                    {(["bar", "stacked", "horizontal_list", "vertical_list", "grid"] as const).map((opt) => (
+                  <div className="mt-2 flex flex-wrap gap-1.5 rounded-xl border border-[#30363d] bg-[#161b22] p-1.5">
+                    {" "}
+                    {LANG_CHART_LAYOUTS.map((opt) => (
                       <button
                         key={opt}
                         onClick={() => setLangLayout(opt)}
-                        className={`px-4 py-1.5 rounded-[9px] text-xs font-semibold tracking-wide transition-all duration-200 ease-out ${
+                        className={`px-3 py-1.5 rounded-[9px] text-xs font-semibold tracking-wide whitespace-nowrap transition-all duration-200 ease-out ${
                           langLayout === opt
                             ? "bg-[#21262d] text-white shadow-sm border border-[#30363d]"
-                            : "text-[#8b949e] hover:text-[#c9d1d9]"
+                            : "text-[#8b949e] hover:text-[#c9d1d9] border border-transparent"
                         }`}
                       >
-                        {opt === "bar" ? "Bar" : opt === "stacked" ? "Stacked" : opt === "horizontal_list" ? "Horizontal List" : opt === "vertical_list" ? "Vertical List" : "Grid"}
+                        {formatLayoutLabel(opt)}
                       </button>
                     ))}
                   </div>
                 </div>
                 <div>
                   <label className="label-text">
-                    Max languages: <span className="text-[#58a6ff] font-semibold">{maxLangs}</span>
+                    Max languages:{" "}
+                    <span className="text-[#58a6ff] font-semibold">
+                      {maxLangs}
+                    </span>
                   </label>
                   <input
                     type="range"
@@ -534,8 +595,18 @@ export default function CardPreview() {
                   />
                 </div>
                 <div className="flex flex-wrap gap-x-5 gap-y-2">
-                  {[{ label: "Hide Border", checked: hideBorder, set: setHideBorder },
-                    { label: "Hide Title", checked: hideTitle, set: setHideTitle }].map((t) => (
+                  {[
+                    {
+                      label: "Hide Border",
+                      checked: hideBorder,
+                      set: setHideBorder,
+                    },
+                    {
+                      label: "Hide Title",
+                      checked: hideTitle,
+                      set: setHideTitle,
+                    },
+                  ].map((t) => (
                     <label key={t.label} className="toggle-label">
                       <input
                         type="checkbox"
@@ -559,8 +630,21 @@ export default function CardPreview() {
                     onChange={(e) => setMiniMetric(e.target.value)}
                     className="input-field"
                   >
-                    {["stars","commits","prs","issues","hours","streak","week","followers","repos","contributions"].map((m) => (
-                      <option key={m} value={m}>{m}</option>
+                    {[
+                      "stars",
+                      "commits",
+                      "prs",
+                      "issues",
+                      "hours",
+                      "streak",
+                      "week",
+                      "followers",
+                      "repos",
+                      "contributions",
+                    ].map((m) => (
+                      <option key={m} value={m}>
+                        {m}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -575,7 +659,9 @@ export default function CardPreview() {
                   />
                 </div>
                 <div>
-                  <label className="label-text">Accent Colour (hex, no #)</label>
+                  <label className="label-text">
+                    Accent Colour (hex, no #)
+                  </label>
                   <input
                     type="text"
                     value={miniColor}
@@ -650,8 +736,7 @@ export default function CardPreview() {
                     />
                   </div>
                   <div>
-                    <label className="label-text">Fill Colour (hex)
-                    </label>
+                    <label className="label-text">Fill Colour (hex)</label>
                     <input
                       type="text"
                       value={sparkFillColor}
@@ -720,7 +805,10 @@ export default function CardPreview() {
         </div>
 
         {/* ─── Embed Code ─── */}
-        <div className="grid gap-4 sm:grid-cols-3 animate-slide-up" style={{ animationDelay: "160ms" }}>
+        <div
+          className="grid gap-4 sm:grid-cols-3 animate-slide-up"
+          style={{ animationDelay: "160ms" }}
+        >
           {[
             { label: "Link", code: embedUrl, id: "link" },
             { label: "Markdown", code: markdownCode, id: "md" },
@@ -737,7 +825,9 @@ export default function CardPreview() {
                   className="copy-btn"
                 >
                   {copiedField === block.id ? (
-                    <span className="text-[#3fb950] transition-colors duration-200">Copied!</span>
+                    <span className="text-[#3fb950] transition-colors duration-200">
+                      Copied!
+                    </span>
                   ) : (
                     "Copy"
                   )}

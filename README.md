@@ -25,6 +25,7 @@ Free, real-time GitHub stat cards, badges, and charts -- drop a URL into your RE
 **Standard card**
 
 [![](https://ghstats.dev/api/card?username=rowkav09&theme=tokyonight)](https://github.com/rowkav09/GitHub-profile-stats)
+
 ```
 [![](https://ghstats.dev/api/card?username=YOUR_USERNAME&theme=tokyonight)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
@@ -34,25 +35,34 @@ Free, real-time GitHub stat cards, badges, and charts -- drop a URL into your RE
 [![](https://ghstats.dev/api/card?username=rowkav09&theme=radical&size=compact&compact_count=3)](https://github.com/rowkav09/GitHub-profile-stats)
 [![](https://ghstats.dev/api/card?username=rowkav09&theme=catppuccin&size=compact&compact_count=4)](https://github.com/rowkav09/GitHub-profile-stats)
 [![](https://ghstats.dev/api/card?username=rowkav09&theme=forest&size=compact&compact_count=6)](https://github.com/rowkav09/GitHub-profile-stats)
+
 ```
 [![](https://ghstats.dev/api/card?username=YOUR_USERNAME&theme=radical&size=compact&compact_count=3)](https://github.com/rowkav09/GitHub-profile-stats)
 [![](https://ghstats.dev/api/card?username=YOUR_USERNAME&theme=catppuccin&size=compact&compact_count=4)](https://github.com/rowkav09/GitHub-profile-stats)
 [![](https://ghstats.dev/api/card?username=YOUR_USERNAME&theme=forest&size=compact&compact_count=6)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
 
-**Languages (bar, stacked, grid, horizontal list, vertical list)**
+**Languages (bar, stacked, grid, horizontal list, vertical list, donut, vertical donut, compact)**
 
 [![](https://ghstats.dev/api/langs?username=rowkav09&theme=dracula&layout=bar)](https://github.com/rowkav09/GitHub-profile-stats)
 [![](https://ghstats.dev/api/langs?username=rowkav09&theme=ocean&layout=stacked)](https://github.com/rowkav09/GitHub-profile-stats)
 [![](https://ghstats.dev/api/langs?username=rowkav09&theme=radical&layout=horizontal_list)](https://github.com/rowkav09/GitHub-profile-stats)
 [![](https://ghstats.dev/api/langs?username=rowkav09&theme=catppuccin&layout=vertical_list)](https://github.com/rowkav09/GitHub-profile-stats)
 [![](https://ghstats.dev/api/langs?username=rowkav09&theme=tokyonight&layout=grid)](https://github.com/rowkav09/GitHub-profile-stats)
-```
+[![](https://ghstats.dev/api/langs?username=rowkav09&theme=tokyonight&layout=donut)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/langs?username=rowkav09&theme=tokyonight&layout=vertical_donut)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/langs?username=rowkav09&theme=tokyonight&layout=compact)](https://github.com/rowkav09/GitHub-profile-stats)
+
+```bash
 [![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=dracula&layout=bar)](https://github.com/rowkav09/GitHub-profile-stats)
 [![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=ocean&layout=stacked)](https://github.com/rowkav09/GitHub-profile-stats)
 [![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=radical&layout=horizontal_list)](https://github.com/rowkav09/GitHub-profile-stats)
 [![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=catppuccin&layout=vertical_list)](https://github.com/rowkav09/GitHub-profile-stats)
 [![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=tokyonight&layout=grid)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=tokyonight&layout=donut)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=tokyonight&layout=donut_vertical)](https://github.com/rowkav09/GitHub-profile-stats)
+[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=tokyonight&layout=compact)](https://github.com/rowkav09/GitHub-profile-stats)
+
 ```
 
 **Mini badges (drop anywhere)**
@@ -63,6 +73,7 @@ Any metric, any colour, any style -- perfect for sprinkling through a README.
 [![](https://ghstats.dev/api/mini?username=rowkav09&metric=commits&color=0ea5e9&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
 [![](https://ghstats.dev/api/mini?username=rowkav09&metric=streak&color=f97316&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
 [![](https://ghstats.dev/api/mini?username=rowkav09&metric=followers&label=Community&color=22c55e&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
+
 ```
 [![](https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=stars&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
 [![](https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=commits&color=0ea5e9&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
@@ -74,24 +85,26 @@ Pass `label=...` to override the default label text and `style=...` to switch be
 
 **Badge styles -- pick a look**
 
-| Style | Preview |
-| --- | --- |
-| `flat` | ![](https://ghstats.dev/api/badge?style=flat) |
-| `flat-square` | ![](https://ghstats.dev/api/badge?style=flat-square) |
+| Style           | Preview                                                |
+| --------------- | ------------------------------------------------------ |
+| `flat`          | ![](https://ghstats.dev/api/badge?style=flat)          |
+| `flat-square`   | ![](https://ghstats.dev/api/badge?style=flat-square)   |
 | `for-the-badge` | ![](https://ghstats.dev/api/badge?style=for-the-badge) |
-| `plastic` | ![](https://ghstats.dev/api/badge?style=plastic) |
-| `minimal` | ![](https://ghstats.dev/api/badge?style=minimal) |
+| `plastic`       | ![](https://ghstats.dev/api/badge?style=plastic)       |
+| `minimal`       | ![](https://ghstats.dev/api/badge?style=minimal)       |
 
 Apply with `?style=for-the-badge` on `/api/mini` or `/api/badge`. Works alongside `color` and `label`.
 
 **Activity sparkline (7--90 days)**
 
 [![](https://ghstats.dev/api/sparkline?username=rowkav09&days=30&width=420)](https://github.com/rowkav09/GitHub-profile-stats)
+
 ```
 [![](https://ghstats.dev/api/sparkline?username=YOUR_USERNAME&days=30&width=420)](https://github.com/rowkav09/GitHub-profile-stats)
 ```
 
 **Quick colour override**
+
 ```
 https://ghstats.dev/api/card?username=YOUR_USERNAME&bg=0f0f23&text=cccccc&title_color=ffff66&icon_color=ff6644
 ```
@@ -100,8 +113,8 @@ https://ghstats.dev/api/card?username=YOUR_USERNAME&bg=0f0f23&text=cccccc&title_
 
 ## 30-second setup
 
-1) Create a public repo named **your-username** on GitHub and add a `README.md`.
-2) Paste an embed from the gallery above. Done.
+1. Create a public repo named **your-username** on GitHub and add a `README.md`.
+2. Paste an embed from the gallery above. Done.
 
 Need tweaks? Use the on-page editor to toggle stats, themes, borders, titles, and copy Markdown/HTML instantly.
 
@@ -110,6 +123,7 @@ Need tweaks? Use the on-page editor to toggle stats, themes, borders, titles, an
 ## Options cheat sheet
 
 **Card ( /api/card )**
+
 - `username` (required)
 - `theme` default `default`
 - Layout: `size=default|compact`, `compact_count=3|4|6`, `show_emoji=true`
@@ -117,23 +131,28 @@ Need tweaks? Use the on-page editor to toggle stats, themes, borders, titles, an
 - Styling: `bg`, `text`, `title_color`, `icon_color`, `border_color`, `border_radius`, `custom_title`, `order`
 
 **Languages ( /api/langs )**
+
 - `layout=bar|stacked|horizontal_list|vertical_list|grid`, `max_langs` (1--12)
 - `hide_border`, `hide_title`, `custom_title`, `border_radius`, theme overrides as above
 
 **Mini badges ( /api/mini )**
+
 - `metric=stars|commits|prs|issues|hours|streak|week|followers|repos|contributions`
 - `label` (override text), `color` (value side), `theme` (for errors)
 - `style=flat|flat-square|for-the-badge|plastic|minimal` (default `flat`)
 
 **Counter badge ( /api/badge )**
+
 - `style=flat|flat-square|for-the-badge|plastic|minimal` (default `flat`)
 
 **Visits badge ( /api/visits )**
+
 - `style=flat|flat-square|for-the-badge|plastic|minimal` (default `flat`)
 
 > Note: `hours` is currently WIP and is an estimate, not exact tracked coding time.
 
 **Sparkline ( /api/sparkline )**
+
 - `days` (7--90), `width` (180--800), `height` (40--240), `line_color`, `fill_color`, `title`, `hide_border`, `border_radius`
 
 ---

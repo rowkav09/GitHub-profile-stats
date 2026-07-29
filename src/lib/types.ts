@@ -59,13 +59,27 @@ export interface CardOptions {
   order?: string[]; // custom stat display order
 }
 
+//This is the single source of truth.  Add new Language Options here.
+export const LANG_CHART_LAYOUTS = [
+  "donut",
+  "donut_vertical",
+  "compact",
+  "bar",
+  "stacked",
+  "horizontal_list",
+  "vertical_list",
+  "grid",
+] as const;
+
+export type LangChartLayout = (typeof LANG_CHART_LAYOUTS)[number];
+
 export interface LangChartOptions {
   hide_border: boolean;
   hide_title: boolean;
   custom_title?: string;
   border_radius: number;
   max_langs: number; // max languages to show (default 8)
-  layout: "donut" | "bar" | "stacked" | "horizontal_list" | "vertical_list" | "grid"; // chart style
+  layout: LangChartLayout;
 }
 
 export type StatKey =

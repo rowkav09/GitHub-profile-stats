@@ -96,7 +96,7 @@ const PARAMS = [
     name: "layout",
     type: "string",
     default: '"bar"',
-    desc: 'Languages chart style — "bar", "stacked", "horizontal_list", "vertical_list", or "grid"',
+    desc: 'Languages chart style — "bar", "stacked", "horizontal_list", "vertical_list", "grid", "donut", "donut_vertical" or "compact"',
   },
   {
     name: "max_langs",
@@ -113,11 +113,31 @@ const PARAMS = [
 ];
 
 const BADGE_STYLES = [
-  { key: "flat", label: "Flat", desc: "Default shields.io look with subtle gradient and rounded corners." },
-  { key: "flat-square", label: "Flat Square", desc: "Same as Flat, but with sharp square corners." },
-  { key: "for-the-badge", label: "For The Badge", desc: "Large, bold, uppercase — built to stand out in a README." },
-  { key: "plastic", label: "Plastic", desc: "Glossy plastic finish with a top-light, bottom-shadow gradient." },
-  { key: "minimal", label: "Minimal", desc: "Just text on a transparent background — clean and unobtrusive." },
+  {
+    key: "flat",
+    label: "Flat",
+    desc: "Default shields.io look with subtle gradient and rounded corners.",
+  },
+  {
+    key: "flat-square",
+    label: "Flat Square",
+    desc: "Same as Flat, but with sharp square corners.",
+  },
+  {
+    key: "for-the-badge",
+    label: "For The Badge",
+    desc: "Large, bold, uppercase — built to stand out in a README.",
+  },
+  {
+    key: "plastic",
+    label: "Plastic",
+    desc: "Glossy plastic finish with a top-light, bottom-shadow gradient.",
+  },
+  {
+    key: "minimal",
+    label: "Minimal",
+    desc: "Just text on a transparent background — clean and unobtrusive.",
+  },
 ];
 
 const HIDE_KEYS = [
@@ -151,7 +171,9 @@ export default function Home() {
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 text-sm text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+            </svg>
             View on GitHub
           </a>
         </div>
@@ -163,11 +185,18 @@ export default function Home() {
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl animate-slide-up">
             GitHub Stats for Your README
           </h1>
-          <p className="mt-4 text-lg text-[#8b949e] max-w-2xl mx-auto animate-slide-up" style={{ animationDelay: '80ms' }}>
-            One line in your README — that&apos;s it. Your stats card stays up to date automatically.
-            Pick a theme, hide what you don&apos;t need, and you&apos;re done.
+          <p
+            className="mt-4 text-lg text-[#8b949e] max-w-2xl mx-auto animate-slide-up"
+            style={{ animationDelay: "80ms" }}
+          >
+            One line in your README — that&apos;s it. Your stats card stays up
+            to date automatically. Pick a theme, hide what you don&apos;t need,
+            and you&apos;re done.
           </p>
-          <div className="mt-8 flex justify-center gap-4 animate-slide-up" style={{ animationDelay: '160ms' }}>
+          <div
+            className="mt-8 flex justify-center gap-4 animate-slide-up"
+            style={{ animationDelay: "160ms" }}
+          >
             <a
               href="#try"
               className="rounded-lg bg-[#238636] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#2ea043] transition-all duration-200 hover:shadow-lg hover:shadow-[#238636]/20"
@@ -181,7 +210,10 @@ export default function Home() {
               Documentation
             </a>
           </div>
-          <div className="mt-12 animate-slide-up" style={{ animationDelay: '240ms' }}>
+          <div
+            className="mt-12 animate-slide-up"
+            style={{ animationDelay: "240ms" }}
+          >
             <HeroCard />
           </div>
         </div>
@@ -195,19 +227,42 @@ export default function Home() {
           {/* Step 1 */}
           <div className="mt-6">
             <h3 className="text-lg font-semibold text-[#c9d1d9] flex items-center gap-2">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#238636] text-xs font-bold text-white">1</span>
+              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#238636] text-xs font-bold text-white">
+                1
+              </span>
               Create your profile README
             </h3>
             <p className="mt-2 text-sm text-[#8b949e] ml-8">
-              GitHub displays a special README on your profile when you create a repo with the same name as your username.
+              GitHub displays a special README on your profile when you create a
+              repo with the same name as your username.
             </p>
             <ol className="mt-2 ml-8 text-sm text-[#8b949e] list-decimal list-inside space-y-1">
-              <li>Go to{" "}
-                <a href="https://github.com/new" target="_blank" rel="noopener noreferrer" className="text-[#58a6ff] hover:underline">github.com/new</a>
+              <li>
+                Go to{" "}
+                <a
+                  href="https://github.com/new"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#58a6ff] hover:underline"
+                >
+                  github.com/new
+                </a>
               </li>
-              <li>Set the repo name to <strong className="text-[#c9d1d9]">your exact username</strong></li>
-              <li>Make it <strong className="text-[#c9d1d9]">public</strong> and check <strong className="text-[#c9d1d9]">&quot;Add a README file&quot;</strong></li>
-              <li>Click <strong className="text-[#c9d1d9]">Create repository</strong></li>
+              <li>
+                Set the repo name to{" "}
+                <strong className="text-[#c9d1d9]">your exact username</strong>
+              </li>
+              <li>
+                Make it <strong className="text-[#c9d1d9]">public</strong> and
+                check{" "}
+                <strong className="text-[#c9d1d9]">
+                  &quot;Add a README file&quot;
+                </strong>
+              </li>
+              <li>
+                Click{" "}
+                <strong className="text-[#c9d1d9]">Create repository</strong>
+              </li>
             </ol>
             <p className="mt-2 text-xs text-[#484f58] ml-8">
               Already have a profile README? Skip to step 2.
@@ -217,18 +272,26 @@ export default function Home() {
           {/* Step 2 */}
           <div className="mt-8">
             <h3 className="text-lg font-semibold text-[#c9d1d9] flex items-center gap-2">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#238636] text-xs font-bold text-white">2</span>
+              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#238636] text-xs font-bold text-white">
+                2
+              </span>
               Add your stats card
             </h3>
             <p className="mt-2 text-sm text-[#8b949e] ml-8">
-              Edit the <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-[#79c0ff]">README.md</code> in your profile repo and paste:
+              Edit the{" "}
+              <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-[#79c0ff]">
+                README.md
+              </code>{" "}
+              in your profile repo and paste:
             </p>
             <pre className="mt-3 ml-8 overflow-x-auto rounded-lg border border-[#30363d] bg-[#161b22] px-5 py-4 text-sm text-[#c9d1d9]">
               {`![GitHub Stats](https://ghstats.dev/api/card?username=YOUR_USERNAME)`}
             </pre>
             <p className="mt-3 ml-8 text-sm text-[#8b949e]">
               Want a different look? Add{" "}
-              <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-[#79c0ff]">{'&theme=tokyonight'}</code>{" "}
+              <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-[#79c0ff]">
+                {"&theme=tokyonight"}
+              </code>{" "}
               or use the editor below to customise everything.
             </p>
           </div>
@@ -330,9 +393,18 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="text-2xl font-bold mb-2">Badge Styles</h2>
           <p className="text-[#8b949e] mb-6">
-            Pass <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-sm text-[#79c0ff]">style</code>{" "}
-            to <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-sm text-[#79c0ff]">/api/mini</code>{" "}
-            or <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-sm text-[#79c0ff]">/api/badge</code>{" "}
+            Pass{" "}
+            <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-sm text-[#79c0ff]">
+              style
+            </code>{" "}
+            to{" "}
+            <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-sm text-[#79c0ff]">
+              /api/mini
+            </code>{" "}
+            or{" "}
+            <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-sm text-[#79c0ff]">
+              /api/badge
+            </code>{" "}
             to switch the badge look.
           </p>
           <pre className="overflow-x-auto rounded-lg border border-[#30363d] bg-[#161b22] px-5 py-3 text-sm text-[#c9d1d9] mb-6">
@@ -354,7 +426,9 @@ export default function Home() {
                       <code className="rounded bg-[#161b22] px-1.5 py-0.5 text-xs text-[#79c0ff]">
                         {s.key}
                       </code>
-                      <div className="text-xs text-[#8b949e] mt-1">{s.label}</div>
+                      <div className="text-xs text-[#8b949e] mt-1">
+                        {s.label}
+                      </div>
                     </td>
                     <td className="px-4 py-3 align-top">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -364,7 +438,9 @@ export default function Home() {
                         className="h-5"
                       />
                     </td>
-                    <td className="px-4 py-3 text-[#c9d1d9] align-top">{s.desc}</td>
+                    <td className="px-4 py-3 text-[#c9d1d9] align-top">
+                      {s.desc}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -372,7 +448,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
 
       {/* ─── Footer ─── */}
       <footer className="border-t border-[#21262d] bg-[#010409]">
@@ -384,7 +459,9 @@ export default function Home() {
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
           >
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+            </svg>
             rowkav09/GitHub-profile-stats
           </a>
         </div>
