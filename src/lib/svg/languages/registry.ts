@@ -9,7 +9,7 @@ import renderCompact from "./renderers/compact";
 import renderHorizontalList from "./renderers/horizontal-list";
 import renderVerticalList from "./renderers/vertical-list";
 
-import { LanguageChartRenderer } from "./types/types";
+import { LanguageChartRenderer } from "./types";
 
 export const languageChartRegistry = {
   bar: renderDefault,

@@ -1,4 +1,5 @@
-import { ThemeConfig, LanguageStat, LangChartOptions } from "@/lib/types";
+import { LanguageStat, LangChartOptions } from "@/lib/types";
+import { ThemeConfig } from "@/lib/themes/types";
 import { escapeXml } from "@/lib/sanitize";
 import { formatLangPct } from "../../text-metrics";
 import renderLanguageCard from "../base";

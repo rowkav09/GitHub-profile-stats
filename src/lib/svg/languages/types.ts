@@ -1,9 +1,5 @@
-import {
-  ThemeConfig,
-  LanguageStat,
-  LangChartLayout,
-  LangChartOptions,
-} from "@/lib/types";
+import { LanguageStat, LangChartOptions } from "@/lib/types";
+import { ThemeConfig } from "@/lib/themes/types";
 
 export type LanguageChartRenderer = (
   languages: LanguageStat[],
