@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { themes } from "@/lib/themes";
-import { renderBadge } from "@/app/api/badge/badge-svg";
+import { renderBadge } from "@/lib/svg/badge";
 import { LANG_CHART_LAYOUTS, LangChartLayout } from "@/lib/types";
 
 const STAT_OPTIONS = [
