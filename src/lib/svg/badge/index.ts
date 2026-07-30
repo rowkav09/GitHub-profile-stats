@@ -1,6 +1,6 @@
 import { escapeXml } from "@/lib/sanitize";
-import { BadgeStyle, BadgeStyleConfig, BadgeColors } from "./types/types";
-import { VALID_STYLES, STYLE_CONFIGS } from "./configs/styleConfig";
+import { BadgeStyle, BadgeColors } from "./types";
+import { VALID_STYLES, STYLE_CONFIGS } from "./configs/registry";
 
 export function resolveBadgeStyle(style?: string | null): BadgeStyle {
   if (style && VALID_STYLES.has(style)) {

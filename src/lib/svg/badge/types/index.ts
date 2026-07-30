@@ -26,3 +26,10 @@ export type BadgeStyleConfig = {
   clipId: string;
   gradientId: string;
 };
+
+export type BadgeStyleDefinition = {
+  key: BadgeStyle;
+  label: string;
+  desc: string;
+  config: BadgeStyleConfig;
+};
