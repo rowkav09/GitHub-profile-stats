@@ -44,42 +44,27 @@ Free, real-time GitHub stat cards, badges, and charts -- drop a URL into your RE
 
 **Languages (bar, stacked, grid, horizontal list, vertical list, donut, vertical donut, compact)**
 
-[![](https://ghstats.dev/api/langs?username=rowkav09&theme=dracula&layout=bar)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/langs?username=rowkav09&theme=ocean&layout=stacked)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/langs?username=rowkav09&theme=radical&layout=horizontal_list)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/langs?username=rowkav09&theme=catppuccin&layout=vertical_list)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/langs?username=rowkav09&theme=tokyonight&layout=grid)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/langs?username=rowkav09&theme=tokyonight&layout=donut)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/langs?username=rowkav09&theme=tokyonight&layout=vertical_donut)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/langs?username=rowkav09&theme=tokyonight&layout=compact)](https://github.com/rowkav09/GitHub-profile-stats)
-
-```bash
-[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=dracula&layout=bar)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=ocean&layout=stacked)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=radical&layout=horizontal_list)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=catppuccin&layout=vertical_list)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=tokyonight&layout=grid)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=tokyonight&layout=donut)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=tokyonight&layout=donut_vertical)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=tokyonight&layout=compact)](https://github.com/rowkav09/GitHub-profile-stats)
-
-```
+| Layout              | Preview                                                                                                                                                              | Markdown                                                                                                                                               |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Bar**             | [![Bar layout](https://ghstats.dev/api/langs?username=rowkav09&theme=dracula&layout=bar)](https://github.com/rowkav09/GitHub-profile-stats)                          | `[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=dracula&layout=bar)](https://github.com/rowkav09/GitHub-profile-stats)`               |
+| **Stacked**         | [![Stacked layout](https://ghstats.dev/api/langs?username=rowkav09&theme=ocean&layout=stacked)](https://github.com/rowkav09/GitHub-profile-stats)                    | `[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=ocean&layout=stacked)](https://github.com/rowkav09/GitHub-profile-stats)`             |
+| **Grid**            | [![Grid layout](https://ghstats.dev/api/langs?username=rowkav09&theme=tokyonight&layout=grid)](https://github.com/rowkav09/GitHub-profile-stats)                     | `[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=tokyonight&layout=grid)](https://github.com/rowkav09/GitHub-profile-stats)`           |
+| **Horizontal List** | [![Horizontal list layout](https://ghstats.dev/api/langs?username=rowkav09&theme=radical&layout=horizontal_list)](https://github.com/rowkav09/GitHub-profile-stats)  | `[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=radical&layout=horizontal_list)](https://github.com/rowkav09/GitHub-profile-stats)`   |
+| **Vertical List**   | [![Vertical list layout](https://ghstats.dev/api/langs?username=rowkav09&theme=catppuccin&layout=vertical_list)](https://github.com/rowkav09/GitHub-profile-stats)   | `[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=catppuccin&layout=vertical_list)](https://github.com/rowkav09/GitHub-profile-stats)`  |
+| **Donut**           | [![Donut layout](https://ghstats.dev/api/langs?username=rowkav09&theme=tokyonight&layout=donut)](https://github.com/rowkav09/GitHub-profile-stats)                   | `[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=tokyonight&layout=donut)](https://github.com/rowkav09/GitHub-profile-stats)`          |
+| **Vertical Donut**  | [![Vertical donut layout](https://ghstats.dev/api/langs?username=rowkav09&theme=tokyonight&layout=donut_vertical)](https://github.com/rowkav09/GitHub-profile-stats) | `[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=tokyonight&layout=donut_vertical)](https://github.com/rowkav09/GitHub-profile-stats)` |
+| **Compact**         | [![Compact layout](https://ghstats.dev/api/langs?username=rowkav09&theme=tokyonight&layout=compact)](https://github.com/rowkav09/GitHub-profile-stats)               | `[![](https://ghstats.dev/api/langs?username=YOUR_USERNAME&theme=tokyonight&layout=compact)](https://github.com/rowkav09/GitHub-profile-stats)`        |
 
 **Mini badges (drop anywhere)**
 
-Any metric, any colour, any style -- perfect for sprinkling through a README.
+Any metric, any colour, any style — perfect for sprinkling through a README.
 
-[![](https://ghstats.dev/api/mini?username=rowkav09&metric=stars&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/mini?username=rowkav09&metric=commits&color=0ea5e9&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/mini?username=rowkav09&metric=streak&color=f97316&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/mini?username=rowkav09&metric=followers&label=Community&color=22c55e&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
-
-```
-[![](https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=stars&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=commits&color=0ea5e9&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=streak&color=f97316&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
-[![](https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=followers&label=Community&color=22c55e&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)
-```
+| Metric        | Preview                                                                                                                                                                                  | Markdown                                                                                                                                                                         |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Stars**     | [![Stars badge](https://ghstats.dev/api/mini?username=rowkav09&metric=stars&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)                                      | `[![](https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=stars&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)`                                  |
+| **Commits**   | [![Commits badge](https://ghstats.dev/api/mini?username=rowkav09&metric=commits&color=0ea5e9&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)                     | `[![](https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=commits&color=0ea5e9&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)`                   |
+| **Streak**    | [![Streak badge](https://ghstats.dev/api/mini?username=rowkav09&metric=streak&color=f97316&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)                       | `[![](https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=streak&color=f97316&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)`                    |
+| **Followers** | [![Followers badge](https://ghstats.dev/api/mini?username=rowkav09&metric=followers&label=Community&color=22c55e&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats) | `[![](https://ghstats.dev/api/mini?username=YOUR_USERNAME&metric=followers&label=Community&color=22c55e&style=for-the-badge)](https://github.com/rowkav09/GitHub-profile-stats)` |
 
 Pass `label=...` to override the default label text and `style=...` to switch between `flat`, `flat-square`, `for-the-badge`, `plastic`, and `minimal` (see the table below).
 
