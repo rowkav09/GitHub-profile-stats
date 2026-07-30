@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { fetchGitHubStats } from "@/lib/github";
 import { renderBadge, resolveBadgeStyle } from "../../../lib/svg/badge";
 import { renderErrorCard } from "@/lib/svg";
-import { resolveTheme } from "@/lib/themes";
+import { resolveTheme } from "@/lib/themes/themes";
 import {
   sanitizeUsername,
   sanitizeHexParam,

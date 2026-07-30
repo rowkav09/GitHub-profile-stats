@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { fetchLanguageStats } from "@/lib/github";
 import { renderLanguageChart, renderErrorCard } from "@/lib/svg";
-import { resolveTheme } from "@/lib/themes";
+import { resolveTheme } from "@/lib/themes/themes";
 import { sanitizeUsername, sanitizeHexParam } from "@/lib/sanitize";
 import {
   LangChartOptions,

@@ -1,7 +1,9 @@
-import { ThemeConfig } from "./types";
+import { ThemeDefinition } from "../types";
 
-export const themes: Record<string, ThemeConfig> = {
-  default: {
+export const THEME_DEFINITIONS: ThemeDefinition[] = [
+  {
+    key: "default",
+    showIn: ["visual_builder", "hero"],
     name: "Default",
     bg: "#0d1117",
     text: "#c9d1d9",
@@ -9,7 +11,9 @@ export const themes: Record<string, ThemeConfig> = {
     icon: "#58a6ff",
     border: "#30363d",
   },
-  light: {
+  {
+    key: "light",
+    showIn: ["visual_builder"],
     name: "Light",
     bg: "#ffffff",
     text: "#24292f",
@@ -17,7 +21,9 @@ export const themes: Record<string, ThemeConfig> = {
     icon: "#0969da",
     border: "#d0d7de",
   },
-  radical: {
+  {
+    key: "radical",
+    showIn: ["visual_builder", "hero"],
     name: "Radical",
     bg: "#141321",
     text: "#a9fef7",
@@ -25,7 +31,9 @@ export const themes: Record<string, ThemeConfig> = {
     icon: "#f8d847",
     border: "#fe428e",
   },
-  tokyonight: {
+  {
+    key: "tokyonight",
+    showIn: ["visual_builder", "hero"],
     name: "Tokyo Night",
     bg: "#1a1b27",
     text: "#70a5fd",
@@ -33,7 +41,9 @@ export const themes: Record<string, ThemeConfig> = {
     icon: "#38bdae",
     border: "#70a5fd",
   },
-  dracula: {
+  {
+    key: "dracula",
+    showIn: ["visual_builder", "hero"],
     name: "Dracula",
     bg: "#282a36",
     text: "#f8f8f2",
@@ -41,7 +51,9 @@ export const themes: Record<string, ThemeConfig> = {
     icon: "#bd93f9",
     border: "#6272a4",
   },
-  nord: {
+  {
+    key: "nord",
+    showIn: ["visual_builder"],
     name: "Nord",
     bg: "#2e3440",
     text: "#d8dee9",
@@ -49,7 +61,9 @@ export const themes: Record<string, ThemeConfig> = {
     icon: "#88c0d0",
     border: "#4c566a",
   },
-  gruvbox: {
+  {
+    key: "gruvbox",
+    showIn: ["visual_builder"],
     name: "Gruvbox",
     bg: "#282828",
     text: "#ebdbb2",
@@ -57,7 +71,9 @@ export const themes: Record<string, ThemeConfig> = {
     icon: "#fe8019",
     border: "#3c3836",
   },
-  catppuccin: {
+  {
+    key: "catppuccin",
+    showIn: ["visual_builder", "hero"],
     name: "Catppuccin",
     bg: "#1e1e2e",
     text: "#cdd6f4",
@@ -65,7 +81,9 @@ export const themes: Record<string, ThemeConfig> = {
     icon: "#f5c2e7",
     border: "#313244",
   },
-  ocean: {
+  {
+    key: "ocean",
+    showIn: ["visual_builder", "hero"],
     name: "Ocean",
     bg: "#0b1929",
     text: "#a3c4e0",
@@ -73,7 +91,9 @@ export const themes: Record<string, ThemeConfig> = {
     icon: "#00e5ff",
     border: "#1a3a5c",
   },
-  sunset: {
+  {
+    key: "sunset",
+    showIn: ["visual_builder", "hero"],
     name: "Sunset",
     bg: "#1a1025",
     text: "#e8d5c4",
@@ -81,7 +101,9 @@ export const themes: Record<string, ThemeConfig> = {
     icon: "#ffa07a",
     border: "#4a2040",
   },
-  forest: {
+  {
+    key: "forest",
+    showIn: ["visual_builder", "hero"],
     name: "Forest",
     bg: "#0d1f0d",
     text: "#b5cea8",
@@ -89,7 +111,9 @@ export const themes: Record<string, ThemeConfig> = {
     icon: "#6a9955",
     border: "#1e3a1e",
   },
-  midnight: {
+  {
+    key: "midnight",
+    showIn: ["visual_builder"],
     name: "Midnight",
     bg: "#020024",
     text: "#eaeaea",
@@ -97,7 +121,9 @@ export const themes: Record<string, ThemeConfig> = {
     icon: "#0099ff",
     border: "#090979",
   },
-  nightowl: {
+  {
+    key: "nightowl",
+    showIn: ["visual_builder", "hero"],
     name: "Night Owl",
     bg: "#011627",
     text: "#d6deeb",
@@ -105,7 +131,9 @@ export const themes: Record<string, ThemeConfig> = {
     icon: "#c792ea",
     border: "#1d3b53",
   },
-  solarized: {
+  {
+    key: "solarized",
+    showIn: ["visual_builder", "hero"],
     name: "Solarized",
     bg: "#002b36",
     text: "#839496",
@@ -113,7 +141,9 @@ export const themes: Record<string, ThemeConfig> = {
     icon: "#b58900",
     border: "#073642",
   },
-  ayu: {
+  {
+    key: "ayu",
+    showIn: ["visual_builder", "hero"],
     name: "Ayu",
     bg: "#0d1017",
     text: "#bfbdb6",
@@ -121,7 +151,9 @@ export const themes: Record<string, ThemeConfig> = {
     icon: "#ff8f40",
     border: "#1b1f29",
   },
-  rosepine: {
+  {
+    key: "rosepine",
+    showIn: ["visual_builder", "hero"],
     name: "Rosé Pine",
     bg: "#191724",
     text: "#e0def4",
@@ -129,7 +161,9 @@ export const themes: Record<string, ThemeConfig> = {
     icon: "#c4a7e7",
     border: "#26233a",
   },
-  kanagawa: {
+  {
+    key: "kanagawa",
+    showIn: ["visual_builder", "hero"],
     name: "Kanagawa",
     bg: "#1F1F28",
     text: "#DCD7BA",
@@ -137,7 +171,9 @@ export const themes: Record<string, ThemeConfig> = {
     icon: "#E6C384",
     border: "#2A2A37",
   },
-  palenight: {
+  {
+    key: "palenight",
+    showIn: ["visual_builder", "hero"],
     name: "Material Palenight",
     bg: "#292D3E",
     text: "#A6ACCD",
@@ -145,25 +181,4 @@ export const themes: Record<string, ThemeConfig> = {
     icon: "#C792EA",
     border: "#2b2a3e",
   },
-};
-
-export function resolveTheme(
-  themeName: string,
-  overrides: {
-    bg?: string;
-    text?: string;
-    title_color?: string;
-    icon_color?: string;
-    border_color?: string;
-  },
-): ThemeConfig {
-  const base = themes[themeName] ?? themes.default;
-  return {
-    ...base,
-    bg: overrides.bg ? `#${overrides.bg}` : base.bg,
-    text: overrides.text ? `#${overrides.text}` : base.text,
-    title: overrides.title_color ? `#${overrides.title_color}` : base.title,
-    icon: overrides.icon_color ? `#${overrides.icon_color}` : base.icon,
-    border: overrides.border_color ? `#${overrides.border_color}` : base.border,
-  };
-}
+];

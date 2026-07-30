@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { fetchGitHubStats } from "@/lib/github";
 import { renderCard, renderErrorCard } from "@/lib/svg";
-import { resolveTheme } from "@/lib/themes";
+import { resolveTheme } from "@/lib/themes/themes";
 import { sanitizeUsername, sanitizeHexParam } from "@/lib/sanitize";
 import { getCacheHeaders } from "@/lib/cache";
 
@@ -38,11 +38,21 @@ export async function GET(request: NextRequest) {
       50,
     ),
     custom_title: params.get("custom_title") ?? undefined,
-    size: (params.get("size") === "compact" ? "compact" : "default") as "default" | "compact",
-    compact_count: ([3, 4, 6].includes(parseInt(params.get("compact_count") ?? "")) ? parseInt(params.get("compact_count")!) : 6) as 3 | 4 | 6,
+    size: (params.get("size") === "compact" ? "compact" : "default") as
+      | "default"
+      | "compact",
+    compact_count: ([3, 4, 6].includes(
+      parseInt(params.get("compact_count") ?? ""),
+    )
+      ? parseInt(params.get("compact_count")!)
+      : 6) as 3 | 4 | 6,
     show_emoji: params.get("show_emoji") === "true",
     order: params.get("order")
-      ? params.get("order")!.split(",").map((s) => s.trim()).filter(Boolean)
+      ? params
+          .get("order")!
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
       : undefined,
   };
 

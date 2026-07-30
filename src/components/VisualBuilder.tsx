@@ -2,29 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import CardPreview from "./CardPreview";
-
-// ─── Constants ───────────────────────────────────────────────────────────────
-
-const THEMES = [
-  { key: "default", name: "Default" },
-  { key: "light", name: "Light" },
-  { key: "radical", name: "Radical" },
-  { key: "tokyonight", name: "Tokyo Night" },
-  { key: "dracula", name: "Dracula" },
-  { key: "nord", name: "Nord" },
-  { key: "gruvbox", name: "Gruvbox" },
-  { key: "catppuccin", name: "Catppuccin" },
-  { key: "ocean", name: "Ocean" },
-  { key: "sunset", name: "Sunset" },
-  { key: "forest", name: "Forest" },
-  { key: "midnight", name: "Midnight" },
-  { key: "nightowl", name: "Night Owl" },
-  { key: "solarized", name: "Solarized" },
-  { key: "ayu", name: "Ayu" },
-  { key: "rosepine", name: "Rosé Pine" },
-  { key: "kanagawa", name: "Kanagawa" },
-  { key: "palenight", name: "Material Palenight" },
-];
+import { THEMES } from "@/lib/themes/configs/registry";
 
 const ALL_STATS = [
   { key: "stars", label: "Total Stars Earned" },
@@ -43,8 +21,6 @@ const ALL_STATS = [
   { key: "followers", label: "Followers" },
 ];
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
 interface StatConfig {
   key: string;
   label: string;
@@ -54,19 +30,19 @@ interface StatConfig {
 type LayoutMode = "list" | "compact";
 type EditorTab = "visual" | "classic";
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
 function extractCardUrl(raw: string): string | null {
-  const mdMatch = raw.match(/!\[.*?\]\((https?:\/\/[^)]+\/api\/(?:card|langs)[^)]*?)\)/);
+  const mdMatch = raw.match(
+    /!\[.*?\]\((https?:\/\/[^)]+\/api\/(?:card|langs)[^)]*?)\)/,
+  );
   if (mdMatch) return mdMatch[1];
-  const htmlMatch = raw.match(/src=["'](https?:\/\/[^"']+\/api\/(?:card|langs)[^"']*?)["']/);
+  const htmlMatch = raw.match(
+    /src=["'](https?:\/\/[^"']+\/api\/(?:card|langs)[^"']*?)["']/,
+  );
   if (htmlMatch) return htmlMatch[1];
   const trimmed = raw.trim();
   if (/https?:\/\/.+\/api\/(card|langs)/.test(trimmed)) return trimmed;
   return null;
 }
-
-// ─── Sub-components ──────────────────────────────────────────────────────────
 
 function SectionHeader({ children }: { children: React.ReactNode }) {
   return (
@@ -90,7 +66,9 @@ function Toggle({
       <span
         onClick={() => onChange(!checked)}
         className={`relative inline-flex h-5 w-9 flex-shrink-0 rounded-full border-2 transition-colors duration-200 cursor-pointer ${
-          checked ? "bg-[#238636] border-[#238636]" : "bg-[#21262d] border-[#30363d]"
+          checked
+            ? "bg-[#238636] border-[#238636]"
+            : "bg-[#21262d] border-[#30363d]"
         }`}
       >
         <span
@@ -99,7 +77,9 @@ function Toggle({
           }`}
         />
       </span>
-      <span className="text-sm text-[#c9d1d9] group-hover:text-white transition-colors">{label}</span>
+      <span className="text-sm text-[#c9d1d9] group-hover:text-white transition-colors">
+        {label}
+      </span>
     </label>
   );
 }
@@ -148,8 +128,6 @@ function CopyButton({
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
-
 export default function VisualBuilder() {
   const [activeTab, setActiveTab] = useState<EditorTab>("visual");
 
@@ -196,8 +174,6 @@ export default function VisualBuilder() {
     setOrigin(window.location.origin);
   }, []);
 
-  // ─── URL builders ──────────────────────────────────────────────────────────
-
   const buildCardUrl = useCallback(
     (base: string) => {
       if (!username.trim()) return "";
@@ -215,7 +191,8 @@ export default function VisualBuilder() {
       const enabledOrder = stats.filter((s) => s.enabled).map((s) => s.key);
       const defaultOrder = ALL_STATS.map((s) => s.key);
       const isReordered = enabledOrder.some(
-        (k, i) => k !== defaultOrder.filter((dk) => !disabledKeys.includes(dk))[i],
+        (k, i) =>
+          k !== defaultOrder.filter((dk) => !disabledKeys.includes(dk))[i],
       );
       if (isReordered) p.set("order", enabledOrder.join(","));
 
@@ -229,7 +206,20 @@ export default function VisualBuilder() {
       }
       return `${base}/api/card?${p.toString()}`;
     },
-    [username, theme, showIcons, hideBorder, hideTitle, showRing, stats, customTitle, borderRadius, layout, gridCols, showEmoji],
+    [
+      username,
+      theme,
+      showIcons,
+      hideBorder,
+      hideTitle,
+      showRing,
+      stats,
+      customTitle,
+      borderRadius,
+      layout,
+      gridCols,
+      showEmoji,
+    ],
   );
 
   const buildLangsUrl = useCallback(
@@ -246,8 +236,6 @@ export default function VisualBuilder() {
     [username, theme, hideBorder, borderRadius, maxLangs],
   );
 
-  // ─── Debounced preview ─────────────────────────────────────────────────────
-
   useEffect(() => {
     if (!username.trim()) {
       setCardImgUrl("");
@@ -261,8 +249,6 @@ export default function VisualBuilder() {
     }, 600);
     return () => clearTimeout(timer);
   }, [buildCardUrl, buildLangsUrl, username, showLanguages]);
-
-  // ─── Drag & Drop ───────────────────────────────────────────────────────────
 
   function handleDragStart(e: React.DragEvent, index: number) {
     setDragIndex(index);
@@ -303,7 +289,9 @@ export default function VisualBuilder() {
         const target = prev.find((s) => s.key === key);
         if (!target) return prev;
         if (target.enabled) {
-          return prev.map((s) => (s.key === key ? { ...s, enabled: false } : s));
+          return prev.map((s) =>
+            s.key === key ? { ...s, enabled: false } : s,
+          );
         }
         const enabledCount = prev.filter((s) => s.enabled).length;
         if (enabledCount >= gridCols) return prev;
@@ -373,14 +361,20 @@ export default function VisualBuilder() {
   function moveStatUp(index: number) {
     if (index === 0) return;
     const newStats = [...stats];
-    [newStats[index - 1], newStats[index]] = [newStats[index], newStats[index - 1]];
+    [newStats[index - 1], newStats[index]] = [
+      newStats[index],
+      newStats[index - 1],
+    ];
     setStats(newStats);
   }
 
   function moveStatDown(index: number) {
     if (index === stats.length - 1) return;
     const newStats = [...stats];
-    [newStats[index], newStats[index + 1]] = [newStats[index + 1], newStats[index]];
+    [newStats[index], newStats[index + 1]] = [
+      newStats[index + 1],
+      newStats[index],
+    ];
     setStats(newStats);
   }
 
@@ -411,14 +405,20 @@ export default function VisualBuilder() {
   function handleImport() {
     const url = extractCardUrl(importInput);
     if (!url) {
-      setImportStatus({ ok: false, msg: "Couldn't find a card URL in that embed code." });
+      setImportStatus({
+        ok: false,
+        msg: "Couldn't find a card URL in that embed code.",
+      });
       return;
     }
     try {
       const p = new URL(url).searchParams;
       const u = p.get("username");
       if (!u) {
-        setImportStatus({ ok: false, msg: "No username found in the card URL." });
+        setImportStatus({
+          ok: false,
+          msg: "No username found in the card URL.",
+        });
         return;
       }
       setUsername(u);
@@ -428,9 +428,19 @@ export default function VisualBuilder() {
       setHideTitle(p.get("hide_title") === "true");
       setShowRing(p.get("show_ring") !== "false");
       const hideStr = p.get("hide");
-      const hiddenKeys = hideStr ? hideStr.split(",").map((s) => s.trim()).filter(Boolean) : [];
+      const hiddenKeys = hideStr
+        ? hideStr
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : [];
       const orderStr = p.get("order");
-      const orderKeys = orderStr ? orderStr.split(",").map((s) => s.trim()).filter(Boolean) : null;
+      const orderKeys = orderStr
+        ? orderStr
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : null;
       setCustomTitle(p.get("custom_title") ?? "");
       setBorderRadius(p.get("border_radius") ?? "4.5");
       setLayout(p.get("size") === "compact" ? "compact" : "list");
@@ -439,14 +449,15 @@ export default function VisualBuilder() {
       setShowEmoji(p.get("show_emoji") === "true");
 
       // Reconstruct stats from order + hide
-      let newStats = ALL_STATS.map((s) => ({ ...s, enabled: !hiddenKeys.includes(s.key) }));
+      let newStats = ALL_STATS.map((s) => ({
+        ...s,
+        enabled: !hiddenKeys.includes(s.key),
+      }));
       if (orderKeys && orderKeys.length > 0) {
         const orderedEnabled = orderKeys
           .map((k) => newStats.find((s) => s.key === k))
           .filter(Boolean) as StatConfig[];
-        const remaining = newStats.filter(
-          (s) => !orderKeys.includes(s.key),
-        );
+        const remaining = newStats.filter((s) => !orderKeys.includes(s.key));
         newStats = [...orderedEnabled, ...remaining];
       }
       setStats(newStats);
@@ -484,7 +495,9 @@ export default function VisualBuilder() {
   const markdownLangs = embedLangsUrl
     ? `[![Top Languages](${embedLangsUrl})](${repoUrl})`
     : "";
-  const fullMarkdown = [markdownCard, markdownLangs].filter(Boolean).join("\n\n");
+  const fullMarkdown = [markdownCard, markdownLangs]
+    .filter(Boolean)
+    .join("\n\n");
 
   const htmlCard = embedCardUrl
     ? `<a href="${repoUrl}"><img src="${embedCardUrl}" alt="GitHub Stats"${widthAttr} /></a>`
@@ -562,7 +575,12 @@ export default function VisualBuilder() {
                 }}
                 className="flex items-center gap-1.5 rounded-lg border border-[#30363d] px-3.5 py-2 text-sm text-[#c9d1d9] hover:border-[#58a6ff] hover:text-white transition-all duration-200"
               >
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                >
                   <path d="M2.75 14A1.75 1.75 0 0 1 1 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.25 14Z" />
                   <path d="M7.25 7.689V2a.75.75 0 0 1 1.5 0v5.689l1.97-1.97a.749.749 0 1 1 1.06 1.06l-3.25 3.25a.749.749 0 0 1-1.06 0L4.22 6.779a.749.749 0 1 1 1.06-1.06l1.97 1.97z" />
                 </svg>
@@ -572,7 +590,12 @@ export default function VisualBuilder() {
                 onClick={resetToScratch}
                 className="flex items-center gap-1.5 rounded-lg border border-[#30363d] px-3.5 py-2 text-sm text-[#8b949e] hover:border-[#f85149] hover:text-[#f85149] transition-all duration-200"
               >
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                >
                   <path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.042.018.749.749 0 0 1 .018 1.042L9.06 8l3.22 3.22a.749.749 0 0 1-.018 1.042.749.749 0 0 1-1.042.018L8 9.06l-3.22 3.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06z" />
                 </svg>
                 Start from Scratch
@@ -584,7 +607,8 @@ export default function VisualBuilder() {
           {importOpen && (
             <div className="rounded-xl border border-[#30363d] bg-[#0d1117] p-4 space-y-3">
               <p className="text-xs text-[#8b949e]">
-                Paste your existing Markdown, HTML, or raw card URL — all settings will load into the builder.
+                Paste your existing Markdown, HTML, or raw card URL — all
+                settings will load into the builder.
               </p>
               <textarea
                 value={importInput}
@@ -626,23 +650,32 @@ export default function VisualBuilder() {
                   <SectionHeader>Stats</SectionHeader>
                   <div className="flex gap-1">
                     <button
-                    onClick={() => {
-                      if (layout === "compact") {
-                        setStats((prev) => {
-                          let count = 0;
-                          return prev.map((s) => ({ ...s, enabled: count++ < gridCols }));
-                        });
-                      } else {
-                        setStats((prev) => prev.map((s) => ({ ...s, enabled: true })));
-                      }
-                    }}
-                    className="text-xs text-[#58a6ff] hover:text-[#79c0ff] transition-colors"
-                  >
-                    All
-                  </button>
+                      onClick={() => {
+                        if (layout === "compact") {
+                          setStats((prev) => {
+                            let count = 0;
+                            return prev.map((s) => ({
+                              ...s,
+                              enabled: count++ < gridCols,
+                            }));
+                          });
+                        } else {
+                          setStats((prev) =>
+                            prev.map((s) => ({ ...s, enabled: true })),
+                          );
+                        }
+                      }}
+                      className="text-xs text-[#58a6ff] hover:text-[#79c0ff] transition-colors"
+                    >
+                      All
+                    </button>
                     <span className="text-[#30363d]">/</span>
                     <button
-                      onClick={() => setStats((prev) => prev.map((s) => ({ ...s, enabled: false })))}
+                      onClick={() =>
+                        setStats((prev) =>
+                          prev.map((s) => ({ ...s, enabled: false })),
+                        )
+                      }
                       className="text-xs text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
                     >
                       None
@@ -666,8 +699,8 @@ export default function VisualBuilder() {
                         dragIndex === i
                           ? "opacity-40 scale-95"
                           : dragOverIndex === i
-                          ? "border-t-2 border-[#58a6ff]"
-                          : "hover:bg-[#161b22]"
+                            ? "border-t-2 border-[#58a6ff]"
+                            : "hover:bg-[#161b22]"
                       } ${!stat.enabled ? "opacity-50" : ""} ${compactLimitReached && !stat.enabled ? "opacity-30" : ""}`}
                     >
                       {/* Drag handle */}
@@ -736,7 +769,9 @@ export default function VisualBuilder() {
                     <div>
                       <label className="text-xs text-[#8b949e] block mb-1.5">
                         Max languages:{" "}
-                        <span className="text-[#58a6ff] font-semibold">{maxLangs}</span>
+                        <span className="text-[#58a6ff] font-semibold">
+                          {maxLangs}
+                        </span>
                       </label>
                       <input
                         type="range"
@@ -760,7 +795,9 @@ export default function VisualBuilder() {
                     Live Preview
                   </span>
                   {cardLoading && cardImgUrl && (
-                    <span className="text-xs text-[#58a6ff] animate-pulse">Updating…</span>
+                    <span className="text-xs text-[#58a6ff] animate-pulse">
+                      Updating…
+                    </span>
                   )}
                 </div>
                 {cardImgUrl ? (
@@ -808,10 +845,14 @@ export default function VisualBuilder() {
               {/* Grid snap visualizer (compact mode) */}
               {layout === "compact" && (
                 <div className="w-full rounded-xl border border-[#30363d] bg-[#0d1117] p-4">
-                  <SectionHeader>Grid Layout ({gridCols} columns)</SectionHeader>
+                  <SectionHeader>
+                    Grid Layout ({gridCols} columns)
+                  </SectionHeader>
                   <div
                     className="grid gap-1.5 mt-2"
-                    style={{ gridTemplateColumns: `repeat(${gridCols === 4 ? 2 : 3}, 1fr)` }}
+                    style={{
+                      gridTemplateColumns: `repeat(${gridCols === 4 ? 2 : 3}, 1fr)`,
+                    }}
                   >
                     {stats
                       .filter((s) => s.enabled)
@@ -821,7 +862,9 @@ export default function VisualBuilder() {
                           key={stat.key}
                           className="rounded-lg border border-[#30363d] bg-[#161b22] px-3 py-2 text-center"
                         >
-                          <div className="text-xs text-[#8b949e] truncate">{stat.label}</div>
+                          <div className="text-xs text-[#8b949e] truncate">
+                            {stat.label}
+                          </div>
                         </div>
                       ))}
                   </div>
@@ -886,8 +929,12 @@ export default function VisualBuilder() {
                 </div>
                 <div className="p-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-[#8b949e]">Image width attribute</span>
-                    <span className="text-xs font-semibold text-[#58a6ff]">{embedWidth}px</span>
+                    <span className="text-xs text-[#8b949e]">
+                      Image width attribute
+                    </span>
+                    <span className="text-xs font-semibold text-[#58a6ff]">
+                      {embedWidth}px
+                    </span>
                   </div>
                   <input
                     type="range"
@@ -899,7 +946,8 @@ export default function VisualBuilder() {
                     className="w-full accent-[#58a6ff]"
                   />
                   <p className="text-xs text-[#484f58]">
-                    Sets the <code className="text-[#79c0ff]">width</code> attribute on the embed image tag.
+                    Sets the <code className="text-[#79c0ff]">width</code>{" "}
+                    attribute on the embed image tag.
                   </p>
                 </div>
               </div>
@@ -909,18 +957,41 @@ export default function VisualBuilder() {
                   <SectionHeader>Appearance</SectionHeader>
                 </div>
                 <div className="p-4 space-y-3">
-                  <Toggle checked={!hideBorder} onChange={(v) => setHideBorder(!v)} label="Show border" />
-                  <Toggle checked={!hideTitle} onChange={(v) => setHideTitle(!v)} label="Show title" />
-                  <Toggle checked={showRing && layout !== "compact"} onChange={setShowRing} label="Activity ring" />
+                  <Toggle
+                    checked={!hideBorder}
+                    onChange={(v) => setHideBorder(!v)}
+                    label="Show border"
+                  />
+                  <Toggle
+                    checked={!hideTitle}
+                    onChange={(v) => setHideTitle(!v)}
+                    label="Show title"
+                  />
+                  <Toggle
+                    checked={showRing && layout !== "compact"}
+                    onChange={setShowRing}
+                    label="Activity ring"
+                  />
                   {layout !== "compact" && (
-                    <Toggle checked={showIcons} onChange={setShowIcons} label="Icons" />
+                    <Toggle
+                      checked={showIcons}
+                      onChange={setShowIcons}
+                      label="Icons"
+                    />
                   )}
                   {layout === "compact" && (
-                    <Toggle checked={showEmoji} onChange={setShowEmoji} label="Emoji icons" />
+                    <Toggle
+                      checked={showEmoji}
+                      onChange={setShowEmoji}
+                      label="Emoji icons"
+                    />
                   )}
                   <div className="pt-1 border-t border-[#21262d]">
                     <label className="text-xs text-[#8b949e] block mb-1.5">
-                      Corner radius: <span className="text-[#58a6ff] font-semibold">{borderRadius}</span>
+                      Corner radius:{" "}
+                      <span className="text-[#58a6ff] font-semibold">
+                        {borderRadius}
+                      </span>
                     </label>
                     <input
                       type="range"
@@ -933,7 +1004,9 @@ export default function VisualBuilder() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-[#8b949e] block mb-1.5">Custom title</label>
+                    <label className="text-xs text-[#8b949e] block mb-1.5">
+                      Custom title
+                    </label>
                     <input
                       type="text"
                       value={customTitle}
@@ -952,7 +1025,9 @@ export default function VisualBuilder() {
             <div className="px-5 py-3.5 bg-[#161b22] border-b border-[#30363d] flex items-center justify-between">
               <SectionHeader>Embed Code</SectionHeader>
               {!embedCardUrl && (
-                <span className="text-xs text-[#484f58]">Enter a username to generate your embed</span>
+                <span className="text-xs text-[#484f58]">
+                  Enter a username to generate your embed
+                </span>
               )}
             </div>
             {embedCardUrl ? (
@@ -963,7 +1038,9 @@ export default function VisualBuilder() {
                     <span className="text-xs font-medium text-[#8b949e]">
                       Stats Card
                       {embedWidth !== 495 && (
-                        <span className="ml-2 text-[#484f58]">(img width={embedWidth}px)</span>
+                        <span className="ml-2 text-[#484f58]">
+                          (img width={embedWidth}px)
+                        </span>
                       )}
                     </span>
                     <div className="flex gap-2">
@@ -992,7 +1069,9 @@ export default function VisualBuilder() {
                 {embedLangsUrl && (
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-[#8b949e]">Languages Chart</span>
+                      <span className="text-xs font-medium text-[#8b949e]">
+                        Languages Chart
+                      </span>
                       <div className="flex gap-2">
                         <CopyButton
                           text={markdownLangs}
@@ -1019,7 +1098,9 @@ export default function VisualBuilder() {
                 {/* Combined copy */}
                 <div className="pt-2 border-t border-[#21262d] flex items-center justify-between">
                   <span className="text-xs text-[#484f58]">
-                    {embedLangsUrl ? "Copy both embeds together:" : "Or copy the raw URL:"}
+                    {embedLangsUrl
+                      ? "Copy both embeds together:"
+                      : "Or copy the raw URL:"}
                   </span>
                   <div className="flex gap-2">
                     {embedLangsUrl ? (

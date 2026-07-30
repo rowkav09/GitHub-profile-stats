@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { fetchGitHubStats } from "@/lib/github";
 import { renderErrorCard, renderSparkline } from "@/lib/svg";
-import { resolveTheme } from "@/lib/themes";
+import { resolveTheme } from "@/lib/themes/themes";
 import { sanitizeUsername, sanitizeHexParam } from "@/lib/sanitize";
 import { getCacheHeaders } from "@/lib/cache";
 
@@ -27,9 +27,21 @@ export async function GET(request: NextRequest) {
   });
 
   const days = clamp(parseInt(params.get("days") ?? "30", 10) || 30, 7, 90);
-  const width = clamp(parseInt(params.get("width") ?? "320", 10) || 320, 180, 800);
-  const height = clamp(parseInt(params.get("height") ?? "80", 10) || 80, 40, 240);
-  const borderRadius = clamp(parseFloat(params.get("border_radius") ?? "6") || 6, 0, 50);
+  const width = clamp(
+    parseInt(params.get("width") ?? "320", 10) || 320,
+    180,
+    800,
+  );
+  const height = clamp(
+    parseInt(params.get("height") ?? "80", 10) || 80,
+    40,
+    240,
+  );
+  const borderRadius = clamp(
+    parseFloat(params.get("border_radius") ?? "6") || 6,
+    0,
+    50,
+  );
   const hideBorder = params.get("hide_border") === "true";
   const lineColor = sanitizeHexParam(params.get("line_color"));
   const fillColor = sanitizeHexParam(params.get("fill_color"));
