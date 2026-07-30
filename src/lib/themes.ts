@@ -164,8 +164,6 @@ export function resolveTheme(
     text: overrides.text ? `#${overrides.text}` : base.text,
     title: overrides.title_color ? `#${overrides.title_color}` : base.title,
     icon: overrides.icon_color ? `#${overrides.icon_color}` : base.icon,
-    border: overrides.border_color
-      ? `#${overrides.border_color}`
-      : base.border,
+    border: overrides.border_color ? `#${overrides.border_color}` : base.border,
   };
 }

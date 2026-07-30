@@ -12,7 +12,6 @@ import { getCacheHeaders } from "@/lib/cache";
 
 export const dynamic = "force-dynamic";
 
-// Parses & validates a layout query param against LANG_CHART_LAYOUTS, defaulting to "bar".
 function parseLangLayout(value: string | null): LangChartLayout {
   return (LANG_CHART_LAYOUTS as readonly string[]).includes(value ?? "")
     ? (value as LangChartLayout)
