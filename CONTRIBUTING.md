@@ -25,7 +25,7 @@ For anything larger (new layouts, breaking API changes) it's worth [opening an i
 
 All themes live in a single source of truth: **`THEME_DEFINITIONS`** in **`src/lib/themes.ts`**. Everything else (`themes`, `THEMES`, `HERO_THEMES`) is derived from it automatically, so adding a theme is one edit in one file.
 
-**1. Add the theme to `THEME_DEFINITIONS` in `src/lib/themes.ts`:**
+**1. Add the theme to `THEME_DEFINITIONS` in `src/lib/themes/configs/index.ts`:**
 
 ```ts
 {
@@ -86,7 +86,7 @@ Add the key and a short display name to the `STAT_OPTIONS` array so it appears a
 
 Badge styles control the visual appearance of `/api/mini`, `/api/badge`, and `/api/visits` output. Five styles are supported: `flat`, `flat-square`, `for-the-badge`, `plastic`, and `minimal`.
 
-**1. Add your style to STYLE_DEFS - `src/lib/svg/badge/configs/styleConfig.ts`**
+**1. Add your style to STYLE_DEFS - `src/lib/svg/badge/configs/index.ts`**
 
 ```ts
 {
@@ -102,7 +102,7 @@ Badge styles control the visual appearance of `/api/mini`, `/api/badge`, and `/a
 },
 ```
 
-**2. Update the BadgeStyle union type - `src/lib/svg/badge/types/index.ts`**
+**2. Update the BadgeStyle union type - `src/lib/svg/badge/types.ts`**
 
 ```ts
 export type BadgeStyle =
