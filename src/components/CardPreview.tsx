@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { formatLayoutLabel } from "@/lib/svg/languages/utils";
 import { themes } from "@/lib/themes/configs/registry";
+import { BADGE_STYLES } from "@/lib/svg/badge/configs/registry";
 import { renderBadge } from "@/lib/svg/badge";
 import { LANG_CHART_LAYOUTS, LangChartLayout } from "@/lib/types";
 
@@ -30,14 +32,6 @@ const EMBED_LABELS: Record<EmbedType, string> = {
   mini: "GitHub Mini Badge",
   sparkline: "Contribution Sparkline",
 };
-
-const BADGE_STYLES = [
-  { key: "flat", label: "Flat" },
-  { key: "flat-square", label: "Square" },
-  { key: "for-the-badge", label: "For The Badge" },
-  { key: "plastic", label: "Plastic" },
-  { key: "minimal", label: "Minimal" },
-] as const;
 
 function BadgeStylePicker({
   value,
@@ -82,14 +76,6 @@ function BadgeStylePicker({
       })}
     </div>
   );
-}
-
-//Helper function to conver the layout key (snake_case) into Title case.
-function formatLayoutLabel(layout: string): string {
-  return layout
-    .split("_")
-    .map((word) => word[0].toUpperCase() + word.slice(1))
-    .join(" ");
 }
 
 export default function CardPreview() {
