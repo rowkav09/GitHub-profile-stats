@@ -6,19 +6,15 @@ import { themes } from "@/lib/themes/configs/registry";
 import { BADGE_STYLES } from "@/lib/svg/badge/configs/registry";
 import { renderBadge } from "@/lib/svg/badge";
 import { LANG_CHART_LAYOUTS } from "@/lib/types";
-import { CardOpts, LangOpts, MiniOpts, SparkOpts } from "./CardPreview/types";
+import { CardOpts, LangOpts, MiniOpts, SparkOpts } from "./types";
 import {
   CARD_DEFAULTS,
   LANG_DEFAULTS,
   MINI_DEFAULTS,
   SPARK_DEFAULTS,
-} from "./CardPreview/configs";
-import {
-  STAT_OPTIONS,
-  EMBED_LABELS,
-  MINI_METRICS,
-} from "./CardPreview/configs";
-import { EmbedType } from "./CardPreview/types";
+} from "./configs";
+import { STAT_OPTIONS, EMBED_LABELS, MINI_METRICS } from "./configs";
+import { EmbedType } from "./types";
 
 function BadgeStylePicker({
   value,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import CardPreview from "./CardPreview";
+import CardPreview from "./CardPreview/CardPreview";
 import { THEMES } from "@/lib/themes/configs/registry";
 
 const ALL_STATS = [

@@ -1,4 +1,4 @@
-import CardPreview from "@/components/CardPreview";
+import CardPreview from "@/components/CardPreview/CardPreview";
 import HeroCard from "@/components/HeroCard";
 import { BADGE_STYLES } from "@/lib/svg/badge/configs/registry";
 
