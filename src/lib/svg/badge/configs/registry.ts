@@ -1,5 +1,5 @@
 import { BadgeStyle, BadgeStyleConfig } from "../types";
-import { BADGE_STYLE_DEFINITIONS } from "./styleConfig";
+import { BADGE_STYLE_DEFINITIONS } from ".";
 
 export const STYLE_CONFIGS: Record<BadgeStyle, BadgeStyleConfig> =
   Object.fromEntries(

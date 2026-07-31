@@ -35,8 +35,6 @@ export interface ContributionDay {
   date: string;
 }
 
-
-
 export interface CardOptions {
   theme: string;
   hide_border: boolean;
