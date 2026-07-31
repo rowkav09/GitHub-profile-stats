@@ -1,4 +1,5 @@
-import { ThemeConfig, ContributionDay } from "../../types";
+import { ContributionDay } from "../../types";
+import { ThemeConfig } from "@/lib/themes/types";
 import { escapeXml } from "../../sanitize";
 import { renderErrorCard } from "../svg-primitives";
 
@@ -77,5 +78,6 @@ export function renderSparkline(
   <circle cx="${lastPoint.x}" cy="${lastPoint.y}" r="3.6" fill="${lineColor}" stroke="${theme.bg}" stroke-width="1" />
   <text x="${PAD_X}" y="${TITLE_Y}" class="sl-title">${escapeXml(title)}</text>
   <text x="${WIDTH - PAD_X}" y="${TITLE_Y}" class="sl-value" text-anchor="end">Today: ${latestVal}</text>
+  
 </svg>`;
 }
