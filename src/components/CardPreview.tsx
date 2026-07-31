@@ -5,33 +5,20 @@ import { formatLayoutLabel } from "@/lib/svg/languages/utils";
 import { themes } from "@/lib/themes/configs/registry";
 import { BADGE_STYLES } from "@/lib/svg/badge/configs/registry";
 import { renderBadge } from "@/lib/svg/badge";
-import { LANG_CHART_LAYOUTS, LangChartLayout } from "@/lib/types";
-
-const STAT_OPTIONS = [
-  { key: "stars", label: "Stars" },
-  { key: "commits", label: "Commits" },
-  { key: "prs", label: "PRs" },
-  { key: "issues", label: "Issues" },
-  { key: "hours", label: "Hours" },
-  { key: "streak", label: "Streak" },
-  { key: "week", label: "This Week" },
-  { key: "trend", label: "Trend" },
-  { key: "avg", label: "Avg / Day" },
-  { key: "active_day", label: "Active Day" },
-  { key: "grade", label: "Grade" },
-  { key: "contributions", label: "Contributions" },
-  { key: "repos", label: "Repos" },
-  { key: "followers", label: "Followers" },
-];
-
-type EmbedType = "card" | "langs" | "mini" | "sparkline";
-
-const EMBED_LABELS: Record<EmbedType, string> = {
-  card: "GitHub Stats Card",
-  langs: "Top Languages",
-  mini: "GitHub Mini Badge",
-  sparkline: "Contribution Sparkline",
-};
+import { LANG_CHART_LAYOUTS } from "@/lib/types";
+import { CardOpts, LangOpts, MiniOpts, SparkOpts } from "./CardPreview/types";
+import {
+  CARD_DEFAULTS,
+  LANG_DEFAULTS,
+  MINI_DEFAULTS,
+  SPARK_DEFAULTS,
+} from "./CardPreview/configs";
+import {
+  STAT_OPTIONS,
+  EMBED_LABELS,
+  MINI_METRICS,
+} from "./CardPreview/configs";
+import { EmbedType } from "./CardPreview/types";
 
 function BadgeStylePicker({
   value,
@@ -78,22 +65,25 @@ function BadgeStylePicker({
   );
 }
 
+function usePatchState<T>(initial: T) {
+  const [state, setState] = useState<T>(initial);
+  const patch = useCallback((p: Partial<T>) => {
+    setState((prev) => ({ ...prev, ...p }));
+  }, []);
+  return [state, patch] as const;
+}
+
 export default function CardPreview() {
   const [embedType, setEmbedType] = useState<EmbedType>("card");
   const [username, setUsername] = useState("octocat");
   const [theme, setTheme] = useState("default");
   const [advancedMode, setAdvancedMode] = useState(false);
 
-  // Card options
-  const [showIcons, setShowIcons] = useState(true);
-  const [showRing, setShowRing] = useState(true);
-  const [hideBorder, setHideBorder] = useState(false);
-  const [hideTitle, setHideTitle] = useState(false);
-  const [borderRadius, setBorderRadius] = useState("4.5");
-  const [customTitle, setCustomTitle] = useState("");
-  const [size, setSize] = useState<"default" | "compact">("default");
-  const [compactCount, setCompactCount] = useState<3 | 4 | 6>(6);
-  const [showEmoji, setShowEmoji] = useState(false);
+  const [card, patchCard] = usePatchState<CardOpts>(CARD_DEFAULTS);
+  const [langs, patchLangs] = usePatchState<LangOpts>(LANG_DEFAULTS);
+  const [mini, patchMini] = usePatchState<MiniOpts>(MINI_DEFAULTS);
+  const [spark, patchSpark] = usePatchState<SparkOpts>(SPARK_DEFAULTS);
+
   const [hiddenStats, setHiddenStats] = useState<string[]>([]);
   const [statsOrder, setStatsOrder] = useState<string[]>(
     STAT_OPTIONS.map((s) => s.key),
@@ -101,33 +91,14 @@ export default function CardPreview() {
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
-  // Languages options
-  const [langLayout, setLangLayout] = useState<LangChartLayout>("bar");
-  const [maxLangs, setMaxLangs] = useState(8);
-
-  // Mini badge options
-  const [miniMetric, setMiniMetric] = useState("stars");
-  const [miniLabel, setMiniLabel] = useState("");
-  const [miniColor, setMiniColor] = useState("");
-  const [miniStyle, setMiniStyle] = useState("flat");
-
-  // Sparkline options
-  const [sparkDays, setSparkDays] = useState("30");
-  const [sparkWidth, setSparkWidth] = useState("320");
-  const [sparkHeight, setSparkHeight] = useState("80");
-  const [sparkTitle, setSparkTitle] = useState("");
-  const [sparkLineColor, setSparkLineColor] = useState("");
-  const [sparkFillColor, setSparkFillColor] = useState("");
-  const [sparkHideBorder, setSparkHideBorder] = useState(false);
-  const [sparkBorderRadius, setSparkBorderRadius] = useState("6");
-
-  // Preview + embed code
-  const [embedUrl, setEmbedUrl] = useState("");
-  const [imgUrl, setImgUrl] = useState("");
-  const [embedLabel, setEmbedLabel] = useState(EMBED_LABELS.card);
-  const [markdownCode, setMarkdownCode] = useState("");
-  const [htmlCode, setHtmlCode] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [output, setOutput] = useState({
+    embedUrl: "",
+    imgUrl: "",
+    embedLabel: EMBED_LABELS.card as string,
+    markdownCode: "",
+    htmlCode: "",
+    loading: false,
+  });
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [origin, setOrigin] = useState("https://ghstats.dev");
 
@@ -167,16 +138,19 @@ export default function CardPreview() {
     if (theme !== "default") p.set("theme", theme);
 
     if (embedType === "card") {
-      if (!showIcons) p.set("show_icons", "false");
-      if (!showRing) p.set("show_ring", "false");
-      if (hideBorder) p.set("hide_border", "true");
-      if (hideTitle) p.set("hide_title", "true");
-      if (borderRadius !== "4.5") p.set("border_radius", borderRadius);
-      if (customTitle.trim()) p.set("custom_title", customTitle.trim());
-      if (size === "compact") p.set("size", "compact");
-      if (size === "compact" && compactCount !== 6)
-        p.set("compact_count", String(compactCount));
-      if (size === "compact" && showEmoji) p.set("show_emoji", "true");
+      if (!card.showIcons) p.set("show_icons", "false");
+      if (!card.showRing) p.set("show_ring", "false");
+      if (card.hideBorder) p.set("hide_border", "true");
+      if (card.hideTitle) p.set("hide_title", "true");
+      if (card.borderRadius !== "4.5")
+        p.set("border_radius", card.borderRadius);
+      if (card.customTitle.trim())
+        p.set("custom_title", card.customTitle.trim());
+      if (card.size === "compact") p.set("size", "compact");
+      if (card.size === "compact" && card.compactCount !== 6)
+        p.set("compact_count", String(card.compactCount));
+      if (card.size === "compact" && card.showEmoji)
+        p.set("show_emoji", "true");
       if (hiddenStats.length > 0) p.set("hide", hiddenStats.join(","));
 
       const visibleOrder = statsOrder.filter((k) => !hiddenStats.includes(k));
@@ -190,60 +164,44 @@ export default function CardPreview() {
     }
 
     if (embedType === "langs") {
-      if (hideBorder) p.set("hide_border", "true");
-      if (hideTitle) p.set("hide_title", "true");
-      if (borderRadius !== "4.5") p.set("border_radius", borderRadius);
-      if (customTitle.trim()) p.set("custom_title", customTitle.trim());
-      if (maxLangs !== 8) p.set("max_langs", String(maxLangs));
-      if (langLayout !== "bar") p.set("layout", langLayout);
+      if (langs.hideBorder) p.set("hide_border", "true");
+      if (langs.hideTitle) p.set("hide_title", "true");
+      if (langs.borderRadius !== "4.5")
+        p.set("border_radius", langs.borderRadius);
+      if (card.customTitle.trim())
+        p.set("custom_title", card.customTitle.trim());
+      if (langs.maxLangs !== 8) p.set("max_langs", String(langs.maxLangs));
+      if (langs.layout !== "bar") p.set("layout", langs.layout);
     }
 
     if (embedType === "mini") {
-      if (miniMetric !== "stars") p.set("metric", miniMetric);
-      if (miniLabel.trim()) p.set("label", miniLabel.trim());
-      if (miniColor.trim()) p.set("color", miniColor.trim());
-      if (miniStyle !== "flat") p.set("style", miniStyle);
+      if (mini.metric !== "stars") p.set("metric", mini.metric);
+      if (mini.label.trim()) p.set("label", mini.label.trim());
+      if (mini.color.trim()) p.set("color", mini.color.trim());
+      if (mini.style !== "flat") p.set("style", mini.style);
     }
 
     if (embedType === "sparkline") {
-      p.set("days", sparkDays || "30");
-      p.set("width", sparkWidth || "320");
-      p.set("height", sparkHeight || "80");
-      if (sparkHideBorder) p.set("hide_border", "true");
-      if (sparkBorderRadius !== "6") p.set("border_radius", sparkBorderRadius);
-      if (sparkLineColor.trim()) p.set("line_color", sparkLineColor.trim());
-      if (sparkFillColor.trim()) p.set("fill_color", sparkFillColor.trim());
-      if (sparkTitle.trim()) p.set("title", sparkTitle.trim());
+      p.set("days", spark.days || "30");
+      p.set("width", spark.width || "320");
+      p.set("height", spark.height || "80");
+      if (spark.hideBorder) p.set("hide_border", "true");
+      if (spark.borderRadius !== "6")
+        p.set("border_radius", spark.borderRadius);
+      if (spark.lineColor.trim()) p.set("line_color", spark.lineColor.trim());
+      if (spark.fillColor.trim()) p.set("fill_color", spark.fillColor.trim());
+      if (spark.title.trim()) p.set("title", spark.title.trim());
     }
 
     return `${base}?${p.toString()}`;
   }, [
-    borderRadius,
-    compactCount,
-    customTitle,
+    card,
     embedType,
-    hideBorder,
-    hideTitle,
     hiddenStats,
-    langLayout,
-    maxLangs,
-    miniColor,
-    miniLabel,
-    miniMetric,
-    miniStyle,
+    langs,
+    mini,
     origin,
-    showEmoji,
-    showIcons,
-    showRing,
-    size,
-    sparkBorderRadius,
-    sparkDays,
-    sparkFillColor,
-    sparkHeight,
-    sparkHideBorder,
-    sparkLineColor,
-    sparkTitle,
-    sparkWidth,
+    spark,
     statsOrder,
     theme,
     username,
@@ -251,21 +209,38 @@ export default function CardPreview() {
 
   useEffect(() => {
     const url = buildEmbedUrl();
-    setEmbedUrl(url);
-    setEmbedLabel(EMBED_LABELS[embedType]);
+    const label = EMBED_LABELS[embedType];
 
     if (!url) {
-      setImgUrl("");
-      setMarkdownCode("");
-      setHtmlCode("");
+      setOutput({
+        embedUrl: "",
+        imgUrl: "",
+        embedLabel: label,
+        markdownCode: "",
+        htmlCode: "",
+        loading: false,
+      });
       return;
     }
 
-    const sep = url.includes("?") ? "&" : "?";
-    setLoading(true);
-    setImgUrl(`${url}${sep}cache=${Date.now()}`);
-    setMarkdownCode(`![${EMBED_LABELS[embedType]}](${url})`);
-    setHtmlCode(`<img src="${url}" alt="${EMBED_LABELS[embedType]}" />`);
+    setOutput((prev) => ({
+      ...prev,
+      embedUrl: url,
+      embedLabel: label,
+      markdownCode: `![${label}](${url})`,
+      htmlCode: `<img src="${url}" alt="${label}" />`,
+    }));
+
+    const timeout = setTimeout(() => {
+      const sep = url.includes("?") ? "&" : "?";
+      setOutput((prev) => ({
+        ...prev,
+        loading: true,
+        imgUrl: `${url}${sep}cache=${Date.now()}`,
+      }));
+    }, 500);
+
+    return () => clearTimeout(timeout);
   }, [buildEmbedUrl, embedType]);
 
   const copyToClipboard = useCallback((text: string, field: string) => {
@@ -277,6 +252,9 @@ export default function CardPreview() {
   }, []);
 
   const themeEntries = useMemo(() => Object.entries(themes), []);
+
+  const { embedUrl, imgUrl, embedLabel, markdownCode, htmlCode, loading } =
+    output;
 
   return (
     <section id="try" className="border-b border-[#21262d] bg-[#0d1117]">
@@ -345,8 +323,8 @@ export default function CardPreview() {
                   </label>
                   <input
                     type="text"
-                    value={customTitle}
-                    onChange={(e) => setCustomTitle(e.target.value)}
+                    value={card.customTitle}
+                    onChange={(e) => patchCard({ customTitle: e.target.value })}
                     placeholder="My Awesome Stats"
                     className="input-field"
                   />
@@ -356,7 +334,7 @@ export default function CardPreview() {
                   <label className="label-text">
                     Border Radius:{" "}
                     <span className="text-[#58a6ff] font-semibold">
-                      {borderRadius}
+                      {card.borderRadius}
                     </span>
                   </label>
                   <input
@@ -364,8 +342,10 @@ export default function CardPreview() {
                     min="0"
                     max="50"
                     step="0.5"
-                    value={borderRadius}
-                    onChange={(e) => setBorderRadius(e.target.value)}
+                    value={card.borderRadius}
+                    onChange={(e) =>
+                      patchCard({ borderRadius: e.target.value })
+                    }
                     className="w-full accent-[#58a6ff] mt-1"
                   />
                 </div>
@@ -376,9 +356,9 @@ export default function CardPreview() {
                     {(["default", "compact"] as const).map((s) => (
                       <button
                         key={s}
-                        onClick={() => setSize(s)}
+                        onClick={() => patchCard({ size: s })}
                         className={`px-5 py-1.5 rounded-[9px] text-xs font-semibold tracking-wide transition-all duration-200 ease-out ${
-                          size === s
+                          card.size === s
                             ? "bg-[#21262d] text-white shadow-sm border border-[#30363d]"
                             : "text-[#8b949e] hover:text-[#c9d1d9]"
                         }`}
@@ -389,7 +369,7 @@ export default function CardPreview() {
                   </div>
                 </div>
 
-                {size === "compact" && (
+                {card.size === "compact" && (
                   <div className="space-y-4 rounded-xl border border-[#30363d]/60 bg-[#0d1117] px-4 py-4">
                     <div>
                       <label className="label-text">Stats to show</label>
@@ -397,9 +377,9 @@ export default function CardPreview() {
                         {([3, 4, 6] as const).map((n) => (
                           <button
                             key={n}
-                            onClick={() => setCompactCount(n)}
+                            onClick={() => patchCard({ compactCount: n })}
                             className={`px-4 py-1.5 rounded-[9px] text-xs font-semibold tracking-wide transition-all duration-200 ease-out ${
-                              compactCount === n
+                              card.compactCount === n
                                 ? "bg-[#21262d] text-white shadow-sm border border-[#30363d]"
                                 : "text-[#8b949e] hover:text-[#c9d1d9]"
                             }`}
@@ -409,14 +389,17 @@ export default function CardPreview() {
                         ))}
                       </div>
                       <p className="mt-1.5 text-[11px] text-[#484f58]">
-                        Shows the first {compactCount} visible stats in order
+                        Shows the first {card.compactCount} visible stats in
+                        order
                       </p>
                     </div>
                     <label className="toggle-label">
                       <input
                         type="checkbox"
-                        checked={showEmoji}
-                        onChange={(e) => setShowEmoji(e.target.checked)}
+                        checked={card.showEmoji}
+                        onChange={(e) =>
+                          patchCard({ showEmoji: e.target.checked })
+                        }
                         className="accent-[#58a6ff] w-4 h-4 rounded"
                       />
                       Use emojis instead of icons
@@ -425,29 +408,23 @@ export default function CardPreview() {
                 )}
 
                 <div className="flex flex-wrap gap-x-5 gap-y-2">
-                  {[
-                    {
-                      label: "Show Icons",
-                      checked: showIcons,
-                      set: setShowIcons,
-                    },
-                    { label: "Show Ring", checked: showRing, set: setShowRing },
-                    {
-                      label: "Hide Border",
-                      checked: hideBorder,
-                      set: setHideBorder,
-                    },
-                    {
-                      label: "Hide Title",
-                      checked: hideTitle,
-                      set: setHideTitle,
-                    },
-                  ].map((t) => (
-                    <label key={t.label} className="toggle-label">
+                  {(
+                    [
+                      { label: "Show Icons", key: "showIcons" },
+                      { label: "Show Ring", key: "showRing" },
+                      { label: "Hide Border", key: "hideBorder" },
+                      { label: "Hide Title", key: "hideTitle" },
+                    ] as const
+                  ).map((t) => (
+                    <label key={t.key} className="toggle-label">
                       <input
                         type="checkbox"
-                        checked={t.checked}
-                        onChange={(e) => t.set(e.target.checked)}
+                        checked={card[t.key]}
+                        onChange={(e) =>
+                          patchCard({
+                            [t.key]: e.target.checked,
+                          } as Partial<CardOpts>)
+                        }
                         className="accent-[#58a6ff] w-4 h-4 rounded"
                       />
                       {t.label}
@@ -552,9 +529,9 @@ export default function CardPreview() {
                     {LANG_CHART_LAYOUTS.map((opt) => (
                       <button
                         key={opt}
-                        onClick={() => setLangLayout(opt)}
+                        onClick={() => patchLangs({ layout: opt })}
                         className={`px-3 py-1.5 rounded-[9px] text-xs font-semibold tracking-wide whitespace-nowrap transition-all duration-200 ease-out ${
-                          langLayout === opt
+                          langs.layout === opt
                             ? "bg-[#21262d] text-white shadow-sm border border-[#30363d]"
                             : "text-[#8b949e] hover:text-[#c9d1d9] border border-transparent"
                         }`}
@@ -568,36 +545,36 @@ export default function CardPreview() {
                   <label className="label-text">
                     Max languages:{" "}
                     <span className="text-[#58a6ff] font-semibold">
-                      {maxLangs}
+                      {langs.maxLangs}
                     </span>
                   </label>
                   <input
                     type="range"
                     min="1"
                     max="12"
-                    value={maxLangs}
-                    onChange={(e) => setMaxLangs(Number(e.target.value))}
+                    value={langs.maxLangs}
+                    onChange={(e) =>
+                      patchLangs({ maxLangs: Number(e.target.value) })
+                    }
                     className="w-full accent-[#58a6ff] mt-1"
                   />
                 </div>
                 <div className="flex flex-wrap gap-x-5 gap-y-2">
-                  {[
-                    {
-                      label: "Hide Border",
-                      checked: hideBorder,
-                      set: setHideBorder,
-                    },
-                    {
-                      label: "Hide Title",
-                      checked: hideTitle,
-                      set: setHideTitle,
-                    },
-                  ].map((t) => (
-                    <label key={t.label} className="toggle-label">
+                  {(
+                    [
+                      { label: "Hide Border", key: "hideBorder" },
+                      { label: "Hide Title", key: "hideTitle" },
+                    ] as const
+                  ).map((t) => (
+                    <label key={t.key} className="toggle-label">
                       <input
                         type="checkbox"
-                        checked={t.checked}
-                        onChange={(e) => t.set(e.target.checked)}
+                        checked={langs[t.key]}
+                        onChange={(e) =>
+                          patchLangs({
+                            [t.key]: e.target.checked,
+                          } as Partial<LangOpts>)
+                        }
                         className="accent-[#58a6ff] w-4 h-4 rounded"
                       />
                       {t.label}
@@ -612,22 +589,11 @@ export default function CardPreview() {
                 <div>
                   <label className="label-text">Metric</label>
                   <select
-                    value={miniMetric}
-                    onChange={(e) => setMiniMetric(e.target.value)}
+                    value={mini.metric}
+                    onChange={(e) => patchMini({ metric: e.target.value })}
                     className="input-field"
                   >
-                    {[
-                      "stars",
-                      "commits",
-                      "prs",
-                      "issues",
-                      "hours",
-                      "streak",
-                      "week",
-                      "followers",
-                      "repos",
-                      "contributions",
-                    ].map((m) => (
+                    {MINI_METRICS.map((m) => (
                       <option key={m} value={m}>
                         {m}
                       </option>
@@ -638,8 +604,8 @@ export default function CardPreview() {
                   <label className="label-text">Custom Label (optional)</label>
                   <input
                     type="text"
-                    value={miniLabel}
-                    onChange={(e) => setMiniLabel(e.target.value)}
+                    value={mini.label}
+                    onChange={(e) => patchMini({ label: e.target.value })}
                     placeholder="Stars"
                     className="input-field"
                   />
@@ -650,15 +616,18 @@ export default function CardPreview() {
                   </label>
                   <input
                     type="text"
-                    value={miniColor}
-                    onChange={(e) => setMiniColor(e.target.value)}
+                    value={mini.color}
+                    onChange={(e) => patchMini({ color: e.target.value })}
                     placeholder="f59e0b"
                     className="input-field"
                   />
                 </div>
                 <div>
                   <label className="label-text">Badge Style</label>
-                  <BadgeStylePicker value={miniStyle} onChange={setMiniStyle} />
+                  <BadgeStylePicker
+                    value={mini.style}
+                    onChange={(style) => patchMini({ style })}
+                  />
                 </div>
               </div>
             )}
@@ -672,8 +641,8 @@ export default function CardPreview() {
                       type="number"
                       min={7}
                       max={90}
-                      value={sparkDays}
-                      onChange={(e) => setSparkDays(e.target.value)}
+                      value={spark.days}
+                      onChange={(e) => patchSpark({ days: e.target.value })}
                       className="input-field"
                     />
                   </div>
@@ -683,8 +652,8 @@ export default function CardPreview() {
                       type="number"
                       min={180}
                       max={800}
-                      value={sparkWidth}
-                      onChange={(e) => setSparkWidth(e.target.value)}
+                      value={spark.width}
+                      onChange={(e) => patchSpark({ width: e.target.value })}
                       className="input-field"
                     />
                   </div>
@@ -694,8 +663,8 @@ export default function CardPreview() {
                       type="number"
                       min={40}
                       max={240}
-                      value={sparkHeight}
-                      onChange={(e) => setSparkHeight(e.target.value)}
+                      value={spark.height}
+                      onChange={(e) => patchSpark({ height: e.target.value })}
                       className="input-field"
                     />
                   </div>
@@ -703,8 +672,8 @@ export default function CardPreview() {
                     <label className="label-text">Title (optional)</label>
                     <input
                       type="text"
-                      value={sparkTitle}
-                      onChange={(e) => setSparkTitle(e.target.value)}
+                      value={spark.title}
+                      onChange={(e) => patchSpark({ title: e.target.value })}
                       placeholder="Last 30 days"
                       className="input-field"
                     />
@@ -715,8 +684,10 @@ export default function CardPreview() {
                     <label className="label-text">Line Colour (hex)</label>
                     <input
                       type="text"
-                      value={sparkLineColor}
-                      onChange={(e) => setSparkLineColor(e.target.value)}
+                      value={spark.lineColor}
+                      onChange={(e) =>
+                        patchSpark({ lineColor: e.target.value })
+                      }
                       placeholder="58a6ff"
                       className="input-field"
                     />
@@ -725,8 +696,10 @@ export default function CardPreview() {
                     <label className="label-text">Fill Colour (hex)</label>
                     <input
                       type="text"
-                      value={sparkFillColor}
-                      onChange={(e) => setSparkFillColor(e.target.value)}
+                      value={spark.fillColor}
+                      onChange={(e) =>
+                        patchSpark({ fillColor: e.target.value })
+                      }
                       placeholder="58a6ff"
                       className="input-field"
                     />
@@ -736,8 +709,10 @@ export default function CardPreview() {
                   <label className="toggle-label">
                     <input
                       type="checkbox"
-                      checked={sparkHideBorder}
-                      onChange={(e) => setSparkHideBorder(e.target.checked)}
+                      checked={spark.hideBorder}
+                      onChange={(e) =>
+                        patchSpark({ hideBorder: e.target.checked })
+                      }
                       className="accent-[#58a6ff] w-4 h-4 rounded"
                     />
                     Hide Border
@@ -749,8 +724,10 @@ export default function CardPreview() {
                       min={0}
                       max={50}
                       step={0.5}
-                      value={sparkBorderRadius}
-                      onChange={(e) => setSparkBorderRadius(e.target.value)}
+                      value={spark.borderRadius}
+                      onChange={(e) =>
+                        patchSpark({ borderRadius: e.target.value })
+                      }
                       className="w-24 rounded border border-[#30363d] bg-[#161b22] px-3 py-1 text-sm text-[#c9d1d9]"
                     />
                   </div>
@@ -759,7 +736,6 @@ export default function CardPreview() {
             )}
           </div>
 
-          {/* Right: Live Preview */}
           <div className="animate-slide-up" style={{ animationDelay: "80ms" }}>
             <label className="label-text">Live Preview</label>
             <div className="preview-box">
@@ -777,8 +753,12 @@ export default function CardPreview() {
                     alt={`${embedLabel} preview`}
                     className="max-w-full transition-opacity duration-500 ease-out"
                     style={{ opacity: loading ? 0.4 : 1 }}
-                    onLoad={() => setLoading(false)}
-                    onError={() => setLoading(false)}
+                    onLoad={() =>
+                      setOutput((prev) => ({ ...prev, loading: false }))
+                    }
+                    onError={() =>
+                      setOutput((prev) => ({ ...prev, loading: false }))
+                    }
                   />
                 </div>
               ) : (
@@ -790,7 +770,6 @@ export default function CardPreview() {
           </div>
         </div>
 
-        {/* ─── Embed Code ─── */}
         <div
           className="grid gap-4 sm:grid-cols-3 animate-slide-up"
           style={{ animationDelay: "160ms" }}
@@ -826,7 +805,6 @@ export default function CardPreview() {
           ))}
         </div>
 
-        {/* ─── Theme Grid ─── */}
         <div className="animate-slide-up" style={{ animationDelay: "240ms" }}>
           <label className="label-text mb-3 block">Theme</label>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
