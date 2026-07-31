@@ -1,4 +1,4 @@
-import { ThemeConfig } from "@/lib/types";
+import { ThemeConfig } from "@/lib/themes/types";
 import { escapeXml } from "@/lib/sanitize";
 import { truncateToWidth } from "../text-metrics";
 import { renderBaseCard } from "../svg-primitives";
