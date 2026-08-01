@@ -1,5 +1,6 @@
-import CardPreview from "@/components/CardPreview";
+import CardPreview from "@/components/CardPreview/CardPreview";
 import HeroCard from "@/components/HeroCard";
+import { BADGE_STYLES } from "@/lib/svg/badge/configs/registry";
 
 const PARAMS = [
   {
@@ -112,34 +113,6 @@ const PARAMS = [
   },
 ];
 
-const BADGE_STYLES = [
-  {
-    key: "flat",
-    label: "Flat",
-    desc: "Default shields.io look with subtle gradient and rounded corners.",
-  },
-  {
-    key: "flat-square",
-    label: "Flat Square",
-    desc: "Same as Flat, but with sharp square corners.",
-  },
-  {
-    key: "for-the-badge",
-    label: "For The Badge",
-    desc: "Large, bold, uppercase — built to stand out in a README.",
-  },
-  {
-    key: "plastic",
-    label: "Plastic",
-    desc: "Glossy plastic finish with a top-light, bottom-shadow gradient.",
-  },
-  {
-    key: "minimal",
-    label: "Minimal",
-    desc: "Just text on a transparent background — clean and unobtrusive.",
-  },
-];
-
 const HIDE_KEYS = [
   { key: "stars", desc: "Total Stars Earned" },
   { key: "commits", desc: "Total Commits (year)" },
@@ -159,7 +132,6 @@ const HIDE_KEYS = [
 export default function Home() {
   return (
     <main className="min-h-screen">
-      {/* ─── Header ─── */}
       <header className="border-b border-[#21262d] bg-[#010409]">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <span className="text-lg font-bold tracking-tight">
@@ -179,7 +151,6 @@ export default function Home() {
         </div>
       </header>
 
-      {/* ─── Hero ─── */}
       <section className="border-b border-[#21262d] bg-gradient-to-b from-[#010409] to-[#0d1117]">
         <div className="mx-auto max-w-6xl px-6 py-20 text-center">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl animate-slide-up">
@@ -219,7 +190,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── Quick Start ─── */}
       <section className="border-b border-[#21262d]">
         <div className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="text-2xl font-bold">Quick Start</h2>
@@ -269,7 +239,6 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Step 2 */}
           <div className="mt-8">
             <h3 className="text-lg font-semibold text-[#c9d1d9] flex items-center gap-2">
               <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#238636] text-xs font-bold text-white">
@@ -298,7 +267,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── Interactive Preview ─── */}
       <section id="try" className="border-b border-[#21262d]">
         <div className="mx-auto max-w-6xl px-6 py-16">
           <div className="flex flex-col sm:flex-row sm:items-end gap-4 mb-4">
@@ -313,7 +281,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── Parameters ─── */}
       <section id="params" className="border-b border-[#21262d]">
         <div className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="text-2xl font-bold mb-2">All Parameters</h2>
@@ -349,7 +316,6 @@ export default function Home() {
             </table>
           </div>
 
-          {/* Hideable Stats */}
           <h3 className="text-xl font-semibold mt-10 mb-4">
             Stats You Can Hide
           </h3>
@@ -388,7 +354,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── Badge Styles ─── */}
       <section className="border-b border-[#21262d]">
         <div className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="text-2xl font-bold mb-2">Badge Styles</h2>
@@ -449,7 +414,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── Footer ─── */}
       <footer className="border-t border-[#21262d] bg-[#010409]">
         <div className="mx-auto max-w-6xl px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-[#484f58]">
           <span>GitHub Profile Stats — open source and free to use.</span>

@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { fetchLanguageStats } from "@/lib/github";
 import { renderLanguageChart, renderErrorCard } from "@/lib/svg";
-import { resolveTheme } from "@/lib/themes";
+import { resolveTheme } from "@/lib/themes/themes";
 import { sanitizeUsername, sanitizeHexParam } from "@/lib/sanitize";
 import {
   LangChartOptions,
@@ -12,7 +12,6 @@ import { getCacheHeaders } from "@/lib/cache";
 
 export const dynamic = "force-dynamic";
 
-// Parses & validates a layout query param against LANG_CHART_LAYOUTS, defaulting to "bar".
 function parseLangLayout(value: string | null): LangChartLayout {
   return (LANG_CHART_LAYOUTS as readonly string[]).includes(value ?? "")
     ? (value as LangChartLayout)

@@ -1,9 +1,13 @@
 import { NextRequest } from "next/server";
 import { fetchGitHubStats } from "@/lib/github";
-import { renderBadge, resolveBadgeStyle } from "../badge/badge-svg";
+import { renderBadge, resolveBadgeStyle } from "../../../lib/svg/badge";
 import { renderErrorCard } from "@/lib/svg";
-import { resolveTheme } from "@/lib/themes";
-import { sanitizeUsername, sanitizeHexParam, formatNumber } from "@/lib/sanitize";
+import { resolveTheme } from "@/lib/themes/themes";
+import {
+  sanitizeUsername,
+  sanitizeHexParam,
+  formatNumber,
+} from "@/lib/sanitize";
 import { GitHubStats } from "@/lib/types";
 import { getCacheHeaders, getMiniMetricCacheProfile } from "@/lib/cache";
 
@@ -20,12 +24,24 @@ const METRICS: Record<string, MetricDef> = {
   commits: { label: "Commits", color: "4c8eda", get: (s) => s.totalCommits },
   prs: { label: "PRs", color: "8b5cf6", get: (s) => s.totalPRs },
   issues: { label: "Issues", color: "ef4444", get: (s) => s.totalIssues },
-  hours: { label: "Hours", color: "f59e0b", get: (s) => `${formatNumber(s.estimatedCodingHours)}h` },
-  streak: { label: "Streak", color: "f97316", get: (s) => `${s.currentStreak}d` },
+  hours: {
+    label: "Hours",
+    color: "f59e0b",
+    get: (s) => `${formatNumber(s.estimatedCodingHours)}h`,
+  },
+  streak: {
+    label: "Streak",
+    color: "f97316",
+    get: (s) => `${s.currentStreak}d`,
+  },
   week: { label: "This Week", color: "10b981", get: (s) => s.commitsThisWeek },
   followers: { label: "Followers", color: "22c55e", get: (s) => s.followers },
   repos: { label: "Repos", color: "0ea5e9", get: (s) => s.publicRepos },
-  contributions: { label: "YTD", color: "06b6d4", get: (s) => s.contributionsThisYear },
+  contributions: {
+    label: "YTD",
+    color: "06b6d4",
+    get: (s) => s.contributionsThisYear,
+  },
 };
 
 export async function GET(request: NextRequest) {
@@ -46,9 +62,15 @@ export async function GET(request: NextRequest) {
     border_color: sanitizeHexParam(params.get("border_color")),
   });
 
-  const color = sanitizeHexParam(params.get("color")) ?? theme.title.replace(/^#/, "") ?? metric.color;
+  const color =
+    sanitizeHexParam(params.get("color")) ??
+    theme.title.replace(/^#/, "") ??
+    metric.color;
   const customLabel = params.get("label")?.trim();
-  const label = customLabel && customLabel.length > 0 ? customLabel.slice(0, 32) : metric.label;
+  const label =
+    customLabel && customLabel.length > 0
+      ? customLabel.slice(0, 32)
+      : metric.label;
   const style = resolveBadgeStyle(params.get("style"));
 
   const headers = {
@@ -71,10 +93,13 @@ export async function GET(request: NextRequest) {
     const labelBg = theme.border?.replace(/^#/, "") ?? "555";
     const text = theme.text?.replace(/^#/, "") ?? "fff";
 
-    return new Response(renderBadge(label, value, { accent: color, labelBg, text }, style), {
-      status: 200,
-      headers,
-    });
+    return new Response(
+      renderBadge(label, value, { accent: color, labelBg, text }, style),
+      {
+        status: 200,
+        headers,
+      },
+    );
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "An unexpected error occurred.";

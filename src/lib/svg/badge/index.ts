@@ -1,113 +1,6 @@
 import { escapeXml } from "@/lib/sanitize";
-
-type BadgeColors = {
-  accent?: string;
-  labelBg?: string;
-  text?: string;
-};
-
-export type BadgeStyle =
-  | "flat"
-  | "flat-square"
-  | "for-the-badge"
-  | "plastic"
-  | "minimal";
-
-type BadgeStyleConfig = {
-  height: number;
-  charWidth: number;
-  pad: number;
-  rx: number;
-  fontSize: number;
-  fontWeight: number;
-  letterSpacing: number;
-  textY: number;
-  uppercase: boolean;
-  transparent: boolean;
-  gradient: "shields" | "plastic" | "none";
-  clipId: string;
-  gradientId: string;
-};
-
-const STYLE_CONFIGS: Record<BadgeStyle, BadgeStyleConfig> = {
-  flat: {
-    height: 20,
-    charWidth: 6.6,
-    pad: 10,
-    rx: 3,
-    fontSize: 11,
-    fontWeight: 400,
-    letterSpacing: 0,
-    textY: 14,
-    uppercase: false,
-    transparent: false,
-    gradient: "shields",
-    clipId: "r_flat",
-    gradientId: "s_flat",
-  },
-  "flat-square": {
-    height: 20,
-    charWidth: 6.6,
-    pad: 10,
-    rx: 0,
-    fontSize: 11,
-    fontWeight: 400,
-    letterSpacing: 0,
-    textY: 14,
-    uppercase: false,
-    transparent: false,
-    gradient: "shields",
-    clipId: "r_sq",
-    gradientId: "s_sq",
-  },
-  "for-the-badge": {
-    height: 28,
-    charWidth: 7.6,
-    pad: 16,
-    rx: 0,
-    fontSize: 11,
-    fontWeight: 900,
-    letterSpacing: 0.5,
-    textY: 20,
-    uppercase: true,
-    transparent: false,
-    gradient: "none",
-    clipId: "r_ftb",
-    gradientId: "g_ftb",
-  },
-  plastic: {
-    height: 20,
-    charWidth: 6.6,
-    pad: 10,
-    rx: 3,
-    fontSize: 11,
-    fontWeight: 400,
-    letterSpacing: 0,
-    textY: 14,
-    uppercase: false,
-    transparent: false,
-    gradient: "plastic",
-    clipId: "r_pl",
-    gradientId: "s_pl",
-  },
-  minimal: {
-    height: 20,
-    charWidth: 6.6,
-    pad: 10,
-    rx: 0,
-    fontSize: 11,
-    fontWeight: 400,
-    letterSpacing: 0,
-    textY: 14,
-    uppercase: false,
-    transparent: true,
-    gradient: "none",
-    clipId: "r_min",
-    gradientId: "g_min",
-  },
-};
-
-const VALID_STYLES = new Set<string>(Object.keys(STYLE_CONFIGS));
+import { BadgeStyle, BadgeColors } from "./types";
+import { VALID_STYLES, STYLE_CONFIGS } from "./configs/registry";
 
 export function resolveBadgeStyle(style?: string | null): BadgeStyle {
   if (style && VALID_STYLES.has(style)) {
@@ -124,9 +17,10 @@ export function renderBadge(
 ): string {
   const safeLabel = escapeXml(label);
   const safeValue = escapeXml(value);
-  const cfg = STYLE_CONFIGS[resolveBadgeStyle(typeof style === "string" ? style : null)];
+  const cfg =
+    STYLE_CONFIGS[resolveBadgeStyle(typeof style === "string" ? style : null)];
 
-  const accent = typeof color === "string" ? color : color.accent ?? "4c8eda";
+  const accent = typeof color === "string" ? color : (color.accent ?? "4c8eda");
   const labelBg = typeof color === "string" ? "555" : (color.labelBg ?? "555");
   const text = typeof color === "string" ? "fff" : (color.text ?? "fff");
 
@@ -147,8 +41,12 @@ export function renderBadge(
 </svg>`;
   }
 
-  const labelWidth = Math.round(displayLabel.length * cfg.charWidth + cfg.pad * 2);
-  const valueWidth = Math.round(displayValue.length * cfg.charWidth + cfg.pad * 2);
+  const labelWidth = Math.round(
+    displayLabel.length * cfg.charWidth + cfg.pad * 2,
+  );
+  const valueWidth = Math.round(
+    displayValue.length * cfg.charWidth + cfg.pad * 2,
+  );
   const totalWidth = labelWidth + valueWidth;
 
   let gradientDef = "";
