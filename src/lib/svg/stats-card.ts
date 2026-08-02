@@ -1,4 +1,5 @@
-import { GitHubStats, ThemeConfig, CardOptions } from "../types";
+import { GitHubStats, CardOptions } from "../types";
+import { ThemeConfig } from "@/lib/themes/types";
 import { escapeXml } from "../sanitize";
 import { ICONS, EMOJIS } from "./icons";
 import { getVisibleStats } from "./stats-fields";

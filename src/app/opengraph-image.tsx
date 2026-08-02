@@ -3,6 +3,7 @@ export const alt =
   "GitHub Profile Stats — Beautiful Stats Cards for Your README";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+export const runtime = "edge";
 
 export default async function Image() {
   return new ImageResponse(

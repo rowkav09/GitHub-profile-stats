@@ -1,6 +1,7 @@
 import { renderErrorCard } from "../svg-primitives";
 import { languageChartRegistry } from "./registry";
-import { LanguageStat, ThemeConfig, LangChartOptions } from "@/lib/types";
+import { LanguageStat, LangChartOptions } from "@/lib/types";
+import { ThemeConfig } from "@/lib/themes/types";
 
 export function renderLanguageChart(
   languages: LanguageStat[],

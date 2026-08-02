@@ -1,4 +1,4 @@
-import { ThemeConfig } from "../types";
+import { ThemeConfig } from "@/lib/themes/types";
 import { escapeXml } from "../sanitize";
 
 export function renderBaseCard(
