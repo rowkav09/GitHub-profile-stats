@@ -15,7 +15,13 @@ export const SITE = {
 
 export const SITE_ROUTES = {
   home: "/",
+  status: "/status",
+  apiStatus: "/api/status",
+  apiStatusBadge: "/api/status/badge",
   apiCard: "/api/card",
+  apiLangs: "/api/langs",
+  apiMini: "/api/mini",
+  apiSparkline: "/api/sparkline",
   apiBadge: "/api/badge",
   apiVisits: "/api/visits",
 } as const;

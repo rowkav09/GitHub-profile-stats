@@ -1,6 +1,10 @@
 ![Users](https://ghstats.dev/api/badge)
 ![Repo Views](https://ghstats.dev/api/visits?username=rowkav09&repo=GitHub-profile-stats)
+[![24h Uptime](https://ghstats.dev/api/status/badge?period=24h)](https://ghstats.dev/status)
+[![7d Uptime](https://ghstats.dev/api/status/badge?period=7d)](https://ghstats.dev/status)
 [![CodeFactor](https://www.codefactor.io/repository/github/rowkav09/github-profile-stats/badge)](https://www.codefactor.io/repository/github/rowkav09/github-profile-stats)
+
+> Live status: [ghstats.dev/status](https://ghstats.dev/status) for API uptime, endpoint health, and response times.
 
 # GitHub Profile Stats -- mini badges, sparklines, and badge styles
 
