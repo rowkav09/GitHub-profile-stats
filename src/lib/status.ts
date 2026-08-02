@@ -317,7 +317,7 @@ export function getStatusCopy(status: StatusLevel): {
 }
 
 export function formatPercentage(value: number | null): string {
-  return value === null ? "n/a" : `${value.toFixed(1)}%`;
+  return value === null ? "n/a" : `${value.toFixed(2)}%`;
 }
 
 export function formatMilliseconds(value: number | null): string {

@@ -60,7 +60,6 @@ export async function GET(request: Request) {
 
   try {
     const report = await fetchStatusReport(request);
-    const copy = getStatusCopy(report.overall.status);
     const uptimeValue = getWindowValue(report, period);
     const accent = toneForStatus(report.overall.status);
 
