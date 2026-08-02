@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { ROBOTS_DISALLOW_ROUTES, SITE } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -6,9 +7,9 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/card", "/api/badge", "/api/visits"],
+        disallow: [...ROBOTS_DISALLOW_ROUTES],
       },
     ],
-    sitemap: "https://ghstats.dev/sitemap.xml",
+    sitemap: `${SITE.url}/sitemap.xml`,
   };
 }

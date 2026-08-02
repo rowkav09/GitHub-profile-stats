@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { SITE } from "@/lib/site";
 export const size = { width: 32, height: 32 };
 export const contentType = "image/png";
 export const runtime = "edge";
@@ -17,7 +18,7 @@ export default function Icon() {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://github.com/rowkav09.png"
+          src={SITE.avatarUrl}
           width={32}
           height={32}
           style={{ borderRadius: "50%" }}

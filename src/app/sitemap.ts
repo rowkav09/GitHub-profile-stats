@@ -1,18 +1,11 @@
 import type { MetadataRoute } from "next";
+import { SITEMAP_ROUTES } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [
-    {
-      url: "https://ghstats.dev",
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 1,
-    },
-    {
-      url: "https://ghstats.dev/api/card",
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 0.8,
-    },
-  ];
+  const lastModified = new Date();
+
+  return SITEMAP_ROUTES.map((route) => ({
+    ...route,
+    lastModified,
+  }));
 }

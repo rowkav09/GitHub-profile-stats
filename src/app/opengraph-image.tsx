@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
-export const alt =
-  "GitHub Profile Stats — Beautiful Stats Cards for Your README";
+import { SITE } from "@/lib/site";
+
+export const alt = SITE.title;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const runtime = "edge";

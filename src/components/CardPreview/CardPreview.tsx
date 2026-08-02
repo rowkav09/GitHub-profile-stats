@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { formatLayoutLabel } from "@/lib/svg/languages/utils";
 import { themes } from "@/lib/themes/configs/registry";
+import { SITE } from "@/lib/site";
 import { LANG_CHART_LAYOUTS } from "@/lib/types";
 import { CardOpts, LangOpts, MiniOpts, SparkOpts } from "./types";
 import {
@@ -50,7 +51,7 @@ export default function CardPreview() {
     loading: false,
   });
   const [copiedField, setCopiedField] = useState<string | null>(null);
-  const [origin, setOrigin] = useState("https://ghstats.dev");
+  const [origin, setOrigin] = useState<string>(SITE.url);
 
   useEffect(() => {
     if (typeof window !== "undefined") {

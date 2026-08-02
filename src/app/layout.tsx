@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
+import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://ghstats.dev"),
+  metadataBase: new URL(SITE.url),
   title: {
-    default:
-      "GitHub Profile Stats — Beautiful Stats Cards for Your README",
-    template: "%s | GitHub Profile Stats",
+    default: SITE.title,
+    template: `%s | ${SITE.name}`,
   },
-  description:
-    "Generate beautiful, dynamically generated GitHub stats cards for your profile README. 13 stats, 18 themes, fully customizable SVG cards — just paste one line. No tokens, no setup, no deployment needed. Free and open source.",
+  description: SITE.description,
   keywords: [
     "github stats",
     "github profile stats",
@@ -28,38 +27,34 @@ export const metadata: Metadata = {
     "profile readme",
     "github stats badge",
   ],
-  authors: [{ name: "rowkav09", url: "https://github.com/rowkav09" }],
-  creator: "rowkav09",
-  publisher: "rowkav09",
+  authors: [{ name: SITE.authorName, url: SITE.authorUrl }],
+  creator: SITE.creator,
+  publisher: SITE.publisher,
   openGraph: {
-    title:
-      "GitHub Profile Stats — Beautiful Stats Cards for Your README",
-    description:
-      "Generate beautiful, dynamically generated GitHub stats cards for your profile README. 13 stats, 18 themes, fully customizable SVG cards — just paste one line. No tokens, no setup, no deployment needed. Free and open source.",
-    url: "https://ghstats.dev",
-    siteName: "GitHub Profile Stats",
+    title: SITE.title,
+    description: SITE.description,
+    url: SITE.url,
+    siteName: SITE.name,
     type: "website",
     locale: "en_US",
     images: [
       {
-        url: "/opengraph-image",
+        url: SITE.ogImagePath,
         width: 1200,
         height: 630,
-        alt: "GitHub Profile Stats — Beautiful Stats Cards for Your README",
+        alt: SITE.title,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title:
-      "GitHub Profile Stats — Beautiful Stats Cards for Your README",
-    description:
-      "Generate beautiful, dynamically generated GitHub stats cards for your profile README. 13 stats, 18 themes, fully customizable SVG cards — just paste one line. No tokens, no setup, no deployment needed. Free and open source.",
-    images: ["/opengraph-image"],
-    creator: "@rowkav09",
+    title: SITE.title,
+    description: SITE.description,
+    images: [SITE.ogImagePath],
+    creator: `@${SITE.creator}`,
   },
   alternates: {
-    canonical: "https://ghstats.dev",
+    canonical: SITE.url,
   },
   robots: {
     index: true,
@@ -77,10 +72,9 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  name: "GitHub Profile Stats",
-  description:
-    "Generate beautiful, dynamically generated GitHub stats cards for your profile README. 13 stats, 18 themes, fully customizable SVG cards — just paste one line. No tokens, no setup, no deployment needed. Free and open source.",
-  url: "https://ghstats.dev",
+  name: SITE.name,
+  description: SITE.description,
+  url: SITE.url,
   applicationCategory: "DeveloperApplication",
   operatingSystem: "All",
   offers: {
@@ -90,8 +84,8 @@ const jsonLd = {
   },
   author: {
     "@type": "Person",
-    name: "rowkav09",
-    url: "https://github.com/rowkav09",
+    name: SITE.authorName,
+    url: SITE.authorUrl,
   },
 };
 

@@ -1,6 +1,7 @@
 import CardPreview from "@/components/CardPreview/CardPreview";
 import HeroCard from "@/components/HeroCard";
 import { BADGE_STYLES } from "@/lib/svg/badge/configs/registry";
+import { SITE } from "@/lib/site";
 
 const PARAMS = [
   {
@@ -138,7 +139,7 @@ export default function Home() {
             <span className="text-[#58a6ff]">GitHub</span> Profile Stats
           </span>
           <a
-            href="https://github.com/rowkav09/GitHub-profile-stats"
+            href={SITE.repoUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 text-sm text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
@@ -254,7 +255,7 @@ export default function Home() {
               in your profile repo and paste:
             </p>
             <pre className="mt-3 ml-8 overflow-x-auto rounded-lg border border-[#30363d] bg-[#161b22] px-5 py-4 text-sm text-[#c9d1d9]">
-              {`![GitHub Stats](https://ghstats.dev/api/card?username=YOUR_USERNAME)`}
+              {`![GitHub Stats](${SITE.url}/api/card?username=YOUR_USERNAME)`}
             </pre>
             <p className="mt-3 ml-8 text-sm text-[#8b949e]">
               Want a different look? Add{" "}
@@ -418,7 +419,7 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-[#484f58]">
           <span>GitHub Profile Stats — open source and free to use.</span>
           <a
-            href="https://github.com/rowkav09/GitHub-profile-stats"
+            href={SITE.repoUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
