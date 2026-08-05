@@ -2,8 +2,7 @@ import { renderBadge, resolveBadgeStyle } from "@/lib/svg/badge";
 import { getCacheHeaders } from "@/lib/cache";
 import { SITE, SITE_ROUTES } from "@/lib/site";
 import {
-  getStatusCopy,
-  formatPercentage,
+  formatUptime,
   type StatusReport,
   type StatusLevel,
 } from "@/lib/status";
@@ -38,15 +37,15 @@ async function fetchStatusReport(request: Request): Promise<StatusReport> {
 }
 
 function getWindowValue(report: StatusReport, period: string): string {
-  if (period === "7d") {
-    return report.overall.uptime7d !== null
-      ? formatPercentage(report.overall.uptime7d)
-      : getStatusCopy(report.overall.status).label.toLowerCase();
-  }
+  const uptime = period === "7d"
+    ? report.overall.uptime7d
+    : report.overall.uptime24h;
 
-  return report.overall.uptime24h !== null
-    ? formatPercentage(report.overall.uptime24h)
-    : getStatusCopy(report.overall.status).label.toLowerCase();
+  return formatUptime(
+    uptime,
+    report.overall.healthyCount,
+    report.overall.totalCount,
+  );
 }
 
 function getWindowLabel(period: string): string {

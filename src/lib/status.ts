@@ -320,6 +320,18 @@ export function formatPercentage(value: number | null): string {
   return value === null ? "n/a" : `${value.toFixed(2)}%`;
 }
 
+export function formatUptime(
+  value: number | null,
+  healthyCount: number,
+  totalCount: number,
+): string {
+  if (value !== null) return formatPercentage(value);
+
+  const currentAvailability =
+    totalCount > 0 ? (healthyCount / totalCount) * 100 : 0;
+  return formatPercentage(currentAvailability);
+}
+
 export function formatMilliseconds(value: number | null): string {
   return value === null ? "n/a" : `${value} ms`;
 }
