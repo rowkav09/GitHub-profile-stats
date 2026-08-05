@@ -52,6 +52,7 @@ export async function GET(request: NextRequest) {
 
   const metricKey = (params.get("metric") ?? "stars").toLowerCase();
   const metric = METRICS[metricKey] ?? METRICS.stars;
+  const allTime = params.get("alltime") === "true";
 
   const themeName = params.get("theme") ?? "default";
   const theme = resolveTheme(themeName, {
@@ -70,7 +71,7 @@ export async function GET(request: NextRequest) {
   const label =
     customLabel && customLabel.length > 0
       ? customLabel.slice(0, 32)
-      : metric.label;
+      : allTime && ["commits", "prs", "issues", "hours"].includes(metricKey) ? `All-time ${metric.label}` : metric.label;
   const style = resolveBadgeStyle(params.get("style"));
 
   const headers = {
@@ -86,7 +87,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const stats = await fetchGitHubStats(username);
+    const stats = await fetchGitHubStats(username, allTime);
     const raw = metric.get(stats);
     const value = typeof raw === "number" ? formatNumber(raw) : raw;
 

@@ -114,6 +114,7 @@ Need tweaks? Use the on-page editor to toggle stats, themes, borders, titles, an
 **Card ( /api/card )**
 
 - `username` (required)
+- `alltime=true` (optional; returns all-time commit, PR, issue, and estimated-hours totals)
 - `theme` default `default`
 - Layout: `size=default|compact`, `compact_count=3|4|6`, `show_emoji=true`
 - Visibility: `hide=stars,issues,...`, `show_ring`, `show_icons`, `hide_title`, `hide_border`

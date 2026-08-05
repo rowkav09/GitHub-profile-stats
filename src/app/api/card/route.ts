@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
   const username = sanitizeUsername(rawUsername);
 
   const themeName = params.get("theme") ?? "default";
+  const allTime = params.get("alltime") === "true";
 
   const theme = resolveTheme(themeName, {
     bg: sanitizeHexParam(params.get("bg")),
@@ -69,7 +70,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const stats = await fetchGitHubStats(username);
+    const stats = await fetchGitHubStats(username, allTime);
     return new Response(renderCard(stats, theme, options), {
       status: 200,
       headers,

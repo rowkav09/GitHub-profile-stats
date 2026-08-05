@@ -60,6 +60,7 @@ query($username: String!) {
       }
     }
     contributionsCollection {
+      contributionYears
       totalCommitContributions
       totalIssueContributions
       totalPullRequestContributions
@@ -192,8 +193,20 @@ function calculateEstimatedCodingHours(
   return Math.round((commitHours + prHours + issueHours) * 10) / 10;
 }
 
+type ContributionTotals = { totalCommitContributions: number; totalIssueContributions: number; totalPullRequestContributions: number };
+
+async function fetchAllTimeTotals(username: string, token: string, years: number[]): Promise<ContributionTotals> {
+  const collections = years.map((year) => `y${year}: contributionsCollection(from: "${year}-01-01T00:00:00Z", to: "${year + 1}-01-01T00:00:00Z") { totalCommitContributions totalIssueContributions totalPullRequestContributions }`).join("\n");
+  const response = await fetch(GITHUB_GRAPHQL, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", "User-Agent": "github-profile-stats" }, body: JSON.stringify({ query: `query($username: String!) { user(login: $username) { ${collections} } }`, variables: { username } }), cache: "no-store" });
+  if (!response.ok) throw new Error(getGitHubAuthError(response.status));
+  const json = await response.json();
+  if (json.errors) throw new Error(json.errors[0]?.message ?? "Unable to load all-time contributions.");
+  return Object.values(json.data.user as Record<string, ContributionTotals>).reduce((total, value) => ({ totalCommitContributions: total.totalCommitContributions + value.totalCommitContributions, totalIssueContributions: total.totalIssueContributions + value.totalIssueContributions, totalPullRequestContributions: total.totalPullRequestContributions + value.totalPullRequestContributions }), { totalCommitContributions: 0, totalIssueContributions: 0, totalPullRequestContributions: 0 });
+}
+
 export async function fetchGitHubStats(
   username: string,
+  allTime = false,
 ): Promise<GitHubStats> {
   const token = getGitHubToken();
   if (!token) {
@@ -230,6 +243,9 @@ export async function fetchGitHubStats(
   }
 
   const contrib = user.contributionsCollection;
+  const totals = allTime
+    ? await fetchAllTimeTotals(username, token, contrib.contributionYears)
+    : contrib;
   const calendar = contrib.contributionCalendar;
 
   const allDays: ContributionDay[] = calendar.weeks.flatMap(
@@ -271,9 +287,9 @@ export async function fetchGitHubStats(
     lastWeek > 0 ? Math.round(((thisWeek - lastWeek) / lastWeek) * 100) : thisWeek > 0 ? 100 : 0;
   const activityLevel = calculateActivityLevel(allDays);
   const estimatedCodingHours = calculateEstimatedCodingHours(
-    contrib.totalCommitContributions,
-    contrib.totalPullRequestContributions,
-    contrib.totalIssueContributions,
+    totals.totalCommitContributions,
+    totals.totalPullRequestContributions,
+    totals.totalIssueContributions,
   );
 
   return {
@@ -281,9 +297,9 @@ export async function fetchGitHubStats(
     name: user.name,
     avatarUrl: user.avatarUrl,
     totalStars,
-    totalCommits: contrib.totalCommitContributions,
-    totalPRs: contrib.totalPullRequestContributions,
-    totalIssues: contrib.totalIssueContributions,
+    totalCommits: totals.totalCommitContributions,
+    totalPRs: totals.totalPullRequestContributions,
+    totalIssues: totals.totalIssueContributions,
     estimatedCodingHours,
     currentStreak: current,
     longestStreak: longest,
