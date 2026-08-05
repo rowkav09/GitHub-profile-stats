@@ -1,4 +1,5 @@
 import { GitHubStats, ContributionDay, LanguageStat } from "./types";
+export type StatsPeriod = "year" | "all";
 
 const GITHUB_GRAPHQL = "https://api.github.com/graphql";
 const GITHUB_TOKEN_ENV_KEYS = [
@@ -31,7 +32,7 @@ function getGitHubAuthError(status: number): string {
 }
 
 const QUERY = `
-query($username: String!) {
+query($username: String!, $yearStart: DateTime!, $allTimeStart: DateTime!, $now: DateTime!) {
   user(login: $username) {
     name
     login
@@ -59,7 +60,11 @@ query($username: String!) {
         }
       }
     }
-    contributionsCollection {
+    year: contributionsCollection(from: $yearStart, to: $now) {
+      totalCommitContributions totalIssueContributions totalPullRequestContributions
+      contributionCalendar { totalContributions weeks { contributionDays { contributionCount date } } }
+    }
+    all: contributionsCollection(from: $allTimeStart, to: $now) {
       totalCommitContributions
       totalIssueContributions
       totalPullRequestContributions
@@ -194,6 +199,7 @@ function calculateEstimatedCodingHours(
 
 export async function fetchGitHubStats(
   username: string,
+  period: StatsPeriod = "year",
 ): Promise<GitHubStats> {
   const token = getGitHubToken();
   if (!token) {
@@ -202,6 +208,8 @@ export async function fetchGitHubStats(
     );
   }
 
+  const now = new Date();
+  const yearStart = new Date(Date.UTC(now.getUTCFullYear(), 0, 1));
   const response = await fetch(GITHUB_GRAPHQL, {
     method: "POST",
     headers: {
@@ -209,7 +217,7 @@ export async function fetchGitHubStats(
       "Content-Type": "application/json",
       "User-Agent": "github-profile-stats",
     },
-    body: JSON.stringify({ query: QUERY, variables: { username } }),
+    body: JSON.stringify({ query: QUERY, variables: { username, yearStart: yearStart.toISOString(), allTimeStart: "2008-01-01T00:00:00Z", now: now.toISOString() } }),
     cache: "no-store",
   });
 
@@ -229,8 +237,9 @@ export async function fetchGitHubStats(
     throw new Error(`User "${username}" not found`);
   }
 
-  const contrib = user.contributionsCollection;
-  const calendar = contrib.contributionCalendar;
+  const yearlyContrib = user.year;
+  const contrib = period === "all" ? user.all : yearlyContrib;
+  const calendar = yearlyContrib.contributionCalendar;
 
   const allDays: ContributionDay[] = calendar.weeks.flatMap(
     (w: { contributionDays: ContributionDay[] }) => w.contributionDays,
@@ -280,6 +289,7 @@ export async function fetchGitHubStats(
     username: user.login,
     name: user.name,
     avatarUrl: user.avatarUrl,
+    period,
     totalStars,
     totalCommits: contrib.totalCommitContributions,
     totalPRs: contrib.totalPullRequestContributions,
@@ -294,7 +304,7 @@ export async function fetchGitHubStats(
     mostActiveDay: calculateMostActiveDay(allDays),
     publicRepos: user.repositories.totalCount,
     followers: user.followers.totalCount,
-    contributionsThisYear: calendar.totalContributions,
+    contributionsThisYear: contrib.contributionCalendar.totalContributions,
     activityLevel,
     grade: calculateGrade(activityLevel, current, thisWeek),
     languages,
