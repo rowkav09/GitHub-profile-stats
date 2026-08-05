@@ -2,7 +2,7 @@ import { renderBadge, resolveBadgeStyle } from "@/lib/svg/badge";
 import { getCacheHeaders } from "@/lib/cache";
 import { SITE, SITE_ROUTES } from "@/lib/site";
 import {
-  formatUptime,
+  formatPercentage,
   type StatusReport,
   type StatusLevel,
 } from "@/lib/status";
@@ -41,11 +41,7 @@ function getWindowValue(report: StatusReport, period: string): string {
     ? report.overall.uptime7d
     : report.overall.uptime24h;
 
-  return formatUptime(
-    uptime,
-    report.overall.healthyCount,
-    report.overall.totalCount,
-  );
+  return formatPercentage(uptime);
 }
 
 function getWindowLabel(period: string): string {

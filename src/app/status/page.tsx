@@ -2,7 +2,7 @@ import Link from "next/link";
 import {
   collectStatusReport,
   formatMilliseconds,
-  formatUptime,
+  formatPercentage,
   getStatusCopy,
 } from "@/lib/status";
 import { SITE, SITE_ROUTES } from "@/lib/site";
@@ -94,11 +94,7 @@ export default async function StatusPage() {
                 24h uptime
               </p>
               <p className="mt-3 text-3xl font-bold text-white">
-                {formatUptime(
-                  report.overall.uptime24h,
-                  report.overall.healthyCount,
-                  report.overall.totalCount,
-                )}
+                {formatPercentage(report.overall.uptime24h)}
               </p>
               <p className="mt-2 text-sm text-[#8b949e]">Rolling availability</p>
             </article>
@@ -108,11 +104,7 @@ export default async function StatusPage() {
                 7d uptime
               </p>
               <p className="mt-3 text-3xl font-bold text-white">
-                {formatUptime(
-                  report.overall.uptime7d,
-                  report.overall.healthyCount,
-                  report.overall.totalCount,
-                )}
+                {formatPercentage(report.overall.uptime7d)}
               </p>
               <p className="mt-2 text-sm text-[#8b949e]">Seven-day window</p>
             </article>
@@ -179,7 +171,7 @@ export default async function StatusPage() {
                       ) : null}
                     </td>
                     <td className="px-4 py-3 align-top text-[#c9d1d9]">
-                      {formatUptime(endpoint.uptime24h, endpoint.ok ? 1 : 0, 1)}
+                      {formatPercentage(endpoint.uptime24h)}
                     </td>
                     <td className={`px-4 py-3 align-top font-medium ${responseTone(endpoint.responseTimeMs)}`}>
                       {formatMilliseconds(endpoint.responseTimeMs)}
