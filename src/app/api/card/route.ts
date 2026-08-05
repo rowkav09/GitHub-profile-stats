@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { fetchGitHubStats, type StatsPeriod } from "@/lib/github";
+import { fetchGitHubStats } from "@/lib/github";
 import { renderCard, renderErrorCard } from "@/lib/svg";
 import { resolveTheme } from "@/lib/themes/themes";
 import { sanitizeUsername, sanitizeHexParam } from "@/lib/sanitize";
@@ -14,7 +14,6 @@ export async function GET(request: NextRequest) {
   const username = sanitizeUsername(rawUsername);
 
   const themeName = params.get("theme") ?? "default";
-  const period: StatsPeriod = params.get("period") === "all" ? "all" : "year";
 
   const theme = resolveTheme(themeName, {
     bg: sanitizeHexParam(params.get("bg")),
@@ -70,7 +69,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const stats = await fetchGitHubStats(username, period);
+    const stats = await fetchGitHubStats(username);
     return new Response(renderCard(stats, theme, options), {
       status: 200,
       headers,

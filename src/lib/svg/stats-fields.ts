@@ -23,7 +23,7 @@ export function getVisibleStats(
   hide: string[],
   order?: string[],
 ): StatItem[] {
-  const periodLabel = stats.period === "all" ? "All time" : new Date().getFullYear();
+  const year = new Date().getFullYear();
   const all: (StatItem & { key: string })[] = [
     {
       key: "stars",
@@ -34,21 +34,21 @@ export function getVisibleStats(
     },
     {
       key: "commits",
-      label: `Total Commits (${periodLabel})`,
+      label: `Total Commits (${year})`,
       short: "Commits",
       value: formatNumber(stats.totalCommits),
       icon: "commit",
     },
     {
       key: "prs",
-      label: stats.period === "all" ? "Pull Requests (All time)" : "Pull Requests",
+      label: "Pull Requests",
       short: "Pull Requests",
       value: formatNumber(stats.totalPRs),
       icon: "pr",
     },
     {
       key: "issues",
-      label: stats.period === "all" ? "Issues Opened (All time)" : "Issues Opened",
+      label: "Issues Opened",
       short: "Issues",
       value: formatNumber(stats.totalIssues),
       icon: "issue",
@@ -105,7 +105,7 @@ export function getVisibleStats(
     },
     {
       key: "contributions",
-      label: stats.period === "all" ? "Contributions (All time)" : "Contributions This Year",
+      label: "Contributions This Year",
       short: "Contributions",
       value: formatNumber(stats.contributionsThisYear),
       icon: "graph",

@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { fetchGitHubStats, type StatsPeriod } from "@/lib/github";
+import { fetchGitHubStats } from "@/lib/github";
 import { renderBadge, resolveBadgeStyle } from "../../../lib/svg/badge";
 import { renderErrorCard } from "@/lib/svg";
 import { resolveTheme } from "@/lib/themes/themes";
@@ -52,7 +52,6 @@ export async function GET(request: NextRequest) {
 
   const metricKey = (params.get("metric") ?? "stars").toLowerCase();
   const metric = METRICS[metricKey] ?? METRICS.stars;
-  const period: StatsPeriod = params.get("period") === "all" ? "all" : "year";
 
   const themeName = params.get("theme") ?? "default";
   const theme = resolveTheme(themeName, {
@@ -71,7 +70,7 @@ export async function GET(request: NextRequest) {
   const label =
     customLabel && customLabel.length > 0
       ? customLabel.slice(0, 32)
-      : metricKey === "contributions" && period === "all" ? "All-time contributions" : metric.label;
+      : metric.label;
   const style = resolveBadgeStyle(params.get("style"));
 
   const headers = {
@@ -87,7 +86,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const stats = await fetchGitHubStats(username, period);
+    const stats = await fetchGitHubStats(username);
     const raw = metric.get(stats);
     const value = typeof raw === "number" ? formatNumber(raw) : raw;
 
