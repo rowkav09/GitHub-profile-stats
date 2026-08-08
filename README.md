@@ -12,15 +12,6 @@ Free, real-time GitHub stat cards, badges, and charts -- drop a URL into your RE
 
 **[ghstats.dev](https://ghstats.dev)**
 
-## Star History
-
-<a href="https://www.star-history.com/?repos=rowkav09%2FGitHub-profile-stats&type=timeline&logscale=&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=rowkav09/GitHub-profile-stats&type=timeline&theme=dark&logscale&legend=top-left&sealed_token=VDzdMJ5RAyJJyTD5hsCPIWakOpWYhcWuBQQcSfgQzDgbaM16qc85t7D1Py3fzLux4yzaRSq2bSbeM6gsS-9GEKqL64G5Zs_4f_8dJKsTS8qk5UL7WyQSAxO84K7M_eEDFg3EAPGJ2S0Ynczfgcrke_nuUSydVLAsBQo_3tT019zd1eM96R3fQfpikCKm" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=rowkav09/GitHub-profile-stats&type=timeline&logscale&legend=top-left&sealed_token=VDzdMJ5RAyJJyTD5hsCPIWakOpWYhcWuBQQcSfgQzDgbaM16qc85t7D1Py3fzLux4yzaRSq2bSbeM6gsS-9GEKqL64G5Zs_4f_8dJKsTS8qk5UL7WyQSAxO84K7M_eEDFg3EAPGJ2S0Ynczfgcrke_nuUSydVLAsBQo_3tT019zd1eM96R3fQfpikCKm" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=rowkav09/GitHub-profile-stats&type=timeline&logscale&legend=top-left&sealed_token=VDzdMJ5RAyJJyTD5hsCPIWakOpWYhcWuBQQcSfgQzDgbaM16qc85t7D1Py3fzLux4yzaRSq2bSbeM6gsS-9GEKqL64G5Zs_4f_8dJKsTS8qk5UL7WyQSAxO84K7M_eEDFg3EAPGJ2S0Ynczfgcrke_nuUSydVLAsBQo_3tT019zd1eM96R3fQfpikCKm" />
- </picture>
-</a>
 
 ---
 
