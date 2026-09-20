@@ -144,3 +144,46 @@ export function resolveProfileCardOptions(params: URLSearchParams): ProfileCardO
     height: compact ? 320 : 627,
   };
 }
+
+export type RepositoryCardData = {
+  owner: string;
+  name: string;
+  description: string;
+  ownerAvatarUrl: string;
+  avatarDataUri: string;
+  contributors: number;
+  openIssues: number;
+  stars: number;
+  forks: number;
+};
+
+export function parseRepository(value: string | null): { owner: string; repo: string } | null {
+  const match = value?.trim().match(/^([A-Za-z0-9](?:[A-Za-z0-9-]{0,38}))\/([A-Za-z0-9._-]{1,100})$/);
+  return match ? { owner: match[1], repo: match[2] } : null;
+}
+
+export async function fetchRepositoryCardData(owner: string, repo: string): Promise<RepositoryCardData> {
+  const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || process.env.GITHUB_ACCESS_TOKEN;
+  const headers: Record<string, string> = { Accept: "application/vnd.github+json", "User-Agent": "github-profile-stats" };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const response = await fetch(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`, { headers, cache: "no-store" });
+  if (!response.ok) throw new Error(response.status === 404 ? `Repository "${owner}/${repo}" not found` : `GitHub API responded with status ${response.status}`);
+  const json = await response.json();
+  let contributors = 0;
+  try {
+    const contributorsResponse = await fetch(`${json.contributors_url}?per_page=1&anon=true`, { headers, cache: "no-store" });
+    if (contributorsResponse.ok) {
+      const link = contributorsResponse.headers.get("link") || "";
+      const last = link.match(/[?&]page=(\d+)>; rel="last"/);
+      contributors = last ? Number(last[1]) : (await contributorsResponse.json()).length;
+    }
+  } catch {}
+  return { owner: json.owner.login, name: json.name, description: json.description || "A GitHub repository", ownerAvatarUrl: json.owner.avatar_url, avatarDataUri: "", contributors, openIssues: json.open_issues_count, stars: json.stargazers_count, forks: json.forks_count };
+}
+
+export function renderRepositoryCard(data: RepositoryCardData, options: ProfileCardOptions): string {
+  const { theme, width, height } = options;
+  const avatarSvg = options.showAvatar && data.avatarDataUri ? avatar({ username: data.owner, avatarDataUri: data.avatarDataUri } as ProfileCardData, width - 250, 62, 172, theme) : "";
+  const body = `<rect width="${width}" height="${height}" fill="${theme.bg}"/><rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="28" fill="${theme.bg}" stroke="${theme.border}" stroke-width="2"/>${avatarSvg}<text x="70" y="125" font-family="${font}" font-size="38" font-weight="400" fill="${theme.text}">${escapeXml(data.owner)}/</text><text x="${70 + Math.min(data.owner.length * 22 + 22, 360)}" y="125" font-family="${font}" font-size="38" font-weight="700" fill="${theme.text}">${escapeXml(data.name)}</text><text x="70" y="185" font-family="${font}" font-size="22" fill="${theme.muted}">${escapeXml((options.subtitle || data.description).slice(0, 95))}</text>${stat(70, 365, data.contributors, "Contributors", theme.text, theme.muted)}${stat(295, 365, data.openIssues, "Open issues", theme.text, theme.muted)}${stat(505, 365, data.stars, "Stars", theme.text, theme.muted)}${stat(690, 365, data.forks, "Forks", theme.text, theme.muted)}<rect x="0" y="${height - 18}" width="${width}" height="18" fill="${theme.accent}"/><text x="${width - 70}" y="${height - 42}" text-anchor="end" font-family="${font}" font-size="16" fill="${theme.muted}">github.com/${escapeXml(data.owner)}/${escapeXml(data.name)}</text>`;
+  return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escapeXml(data.owner)}/${escapeXml(data.name)} repository card"><title>${escapeXml(data.owner)}/${escapeXml(data.name)} repository card</title>${body}</svg>`;
+}
