@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   collectStatusReport,
@@ -6,6 +7,19 @@ import {
   getStatusCopy,
 } from "@/lib/status";
 import { SITE, SITE_ROUTES } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: "Service Status",
+  description: `Live uptime and response-time checks for ${SITE.name}.`,
+  alternates: {
+    canonical: SITE_ROUTES.status,
+  },
+  openGraph: {
+    title: `${SITE.name} Service Status`,
+    description: `Live uptime and response-time checks for ${SITE.name}.`,
+    url: SITE_ROUTES.status,
+  },
+};
 
 export const dynamic = "force-dynamic";
 
