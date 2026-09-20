@@ -24,5 +24,10 @@
     "postcss": "^8.4.0",
     "tailwindcss": "^3.4.0",
     "typescript": "^5.0.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rowkav09/GitHub-profile-stats.git"
+  },
+  "homepage": "https://ghstats.dev"
 }
