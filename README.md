@@ -172,6 +172,12 @@ Default, Light, Radical, Tokyo Night, Dracula, Nord, Gruvbox, Catppuccin, Ocean,
 
 MIT
 
+## Live social card examples
+
+[![rowkav09 profile card](https://ghstats.dev/api/profile?username=rowkav09&type=profile&theme=dark)](https://github.com/rowkav09/GitHub-profile-stats)
+
+[![rowkav09 contribution card](https://ghstats.dev/api/profile?username=rowkav09&type=contributions&theme=dark)](https://github.com/rowkav09/GitHub-profile-stats)
+
 ## Social profile cards
 
 Generate a shareable profile card for posts, portfolios, and profile pages:
