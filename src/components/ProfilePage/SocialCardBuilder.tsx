@@ -14,7 +14,7 @@ const REPO_URL = "https://github.com/rowkav09/GitHub-profile-stats";
 export default function SocialCardBuilder({ username }: { username: string }) {
   const [type, setType] = useState<(typeof TYPES)[number]["key"]>("profile");
   const [theme, setTheme] = useState<(typeof THEMES)[number]>("dark");
-  const [copied, setCopied] = useState(false);
+  const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
   const encoded = encodeURIComponent(username);
   const svgUrl = `/api/profile?username=${encoded}&type=${type}&theme=${theme}`;
   const pngUrl = `/api/profile/png?username=${encoded}&type=${type}&theme=${theme}&download=true`;
@@ -25,8 +25,11 @@ export default function SocialCardBuilder({ username }: { username: string }) {
 
   function copyMarkdown() {
     navigator.clipboard.writeText(markdown).then(() => {
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1400);
+      setCopyStatus("copied");
+      window.setTimeout(() => setCopyStatus("idle"), 1400);
+    }).catch(() => {
+      setCopyStatus("failed");
+      window.setTimeout(() => setCopyStatus("idle"), 1800);
     });
   }
 
@@ -71,7 +74,7 @@ export default function SocialCardBuilder({ username }: { username: string }) {
           <div className="embed-block">
             <div className="flex items-center justify-between gap-3">
               <span className="label-text mb-0">Linked markdown embed</span>
-              <button type="button" onClick={copyMarkdown} className="copy-btn">{copied ? "Copied" : "Copy"}</button>
+              <button type="button" onClick={copyMarkdown} className="copy-btn">{copyStatus === "copied" ? "Copied" : copyStatus === "failed" ? "Copy failed" : "Copy"}</button>
             </div>
             <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-all text-xs leading-6 text-[#79c0ff]">{markdown}</pre>
             <p className="mt-2 text-xs text-[#484f58]">The image stays live and clicking it opens the GitHub-profile-stats repository.</p>
