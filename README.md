@@ -184,6 +184,9 @@ Use the PNG endpoint for LinkedIn and other sites that require an uploaded raste
 
 ```text
 https://ghstats.dev/api/profile/png?username=octocat&theme=dark&type=profile&download=true
+
+# Contribution heatmap
+https://ghstats.dev/api/profile/png?username=octocat&theme=dark&type=contributions
 ```
 
 ### Profile card parameters
@@ -192,7 +195,7 @@ https://ghstats.dev/api/profile/png?username=octocat&theme=dark&type=profile&dow
 | --- | --- | --- |
 | `username` | GitHub username (profile card) | required unless `repo` is set |
 | `repo` | `owner/name` (repository card) | required unless `username` is set |
-| `type` | `repo`, `profile`, `compact` | `repo` |
+| `type` | `repo`, `profile`, `compact`, `contributions` | `repo` |
 | `theme` | `github`, `light`, `dark`, `ocean`, `violet`, `amber` | `github` |
 | `title` | custom heading, up to 80 characters | generated |
 | `subtitle` | custom description, up to 140 characters | generated |
