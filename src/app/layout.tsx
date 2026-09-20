@@ -71,22 +71,43 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "WebApplication",
-  name: SITE.name,
-  description: SITE.description,
-  url: SITE.url,
-  applicationCategory: "DeveloperApplication",
-  operatingSystem: "All",
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "USD",
-  },
-  author: {
-    "@type": "Person",
-    name: SITE.authorName,
-    url: SITE.authorUrl,
-  },
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${SITE.url}/#website`,
+      name: SITE.name,
+      url: SITE.url,
+      description: SITE.description,
+      inLanguage: "en",
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": `${SITE.url}/#application`,
+      name: SITE.name,
+      description: SITE.description,
+      url: SITE.url,
+      applicationCategory: "DeveloperApplication",
+      applicationSubCategory: "GitHub README generator",
+      operatingSystem: "Any",
+      isAccessibleForFree: true,
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+      author: {
+        "@type": "Person",
+        name: SITE.authorName,
+        url: SITE.authorUrl,
+      },
+      sourceOrganization: {
+        "@type": "Organization",
+        name: "GitHub",
+        url: "https://github.com",
+      },
+      codeRepository: SITE.repoUrl,
+    },
+  ],
 };
 
 export default function RootLayout({
