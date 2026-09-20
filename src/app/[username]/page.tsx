@@ -105,7 +105,12 @@ export default function ProfilePage({ params }: ProfilePageProps) {
       <section className="mx-auto max-w-5xl space-y-8 px-6 py-12">
         <SocialCardBuilder username={username} />
 
-        <div className="grid gap-8 lg:grid-cols-2">
+        <details className="group rounded-2xl border border-[#30363d] bg-[#010409]">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 font-semibold text-[#c9d1d9] sm:p-6">
+            <span><span className="block text-lg">See more card options</span><span className="mt-1 block text-sm font-normal text-[#8b949e]">Detailed stats and language cards</span></span>
+            <span className="text-[#58a6ff] transition-transform group-open:rotate-180">⌄</span>
+          </summary>
+          <div className="grid gap-8 border-t border-[#21262d] p-5 lg:grid-cols-2 sm:p-6">
           <article className="rounded-2xl border border-[#30363d] bg-[#010409] p-5 sm:p-8">
             <div className="flex items-start justify-between gap-3">
               <div><h2 className="text-xl font-semibold">Detailed stats</h2><p className="mt-1 text-sm text-[#8b949e]">The original README stats card.</p></div>
@@ -122,7 +127,8 @@ export default function ProfilePage({ params }: ProfilePageProps) {
             <img src={languagesUrl} alt={`${username}'s top programming languages`} className="mx-auto mt-5 h-auto w-full" />
             <LinkedEmbed label={`${username}'s top programming languages`} imageUrl={languagesUrl} />
           </article>
-        </div>
+          </div>
+        </details>
 
         <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-[#30363d] bg-[#161b22] p-6 text-center sm:flex-row">
           <Link href={`${SITE_ROUTES.home}#try`} className="rounded-lg bg-[#238636] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#2ea043]">Open the full generator</Link>
