@@ -1,7 +1,7 @@
 import { GitHubStats } from "@/lib/types";
 import { escapeXml, sanitizeHexParam } from "@/lib/sanitize";
 
-export type ProfileCardType = "repo" | "profile" | "compact";
+export type ProfileCardType = "repo" | "profile" | "compact" | "contributions";
 
 export type ProfileCardTheme = {
   bg: string;
@@ -28,7 +28,7 @@ export type ProfileCardData = GitHubStats & {
 };
 
 
-export const PROFILE_CARD_TYPES: ProfileCardType[] = ["repo", "profile", "compact"];
+export const PROFILE_CARD_TYPES: ProfileCardType[] = ["repo", "profile", "compact", "contributions"];
 
 export const PROFILE_THEMES: Record<string, ProfileCardTheme> = {
   github: {
@@ -122,8 +122,29 @@ function compactLayout(data: ProfileCardData, options: ProfileCardOptions) {
   return `<rect width="${width}" height="${height}" fill="${theme.bg}"/><rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="24" fill="${theme.panel}" stroke="${theme.border}" stroke-width="2"/>${options.showAvatar ? avatar(data, 48, 48, 140, theme) : ""}<text x="225" y="93" font-family="${font}" font-size="34" font-weight="700" fill="${theme.text}">${escapeXml(data.name || data.username)}</text><text x="225" y="132" font-family="${font}" font-size="20" fill="${theme.accent}">@${escapeXml(data.username)}</text>${stat(225, 220, data.followers, "Followers", theme.text, theme.muted)}${stat(400, 220, data.totalStars, "Stars", theme.text, theme.muted)}${stat(550, 220, data.publicRepos, "Repos", theme.text, theme.muted)}${stat(700, 220, data.contributionsThisYear, "Contributions", theme.text, theme.muted)}<text x="${width - 46}" y="${height - 35}" text-anchor="end" font-family="${font}" font-size="14" fill="${theme.muted}">ghstats.dev</text>`;
 }
 
+function contributionGraphLayout(data: ProfileCardData, options: ProfileCardOptions) {
+  const { theme, width, height } = options;
+  const days = data.contributionDays.slice(-371);
+  const max = Math.max(...days.map((day) => day.contributionCount), 1);
+  const cell = 16;
+  const gap = 4;
+  const startX = 74;
+  const startY = 190;
+  const cells = days.map((day, index) => {
+    const week = Math.floor(index / 7);
+    const weekday = index % 7;
+    const ratio = day.contributionCount / max;
+    const opacity = day.contributionCount === 0 ? 1 : Math.max(0.28, Math.min(1, 0.22 + ratio * 0.78));
+    const fill = day.contributionCount === 0 ? theme.panel : theme.accent;
+    const label = `${day.date}: ${day.contributionCount} contribution${day.contributionCount === 1 ? "" : "s"}`;
+    return `<rect x="${startX + week * (cell + gap)}" y="${startY + weekday * (cell + gap)}" width="${cell}" height="${cell}" rx="3" fill="${fill}" fill-opacity="${opacity}" stroke="${theme.border}" stroke-width="0.5"><title>${escapeXml(label)}</title></rect>`;
+  }).join("");
+  const legend = [0.28, 0.52, 0.76, 1].map((opacity, index) => `<rect x="${width - 184 + index * 24}" y="${height - 91}" width="16" height="16" rx="3" fill="${theme.accent}" fill-opacity="${opacity}"/>`).join("");
+  return `<rect width="${width}" height="${height}" fill="${theme.bg}"/><rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="28" fill="${theme.bg}" stroke="${theme.border}" stroke-width="2"/><text x="70" y="88" font-family="${font}" font-size="38" font-weight="700" fill="${theme.text}">${escapeXml(options.title || `${data.username}'s contributions`)}</text><text x="70" y="126" font-family="${font}" font-size="18" fill="${theme.muted}">${escapeXml(options.subtitle || "A year of public GitHub activity")}</text><text x="${width - 70}" y="88" text-anchor="end" font-family="${font}" font-size="32" font-weight="700" fill="${theme.text}">${data.contributionsThisYear}</text><text x="${width - 70}" y="116" text-anchor="end" font-family="${font}" font-size="15" fill="${theme.muted}">contributions this year</text>${cells}<text x="70" y="${height - 72}" font-family="${font}" font-size="16" fill="${theme.muted}">Less</text><rect x="115" y="${height - 88}" width="16" height="16" rx="3" fill="${theme.panel}" stroke="${theme.border}"/>${[0.28, 0.52, 0.76, 1].map((opacity, index) => `<rect x="${139 + index * 24}" y="${height - 88}" width="16" height="16" rx="3" fill="${theme.accent}" fill-opacity="${opacity}"/>`).join("")}<text x="244" y="${height - 72}" font-family="${font}" font-size="16" fill="${theme.muted}">More</text><text x="${width - 70}" y="${height - 72}" text-anchor="end" font-family="${font}" font-size="16" fill="${theme.muted}">ghstats.dev/${escapeXml(data.username)}</text>`;
+}
+
 export function renderProfileCard(data: ProfileCardData, options: ProfileCardOptions): string {
-  const body = options.type === "profile" ? profileLayout(data, options) : options.type === "compact" ? compactLayout(data, options) : repoLayout(data, options);
+  const body = options.type === "profile" ? profileLayout(data, options) : options.type === "compact" ? compactLayout(data, options) : options.type === "contributions" ? contributionGraphLayout(data, options) : repoLayout(data, options);
   return `<svg width="${options.width}" height="${options.height}" viewBox="0 0 ${options.width} ${options.height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escapeXml(data.username)} GitHub profile card"><title>${escapeXml(data.username)} GitHub profile card</title>${body}</svg>`;
 }
 
