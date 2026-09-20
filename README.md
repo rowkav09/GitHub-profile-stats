@@ -171,3 +171,33 @@ Default, Light, Radical, Tokyo Night, Dracula, Nord, Gruvbox, Catppuccin, Ocean,
 ## License
 
 MIT
+
+## Social profile cards
+
+Generate a shareable profile card for posts, portfolios, and profile pages:
+
+```text
+https://ghstats.dev/api/profile?username=octocat&theme=github&type=repo
+```
+
+Use the PNG endpoint for LinkedIn and other sites that require an uploaded raster image:
+
+```text
+https://ghstats.dev/api/profile/png?username=octocat&theme=dark&type=profile&download=true
+```
+
+### Profile card parameters
+
+| Parameter | Values | Default |
+| --- | --- | --- |
+| `username` | GitHub username | required |
+| `type` | `repo`, `profile`, `compact` | `repo` |
+| `theme` | `github`, `light`, `dark`, `ocean`, `violet`, `amber` | `github` |
+| `title` | custom heading, up to 80 characters | generated |
+| `subtitle` | custom description, up to 140 characters | generated |
+| `show_avatar` | `true`, `false` | `true` |
+| `show_languages` | `true`, `false` | `true` |
+| `bg`, `panel`, `text`, `muted`, `accent`, `border` | six-digit hex without `#` | theme value |
+| `download` | `true` forces attachment download (PNG only) | `false` |
+
+The preset and layout registries are separate, so adding a new colour preset or card type does not require changing the API routes.
