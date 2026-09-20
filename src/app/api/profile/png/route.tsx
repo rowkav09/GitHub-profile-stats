@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 import { fetchGitHubStats } from "@/lib/github";
 import { sanitizeUsername } from "@/lib/sanitize";
-import { renderProfileCard, resolveProfileCardOptions } from "@/lib/profile-card";
+import { fetchRepositoryCardData, parseRepository, renderProfileCard, renderRepositoryCard, resolveProfileCardOptions } from "@/lib/profile-card";
 
 export const dynamic = "force-dynamic";
 export const runtime = "edge";
@@ -21,11 +21,18 @@ async function avatarDataUri(url: string): Promise<string> {
 
 export async function GET(request: NextRequest) {
   const username = sanitizeUsername(request.nextUrl.searchParams.get("username") || "");
-  if (!username) return new Response("Missing or invalid username", { status: 400 });
+  const repository = parseRepository(request.nextUrl.searchParams.get("repo"));
+  if (!username && !repository) return new Response("Supply a valid username or repo=owner/name", { status: 400 });
   try {
-    const stats = await fetchGitHubStats(username);
     const options = resolveProfileCardOptions(request.nextUrl.searchParams);
-    const svg = renderProfileCard({ ...stats, avatarDataUri: await avatarDataUri(stats.avatarUrl) }, options);
+    let svg: string;
+    if (repository) {
+      const data = await fetchRepositoryCardData(repository.owner, repository.repo);
+      svg = renderRepositoryCard({ ...data, avatarDataUri: await avatarDataUri(data.ownerAvatarUrl) }, options);
+    } else {
+      const stats = await fetchGitHubStats(username!);
+      svg = renderProfileCard({ ...stats, avatarDataUri: await avatarDataUri(stats.avatarUrl) }, options);
+    }
     const dataUri = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
     const response = new ImageResponse(
       <div style={{ display: "flex", width: "100%", height: "100%" }}>
@@ -35,7 +42,7 @@ export async function GET(request: NextRequest) {
       { width: options.width, height: options.height },
     );
     if (request.nextUrl.searchParams.get("download") === "true") {
-      response.headers.set("Content-Disposition", `attachment; filename="${username}-github-profile.png"`);
+      response.headers.set("Content-Disposition", `attachment; filename="${repository ? `${repository.owner}-${repository.repo}` : username}-github-card.png"`);
     }
     return response;
   } catch (error) {
