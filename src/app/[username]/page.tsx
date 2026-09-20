@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { sanitizeUsername } from "@/lib/sanitize";
 import { SITE, SITE_ROUTES } from "@/lib/site";
 import SocialCardBuilder from "@/components/ProfilePage/SocialCardBuilder";
-import LinkedEmbed from "@/components/ProfilePage/LinkedEmbed";
 
 type ProfilePageProps = {
   params: { username: string };
@@ -59,8 +58,6 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 
   const encodedUsername = encodeURIComponent(username);
   const profileUrl = `https://github.com/${encodedUsername}`;
-  const cardUrl = `${SITE_ROUTES.apiCard}?username=${encodedUsername}`;
-  const languagesUrl = `${SITE_ROUTES.apiLangs}?username=${encodedUsername}`;
 
   return (
     <main className="min-h-screen bg-[#0d1117]">
@@ -104,31 +101,6 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 
       <section className="mx-auto max-w-5xl space-y-8 px-6 py-12">
         <SocialCardBuilder username={username} />
-
-        <details className="group rounded-2xl border border-[#30363d] bg-[#010409]">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 font-semibold text-[#c9d1d9] sm:p-6">
-            <span><span className="block text-lg">See more card options</span><span className="mt-1 block text-sm font-normal text-[#8b949e]">Detailed stats and language cards</span></span>
-            <span className="text-[#58a6ff] transition-transform group-open:rotate-180">⌄</span>
-          </summary>
-          <div className="grid gap-8 border-t border-[#21262d] p-5 lg:grid-cols-2 sm:p-6">
-          <article className="rounded-2xl border border-[#30363d] bg-[#010409] p-5 sm:p-8">
-            <div className="flex items-start justify-between gap-3">
-              <div><h2 className="text-xl font-semibold">Detailed stats</h2><p className="mt-1 text-sm text-[#8b949e]">The original README stats card.</p></div>
-              <a href={cardUrl} target="_blank" rel="noopener noreferrer" className="shrink-0 rounded-lg border border-[#30363d] px-3 py-2 text-xs font-semibold text-[#c9d1d9] transition-colors hover:border-[#58a6ff]">Open SVG</a>
-            </div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={cardUrl} alt={`${username}'s detailed GitHub stats`} className="mx-auto mt-5 h-auto w-full" />
-            <LinkedEmbed label={`${username}'s detailed GitHub stats`} imageUrl={cardUrl} />
-          </article>
-
-          <article className="rounded-2xl border border-[#30363d] bg-[#010409] p-5 sm:p-8">
-            <div><h2 className="text-xl font-semibold">Top languages</h2><p className="mt-1 text-sm text-[#8b949e]">Calculated across public, non-fork repositories.</p></div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={languagesUrl} alt={`${username}'s top programming languages`} className="mx-auto mt-5 h-auto w-full" />
-            <LinkedEmbed label={`${username}'s top programming languages`} imageUrl={languagesUrl} />
-          </article>
-          </div>
-        </details>
 
         <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-[#30363d] bg-[#161b22] p-6 text-center sm:flex-row">
           <Link href={`${SITE_ROUTES.home}#try`} className="rounded-lg bg-[#238636] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#2ea043]">Open the full generator</Link>
