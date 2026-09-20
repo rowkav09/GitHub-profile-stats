@@ -26,11 +26,7 @@ export const SITE_ROUTES = {
   apiVisits: "/api/visits",
 } as const;
 
-export const ROBOTS_DISALLOW_ROUTES = [
-  SITE_ROUTES.apiCard,
-  SITE_ROUTES.apiBadge,
-  SITE_ROUTES.apiVisits,
-] as const;
+export const ROBOTS_DISALLOW_ROUTES = ["/api/"] as const;
 
 export const SITEMAP_ROUTES = [
   {
@@ -39,8 +35,8 @@ export const SITEMAP_ROUTES = [
     priority: 1,
   },
   {
-    url: new URL(SITE_ROUTES.apiCard, SITE.url).href,
-    changeFrequency: "daily" as const,
-    priority: 0.8,
+    url: new URL(SITE_ROUTES.status, SITE.url).href,
+    changeFrequency: "hourly" as const,
+    priority: 0.5,
   },
 ] as const;
