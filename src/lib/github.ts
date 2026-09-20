@@ -36,6 +36,7 @@ query($username: String!) {
     name
     login
     avatarUrl
+    bio
     followers {
       totalCount
     }
@@ -296,6 +297,7 @@ export async function fetchGitHubStats(
     username: user.login,
     name: user.name,
     avatarUrl: user.avatarUrl,
+    bio: user.bio,
     totalStars,
     totalCommits: totals.totalCommitContributions,
     totalPRs: totals.totalPullRequestContributions,

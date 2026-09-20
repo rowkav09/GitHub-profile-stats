@@ -9,6 +9,7 @@ export interface GitHubStats {
   username: string;
   name: string | null;
   avatarUrl: string;
+  bio: string | null;
   totalStars: number;
   totalCommits: number;
   totalPRs: number;
