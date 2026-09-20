@@ -177,7 +177,7 @@ MIT
 Generate a shareable profile card for posts, portfolios, and profile pages:
 
 ```text
-https://ghstats.dev/api/profile?username=octocat&theme=github&type=repo
+https://ghstats.dev/api/profile?repo=octocat/Hello-World&theme=github&type=repo
 ```
 
 Use the PNG endpoint for LinkedIn and other sites that require an uploaded raster image:
@@ -190,7 +190,8 @@ https://ghstats.dev/api/profile/png?username=octocat&theme=dark&type=profile&dow
 
 | Parameter | Values | Default |
 | --- | --- | --- |
-| `username` | GitHub username | required |
+| `username` | GitHub username (profile card) | required unless `repo` is set |
+| `repo` | `owner/name` (repository card) | required unless `username` is set |
 | `type` | `repo`, `profile`, `compact` | `repo` |
 | `theme` | `github`, `light`, `dark`, `ocean`, `violet`, `amber` | `github` |
 | `title` | custom heading, up to 80 characters | generated |
