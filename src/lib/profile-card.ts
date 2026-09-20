@@ -99,6 +99,20 @@ function languagePills(data: ProfileCardData, y: number, theme: ProfileCardOptio
   }).join("");
 }
 
+function languageSection(data: ProfileCardData, y: number, theme: ProfileCardOptions["theme"], width: number) {
+  const languages = data.languages.slice(0, 4);
+  const panelX = 42;
+  const panelWidth = width - 84;
+  const gap = 14;
+  const tileWidth = (panelWidth - 56 - gap * 3) / 4;
+  const tiles = languages.map((lang, index) => {
+    const x = panelX + 28 + index * (tileWidth + gap);
+    const barWidth = Math.max(0, (tileWidth - 32) * Math.min(100, lang.percentage) / 100);
+    return `<rect x="${x}" y="${y + 52}" width="${tileWidth}" height="82" rx="14" fill="${theme.bg}" stroke="${theme.border}"/><circle cx="${x + 18}" cy="${y + 77}" r="6" fill="${lang.color}"/><text x="${x + 32}" y="${y + 83}" font-family="${font}" font-size="17" font-weight="600" fill="${theme.text}">${escapeXml(lang.name)}</text><text x="${x + tileWidth - 16}" y="${y + 83}" text-anchor="end" font-family="${font}" font-size="16" fill="${theme.muted}">${lang.percentage}%</text><rect x="${x + 16}" y="${y + 101}" width="${tileWidth - 32}" height="10" rx="5" fill="${theme.border}"/><rect x="${x + 16}" y="${y + 101}" width="${barWidth}" height="10" rx="5" fill="${lang.color}"/>`;
+  }).join("");
+  return `<rect x="${panelX}" y="${y}" width="${panelWidth}" height="154" rx="22" fill="${theme.panel}" stroke="${theme.border}"/><text x="${panelX + 28}" y="${y + 33}" font-family="${font}" font-size="19" font-weight="700" fill="${theme.text}">Top languages</text>${tiles}`;
+}
+
 function avatar(data: ProfileCardData, x: number, y: number, size: number, theme: ProfileCardOptions["theme"]) {
   if (!data.avatarDataUri) return "";
   const id = `avatar-${x}-${y}`;
@@ -115,7 +129,7 @@ function repoLayout(data: ProfileCardData, options: ProfileCardOptions) {
   const bio = options.subtitle ?? data.bio ?? "";
   const bioLine = bio ? `<text x="70" y="180" font-family="${font}" font-size="20" fill="${theme.muted}">${escapeXml(bio.slice(0, 110))}</text>` : "";
   const stats = [[data.followers, "Followers"], [data.publicRepos, "Public repos"], [data.totalStars, "Stars earned"], [data.contributionsThisYear, "Contributions"]] as const;
-  return `<rect width="${width}" height="${height}" fill="${theme.bg}"/><rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="28" fill="${theme.bg}" stroke="${theme.border}" stroke-width="2"/><rect x="42" y="42" width="${width - 84}" height="206" rx="24" fill="${theme.panel}" stroke="${theme.border}"/>${options.showAvatar ? avatar(data, width - 238, 59, 170, theme) : ""}<text x="70" y="112" font-family="${font}" font-size="40" font-weight="700" fill="${theme.text}">${displayName}</text><text x="70" y="150" font-family="${font}" font-size="22" fill="${theme.accent}">@${escapeXml(data.username)}</text>${bioLine}${stats.map((item, index) => statPanel(42 + index * 280, 276, 260, item[0], item[1], theme)).join("")}${options.showLanguages ? languagePills(data, 430, theme) : ""}<rect x="0" y="${height - 18}" width="${width}" height="18" fill="${theme.accent}"/>`;
+  return `<rect width="${width}" height="${height}" fill="${theme.bg}"/><rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="28" fill="${theme.bg}" stroke="${theme.border}" stroke-width="2"/><rect x="42" y="42" width="${width - 84}" height="206" rx="24" fill="${theme.panel}" stroke="${theme.border}"/>${options.showAvatar ? avatar(data, width - 238, 59, 170, theme) : ""}<text x="70" y="112" font-family="${font}" font-size="40" font-weight="700" fill="${theme.text}">${displayName}</text><text x="70" y="150" font-family="${font}" font-size="22" fill="${theme.accent}">@${escapeXml(data.username)}</text>${bioLine}${stats.map((item, index) => statPanel(42 + index * 284, 276, 264, item[0], item[1], theme)).join("")}${options.showLanguages ? languageSection(data, 420, theme, width) : ""}<rect x="0" y="${height - 18}" width="${width}" height="18" fill="${theme.accent}"/>`;
 }
 
 function profileLayout(data: ProfileCardData, options: ProfileCardOptions) {
