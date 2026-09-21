@@ -76,51 +76,15 @@ jobs:
       # correctly without one. Into RUNNER_TEMP rather than the checkout,
       # because `npm pack` writes to the working directory by default and a
       # stray .tgz is something this job would then scan.
+      # Keep the complete transitive dependency tree reviewed and pinned in
+      # .github/threatcrush/package-lock.json. npm ci verifies every integrity
+      # value before exposing the scanner to pull-request contents.
       - name: Install ThreatCrush
-        run: |
-          set -euo pipefail
-          spec='@profullstack/threatcrush@0.11.9'
-          want='sha512-ZjIYeGPBNIcD2LjanW8pv8NiPclI8IZCaY/8su2vusYklQUROguSusJe+nhoQDLMSGhNM7d/kNJn6snEZrvL9g=='
+        working-directory: .github/threatcrush
+        run: npm ci --ignore-scripts --no-audit --no-fund
 
-          # Retried: a transient registry blip is not a security signal.
-          name=""
-          for attempt in 1 2 3; do
-            if name=$(npm pack --silent --pack-destination "${RUNNER_TEMP}" "${spec}" | tail -1) \
-              && [ -n "${name}" ] && [ -f "${RUNNER_TEMP}/${name}" ]; then
-              break
-            fi
-            name=""
-            echo "::warning::ThreatCrush download attempt ${attempt}/3 failed; retrying in $((attempt * 10))s"
-            sleep "$((attempt * 10))"
-          done
-          if [ -z "${name}" ]; then
-            echo "::error::ThreatCrush download failed after 3 attempts"
-            exit 1
-          fi
-
-          # Not retried, unlike the download. A blip and a mismatch are not the
-          # same event: one is the network, the other is the registry handing
-          # back bytes nobody signed off on, and retrying that just asks again
-          # until it succeeds.
-          if [ -n "${want}" ]; then
-            got="sha512-$(openssl dgst -sha512 -binary "${RUNNER_TEMP}/${name}" | openssl base64 -A)"
-            if [ "${got}" != "${want}" ]; then
-              echo "::error::ThreatCrush integrity mismatch for ${spec}"
-              echo "::error::expected ${want}"
-              echo "::error::received ${got}"
-              echo "::error::refusing to install — this is not a transient failure"
-              exit 1
-            fi
-            echo "Integrity verified for ${spec}: ${got}"
-          else
-            echo "::warning::no integrity hash pinned for ${spec}; installing unverified"
-          fi
-
-          npm install -g --ignore-scripts "${RUNNER_TEMP}/${name}"
-
-          # Recorded so a release that changed the interface is visible in the
-          # log rather than inferred from a confusing failure downstream.
-          threatcrush --version
+      - name: Record ThreatCrush version
+        run: .github/threatcrush/node_modules/.bin/threatcrush --version
 
       # The CLI emits SARIF itself, so this asks for it and nothing converts
       # anything.
@@ -148,7 +112,7 @@ jobs:
           if [ -n "$FAIL_ON" ]; then
             ARGS+=(--fail-on "$FAIL_ON")
           fi
-          threatcrush "${ARGS[@]}" || code=$?
+          .github/threatcrush/node_modules/.bin/threatcrush "${ARGS[@]}" || code=$?
 
           # The SARIF file is the evidence that a scan happened, and it is the
           # only evidence worth trusting. An exit code says what the process
@@ -241,7 +205,7 @@ jobs:
               out.append("No findings.")
           else:
               try:
-                  changed = set(open(os.environ["RUNNER_TEMP"] + "/threatcrush-changed.txt").read().split())
+                  changed = set(open(os.environ["RUNNER_TEMP"] + "/threatcrush-changed.txt").read().splitlines())
               except Exception:
                   changed = set()
 
@@ -339,7 +303,7 @@ jobs:
                 per_page: 100,
               });
               const existing = comments.find(
-                (c) => c.user.type === 'Bot' && c.body.includes('ThreatCrush Security Scan'),
+                (c) => c.user.login === 'github-actions[bot]' && c.body.startsWith('## ThreatCrush Security Scan'),
               );
               const target = { owner: context.repo.owner, repo: context.repo.repo, body };
 
