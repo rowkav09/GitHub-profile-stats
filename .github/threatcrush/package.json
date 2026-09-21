@@ -5,6 +5,7 @@
     "@profullstack/threatcrush": "0.11.9"
   },
   "overrides": {
-    "nodemailer": "10.0.10"
+    "nodemailer": "10.0.10",
+    "@opentelemetry/core": "2.8.0"
   }
 }
