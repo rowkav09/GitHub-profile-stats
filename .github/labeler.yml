@@ -1,0 +1,18 @@
+area:api:
+  - changed-files:
+      - any-glob-to-any-file: ["src/app/api/**", "src/lib/github/**", "src/middleware.ts"]
+area:cards:
+  - changed-files:
+      - any-glob-to-any-file: ["src/components/**/*Card*", "src/app/**/card/**", "src/lib/**/*card*"]
+area:themes:
+  - changed-files:
+      - any-glob-to-any-file: ["src/**/*theme*", "src/**/*.css", "src/components/**/*Theme*"]
+area:ci:
+  - changed-files:
+      - any-glob-to-any-file: [".github/**", "Dockerfile", "docker-compose.yml", "next.config.mjs"]
+area:docs:
+  - changed-files:
+      - any-glob-to-any-file: ["**/*.md", "docs/**"]
+area:deps:
+  - changed-files:
+      - any-glob-to-any-file: ["package.json", "bun.lock", "package-lock.json"]
