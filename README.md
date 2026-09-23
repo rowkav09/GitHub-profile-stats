@@ -211,3 +211,13 @@ https://ghstats.dev/api/profile/png?username=octocat&theme=dark&type=contributio
 | `download` | `true` forces attachment download (PNG only) | `false` |
 
 The preset and layout registries are separate, so adding a new colour preset or card type does not require changing the API routes.
+
+## Star History
+
+<a href="https://www.star-history.com/?repos=rowkavdev%2Fgithub-profile-stats&type=timeline&legend=bottom-right">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=rowkavdev/github-profile-stats&type=timeline&theme=dark&legend=bottom-right" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=rowkavdev/github-profile-stats&type=timeline&legend=bottom-right" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=rowkavdev/github-profile-stats&type=timeline&legend=bottom-right" />
+ </picture>
+</a>
