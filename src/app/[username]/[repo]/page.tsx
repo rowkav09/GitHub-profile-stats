@@ -5,9 +5,11 @@ import RepositoryCardBuilder from "@/components/RepositoryPage/RepositoryCardBui
 import { sanitizeUsername } from "@/lib/sanitize";
 import { SITE, SITE_ROUTES } from "@/lib/site";
 
-type Props = { params: { username: string; repo: string } };
+type RouteParams = { username: string; repo: string };
+type Props = { params: Promise<RouteParams> };
 
-function values(params: Props["params"]) {
+// Next.js 15+ passes params as a Promise; reading it synchronously gives undefined.
+function values(params: RouteParams) {
   try {
     const owner = sanitizeUsername(decodeURIComponent(params.username)) ?? "";
     const repo = decodeURIComponent(params.repo);
@@ -15,8 +17,8 @@ function values(params: Props["params"]) {
   } catch { return { owner: "", repo: "" }; }
 }
 
-export function generateMetadata({ params }: Props): Metadata {
-  const { owner, repo } = values(params);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { owner, repo } = values(await params);
   if (!owner || !repo) return { title: "Invalid GitHub repository", robots: { index: false, follow: false } };
   const title = `${owner}/${repo} GitHub repository card`;
   const description = `Build and download a live GitHub repository card for ${owner}/${repo}.`;
@@ -24,8 +26,8 @@ export function generateMetadata({ params }: Props): Metadata {
   return { title, description, alternates: { canonical }, openGraph: { title, description, url: canonical, type: "website", images: [`${SITE.url}/api/profile/png?repo=${encodeURIComponent(`${owner}/${repo}`)}&theme=dark`] } };
 }
 
-export default function RepositoryPage({ params }: Props) {
-  const { owner, repo } = values(params);
+export default async function RepositoryPage({ params }: Props) {
+  const { owner, repo } = values(await params);
   if (!owner || !repo) notFound();
   const githubUrl = `https://github.com/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`;
   return <main className="min-h-screen bg-[#0d1117]">
