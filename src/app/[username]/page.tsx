@@ -6,7 +6,8 @@ import { SITE, SITE_ROUTES } from "@/lib/site";
 import SocialCardBuilder from "@/components/ProfilePage/SocialCardBuilder";
 
 type ProfilePageProps = {
-  params: { username: string };
+  // Next.js 15+ passes params as a Promise; reading it synchronously gives undefined.
+  params: Promise<{ username: string }>;
 };
 
 function getUsername(rawUsername: string): string {
@@ -17,8 +18,8 @@ function getUsername(rawUsername: string): string {
   }
 }
 
-export function generateMetadata({ params }: ProfilePageProps): Metadata {
-  const username = getUsername(params.username);
+export async function generateMetadata({ params }: ProfilePageProps): Promise<Metadata> {
+  const username = getUsername((await params).username);
 
   if (!username) {
     return {
@@ -52,8 +53,8 @@ export function generateMetadata({ params }: ProfilePageProps): Metadata {
   };
 }
 
-export default function ProfilePage({ params }: ProfilePageProps) {
-  const username = getUsername(params.username);
+export default async function ProfilePage({ params }: ProfilePageProps) {
+  const username = getUsername((await params).username);
   if (!username) notFound();
 
   const encodedUsername = encodeURIComponent(username);
