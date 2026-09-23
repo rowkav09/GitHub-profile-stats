@@ -9,7 +9,7 @@ const TYPES = [
   { key: "repo", label: "Repo-style" },
 ] as const;
 const THEMES = ["github", "light", "dark", "ocean", "violet", "amber"] as const;
-const REPO_URL = "https://github.com/rowkav09/GitHub-profile-stats";
+const REPO_URL = "https://github.com/rowkavdev/GitHub-profile-stats";
 
 export default function SocialCardBuilder({ username }: { username: string }) {
   const [type, setType] = useState<(typeof TYPES)[number]["key"]>("profile");

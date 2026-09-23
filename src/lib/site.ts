@@ -8,7 +8,7 @@ export const SITE = {
   authorUrl: "https://github.com/rowkav09",
   creator: "rowkav09",
   publisher: "rowkav09",
-  repoUrl: "https://github.com/rowkav09/GitHub-profile-stats",
+  repoUrl: "https://github.com/rowkavdev/GitHub-profile-stats",
   avatarUrl: "https://github.com/rowkav09.png",
   ogImagePath: "/opengraph-image",
 } as const;

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const REPO_URL = "https://github.com/rowkav09/GitHub-profile-stats";
+const REPO_URL = "https://github.com/rowkavdev/GitHub-profile-stats";
 
 export default function LinkedEmbed({ label, imageUrl }: { label: string; imageUrl: string }) {
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");

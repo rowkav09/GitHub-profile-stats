@@ -5,7 +5,7 @@ Contributions of all kinds are welcome — whether you want to add a new colour 
 ## Getting Started
 
 ```bash
-git clone https://github.com/rowkav09/GitHub-profile-stats.git
+git clone https://github.com/rowkavdev/GitHub-profile-stats.git
 cd GitHub-profile-stats
 npm install
 cp .env.example .env.local   # add your GITHUB_TOKEN, GH_TOKEN, or GITHUB_ACCESS_TOKEN
@@ -17,7 +17,7 @@ npm run dev                  # http://localhost:3000
 3. Make your changes (see guides below)
 4. Open a PR against `main` with a short description of what you changed and why
 
-For anything larger (new layouts, breaking API changes) it's worth [opening an issue](https://github.com/rowkav09/GitHub-profile-stats/issues) first to discuss the approach before writing code.
+For anything larger (new layouts, breaking API changes) it's worth [opening an issue](https://github.com/rowkavdev/GitHub-profile-stats/issues) first to discuss the approach before writing code.
 
 ---
 
@@ -166,7 +166,7 @@ export function renderLanguageChart() {
 
 | Area                       | Where to look                                                                                                         |
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Bug fixes                  | [Open an issue](https://github.com/rowkav09/GitHub-profile-stats/issues) first so we can confirm it, then submit a PR |
+| Bug fixes                  | [Open an issue](https://github.com/rowkavdev/GitHub-profile-stats/issues) first so we can confirm it, then submit a PR |
 | New card layouts           | `src/lib/svg.ts` — add a new render function and wire it up via `options.size`                                        |
 | Badge styles               | `src/app/api/badge/badge-svg.ts` — add a config entry and update the page picker                                      |
 | Visual editor improvements | `src/components/CardPreview.tsx` and `src/components/VisualBuilder.tsx`                                               |
