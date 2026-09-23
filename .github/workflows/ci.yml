@@ -55,7 +55,7 @@ jobs:
           context: .
           push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
           tags: |
-            ghcr.io/rowkav09/github-profile-stats:latest
-            ghcr.io/rowkav09/github-profile-stats:${{ github.sha }}
+            ghcr.io/rowkavdev/github-profile-stats:latest
+            ghcr.io/rowkavdev/github-profile-stats:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
