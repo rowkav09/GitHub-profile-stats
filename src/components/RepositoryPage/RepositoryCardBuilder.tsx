@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 
 const THEMES = ["github", "light", "dark", "ocean", "violet", "amber"] as const;
-const REPO_URL = "https://github.com/rowkav09/GitHub-profile-stats";
+const REPO_URL = "https://github.com/rowkavdev/GitHub-profile-stats";
 
 export default function RepositoryCardBuilder({ owner, repo }: { owner: string; repo: string }) {
   const [theme, setTheme] = useState<(typeof THEMES)[number]>("dark");
