@@ -1,0 +1,36 @@
+name: Mira pause
+# Pauses Mira's automatic review on every new PR: comments "/mira pause"
+# and adds the mira-paused label. Comment "/mira resume" to review.
+on:
+  pull_request:
+    types: [opened]
+permissions:
+  contents: read
+concurrency:
+  group: mira-pause-${{ github.event.pull_request.number }}
+jobs:
+  pause:
+    # Fork PRs get a read-only token, so this only runs for same-repo PRs.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Comment /mira pause and label
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+            const name = 'mira-paused';
+            try { await github.rest.issues.getLabel({ owner, repo, name }); }
+            catch { await github.rest.issues.createLabel({ owner, repo, name, color: '1d76db', description: 'Mira review paused' }).catch(() => {}); }
+            try {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body: '/mira pause' });
+              await github.rest.issues.addLabels({ owner, repo, issue_number, labels: [name] });
+            } catch (error) {
+              // Pausing is best-effort: never fail the PR's checks over it.
+              core.warning(`Couldn't pause Mira: ${error.message}`);
+            }
