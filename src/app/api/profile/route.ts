@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { fetchGitHubStats } from "@/lib/github";
+import { fetchGitHubStats, parseExtraOwners } from "@/lib/github";
 import { sanitizeUsername } from "@/lib/sanitize";
 import { fetchRepositoryCardData, parseRepository, renderProfileCard, renderRepositoryCard, resolveProfileCardOptions } from "@/lib/profile-card";
 import { getCacheHeaders } from "@/lib/cache";
@@ -27,7 +27,8 @@ export async function GET(request: NextRequest) {
       const data = await fetchRepositoryCardData(repository.owner, repository.repo);
       svg = renderRepositoryCard({ ...data, avatarDataUri: await avatarDataUri(data.ownerAvatarUrl) }, options);
     } else {
-      const stats = await fetchGitHubStats(username!);
+      const extraOwners = parseExtraOwners(request.nextUrl.searchParams.get("orgs"), username);
+      const stats = await fetchGitHubStats(username!, false, extraOwners);
       svg = renderProfileCard({ ...stats, avatarDataUri: await avatarDataUri(stats.avatarUrl) }, options);
     }
     return new Response(svg, { headers: { "Content-Type": "image/svg+xml", ...getCacheHeaders("default") } });

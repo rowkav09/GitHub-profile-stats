@@ -107,6 +107,7 @@ Need tweaks? Use the on-page editor to toggle stats, themes, borders, titles, an
 
 - `username` (required)
 - `alltime=true` (optional; returns all-time commit, PR, issue, and estimated-hours totals)
+- `orgs=my-org` (optional; comma list, up to 3; also works on `/api/langs`, `/api/mini` and `/api/profile`) - also counts the public, non-fork repos owned by these accounts. Stars, repo count and languages are combined. Commits, PRs, issues, contributions and streaks stay your own, since GitHub already credits your work in org repos to you. Handy after moving repos into an org.
 - `theme` default `default`
 - Layout: `size=default|compact`, `compact_count=3|4|6`, `show_emoji=true`
 - Visibility: `hide=stars,issues,...`, `show_ring`, `show_icons`, `hide_title`, `hide_border`

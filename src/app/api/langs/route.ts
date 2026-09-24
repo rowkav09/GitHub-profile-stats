@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { fetchLanguageStats } from "@/lib/github";
+import { fetchLanguageStats, parseExtraOwners } from "@/lib/github";
 import { renderLanguageChart, renderErrorCard } from "@/lib/svg";
 import { resolveTheme } from "@/lib/themes/themes";
 import { sanitizeUsername, sanitizeHexParam } from "@/lib/sanitize";
@@ -63,7 +63,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const languages = await fetchLanguageStats(username);
+    const extraOwners = parseExtraOwners(params.get("orgs"), username);
+    const languages = await fetchLanguageStats(username, extraOwners);
     return new Response(renderLanguageChart(languages, theme, options), {
       status: 200,
       headers,

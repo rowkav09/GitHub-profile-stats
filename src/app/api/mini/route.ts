@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { fetchGitHubStats } from "@/lib/github";
+import { fetchGitHubStats, parseExtraOwners } from "@/lib/github";
 import { renderBadge, resolveBadgeStyle } from "../../../lib/svg/badge";
 import { renderErrorCard } from "@/lib/svg";
 import { resolveTheme } from "@/lib/themes/themes";
@@ -87,7 +87,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const stats = await fetchGitHubStats(username, allTime);
+    const extraOwners = parseExtraOwners(params.get("orgs"), username);
+    const stats = await fetchGitHubStats(username, allTime, extraOwners);
     const raw = metric.get(stats);
     const value = typeof raw === "number" ? formatNumber(raw) : raw;
 

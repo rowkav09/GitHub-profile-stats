@@ -1,4 +1,4 @@
-import { GitHubStats, ContributionDay, LanguageStat } from "./types";
+import type { GitHubStats, ContributionDay, LanguageStat } from "./types";
 
 const GITHUB_GRAPHQL = "https://api.github.com/graphql";
 const GITHUB_TOKEN_ENV_KEYS = [
@@ -194,6 +194,129 @@ function calculateEstimatedCodingHours(
   return Math.round((commitHours + prHours + issueHours) * 10) / 10;
 }
 
+type RepoLanguageNode = {
+  stargazerCount?: number;
+  languages?: { edges: Array<{ size: number; node: { name: string; color: string | null } }> } | null;
+};
+
+function aggregateLanguages(repos: RepoLanguageNode[]): LanguageStat[] {
+  const langTotals: Record<string, { size: number; color: string }> = {};
+  for (const repo of repos) {
+    for (const edge of repo.languages?.edges ?? []) {
+      const { name, color } = edge.node;
+      if (!langTotals[name]) langTotals[name] = { size: 0, color: color ?? "#858585" };
+      langTotals[name].size += edge.size;
+    }
+  }
+  const totalLangSize = Object.values(langTotals).reduce((s, l) => s + l.size, 0);
+  return Object.entries(langTotals)
+    .map(([name, { size, color }]) => ({
+      name,
+      size,
+      color: color || "#858585",
+      percentage: totalLangSize > 0 ? Math.round((size / totalLangSize) * 1000) / 10 : 0,
+    }))
+    .sort((a, b) => b.size - a.size)
+    .slice(0, 12);
+}
+
+// ---------------------------------------------------------------------------
+// Extra owners (opt-in, e.g. `?orgs=rowkavdev`)
+//
+// When someone moves their repos into an org, the stars, repo count and
+// languages of those repos stop showing on their card, because those come from
+// repositories the *user* owns. A card can opt in to also counting the public,
+// non-fork repos owned by up to MAX_EXTRA_OWNERS other accounts (usually orgs).
+//
+// What "combined" means, per stat:
+// - stars, repos, languages: summed across the user and the extra owners'
+//   public, non-fork repos (top 100 by stars per owner, same limit as the user).
+// - commits, PRs, issues, contributions, streaks, weekly/activity stats: NOT
+//   summed. GitHub already credits a user's commits, PRs and issues in org repos
+//   to that user's own contribution calendar, so adding org activity would
+//   double count it (and would count other people's work).
+// - followers, name, avatar, bio: always the user's own.
+// Without the param nothing changes: no extra requests, same output.
+// ---------------------------------------------------------------------------
+
+export const MAX_EXTRA_OWNERS = 3;
+
+const OWNER_LOGIN_RE = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$/;
+
+export function parseExtraOwners(raw: string | null | undefined, username?: string | null): string[] {
+  if (!raw) return [];
+  const self = username?.toLowerCase();
+  const seen = new Set<string>();
+  const owners: string[] = [];
+  for (const part of raw.split(",")) {
+    const login = part.trim();
+    if (!OWNER_LOGIN_RE.test(login)) continue;
+    const key = login.toLowerCase();
+    if (key === self || seen.has(key)) continue;
+    seen.add(key);
+    owners.push(login);
+    if (owners.length >= MAX_EXTRA_OWNERS) break;
+  }
+  return owners;
+}
+
+const OWNER_REPOS_QUERY = `
+query($login: String!) {
+  repositoryOwner(login: $login) {
+    login
+    repositories(
+      first: 100
+      ownerAffiliations: OWNER
+      privacy: PUBLIC
+      isFork: false
+      orderBy: { field: STARGAZERS, direction: DESC }
+    ) {
+      totalCount
+      nodes {
+        stargazerCount
+        languages(first: 10, orderBy: { field: SIZE, direction: DESC }) {
+          edges {
+            size
+            node {
+              name
+              color
+            }
+          }
+        }
+      }
+    }
+  }
+}`;
+
+type OwnerRepos = { login: string; totalCount: number; nodes: RepoLanguageNode[] };
+
+async function fetchOwnerRepos(login: string, token: string): Promise<OwnerRepos> {
+  const response = await fetch(GITHUB_GRAPHQL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      "User-Agent": "github-profile-stats",
+    },
+    body: JSON.stringify({ query: OWNER_REPOS_QUERY, variables: { login } }),
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error(getGitHubAuthError(response.status));
+  const json = await response.json();
+  if (json.errors) throw new Error(json.errors[0]?.message ?? "Unknown GraphQL error");
+  const owner = json.data?.repositoryOwner;
+  if (!owner) throw new Error(`Account "${login}" in orgs= not found`);
+  return {
+    login: owner.login,
+    totalCount: owner.repositories.totalCount,
+    nodes: owner.repositories.nodes ?? [],
+  };
+}
+
+function fetchExtraOwners(extraOwners: string[], token: string): Promise<OwnerRepos[]> {
+  return Promise.all(extraOwners.map((login) => fetchOwnerRepos(login, token)));
+}
+
 type ContributionTotals = { totalCommitContributions: number; totalIssueContributions: number; totalPullRequestContributions: number };
 
 async function fetchAllTimeTotals(username: string, token: string, years: number[]): Promise<ContributionTotals> {
@@ -208,6 +331,7 @@ async function fetchAllTimeTotals(username: string, token: string, years: number
 export async function fetchGitHubStats(
   username: string,
   allTime = false,
+  extraOwners: string[] = [],
 ): Promise<GitHubStats> {
   const token = getGitHubToken();
   if (!token) {
@@ -215,6 +339,10 @@ export async function fetchGitHubStats(
       "GitHub API token is not set. Configure GITHUB_TOKEN, GH_TOKEN, or GITHUB_ACCESS_TOKEN.",
     );
   }
+
+  const extraPromise = extraOwners.length > 0 ? fetchExtraOwners(extraOwners, token) : null;
+  // Don't leave a rejected extra-owner request unhandled if the user query fails first.
+  extraPromise?.catch(() => {});
 
   const response = await fetch(GITHUB_GRAPHQL, {
     method: "POST",
@@ -253,34 +381,22 @@ export async function fetchGitHubStats(
     (w: { contributionDays: ContributionDay[] }) => w.contributionDays,
   );
 
-  const totalStars = user.repositories.nodes.reduce(
-    (sum: number, repo: { stargazerCount: number }) =>
-      sum + repo.stargazerCount,
+  const extras = extraPromise ? await extraPromise : [];
+  const repoNodes: RepoLanguageNode[] = [
+    ...user.repositories.nodes,
+    ...extras.flatMap((owner) => owner.nodes),
+  ];
+
+  const totalStars = repoNodes.reduce(
+    (sum: number, repo) => sum + (repo.stargazerCount ?? 0),
     0,
   );
+  const publicRepos =
+    user.repositories.totalCount +
+    extras.reduce((sum, owner) => sum + owner.totalCount, 0);
 
   // Aggregate language sizes across all repos
-  const langTotals: Record<string, { size: number; color: string }> = {};
-  for (const repo of user.repositories.nodes as Array<{
-    stargazerCount: number;
-    languages: { edges: Array<{ size: number; node: { name: string; color: string } }> };
-  }>) {
-    for (const edge of repo.languages?.edges ?? []) {
-      const { name, color } = edge.node;
-      if (!langTotals[name]) langTotals[name] = { size: 0, color: color ?? "#858585" };
-      langTotals[name].size += edge.size;
-    }
-  }
-  const totalLangSize = Object.values(langTotals).reduce((s, l) => s + l.size, 0);
-  const languages: LanguageStat[] = Object.entries(langTotals)
-    .map(([name, { size, color }]) => ({
-      name,
-      size,
-      color: color || "#858585",
-      percentage: totalLangSize > 0 ? Math.round((size / totalLangSize) * 1000) / 10 : 0,
-    }))
-    .sort((a, b) => b.size - a.size)
-    .slice(0, 12);
+  const languages = aggregateLanguages(repoNodes);
 
   const { current, longest } = calculateStreak(allDays);
   const { thisWeek, lastWeek } = calculateWeeklyTrend(allDays);
@@ -310,7 +426,7 @@ export async function fetchGitHubStats(
     weeklyTrend,
     avgCommitsPerDay: calculateAvgCommitsPerDay(allDays),
     mostActiveDay: calculateMostActiveDay(allDays),
-    publicRepos: user.repositories.totalCount,
+    publicRepos,
     followers: user.followers.totalCount,
     contributionsThisYear: calendar.totalContributions,
     activityLevel,
@@ -343,6 +459,7 @@ query($username: String!) {
 
 export async function fetchLanguageStats(
   username: string,
+  extraOwners: string[] = [],
 ): Promise<LanguageStat[]> {
   const token = getGitHubToken();
   if (!token) {
@@ -350,6 +467,9 @@ export async function fetchLanguageStats(
       "GitHub API token is not set. Configure GITHUB_TOKEN, GH_TOKEN, or GITHUB_ACCESS_TOKEN.",
     );
   }
+
+  const extraPromise = extraOwners.length > 0 ? fetchExtraOwners(extraOwners, token) : null;
+  extraPromise?.catch(() => {});
 
   const response = await fetch(GITHUB_GRAPHQL, {
     method: "POST",
@@ -378,25 +498,9 @@ export async function fetchLanguageStats(
     throw new Error(`User "${username}" not found`);
   }
 
-  const langTotals: Record<string, { size: number; color: string }> = {};
-  for (const repo of user.repositories.nodes as Array<{
-    languages: { edges: Array<{ size: number; node: { name: string; color: string } }> };
-  }>) {
-    for (const edge of repo.languages?.edges ?? []) {
-      const { name, color } = edge.node;
-      if (!langTotals[name]) langTotals[name] = { size: 0, color: color ?? "#858585" };
-      langTotals[name].size += edge.size;
-    }
-  }
-
-  const totalLangSize = Object.values(langTotals).reduce((s, l) => s + l.size, 0);
-  return Object.entries(langTotals)
-    .map(([name, { size, color }]) => ({
-      name,
-      size,
-      color: color || "#858585",
-      percentage: totalLangSize > 0 ? Math.round((size / totalLangSize) * 1000) / 10 : 0,
-    }))
-    .sort((a, b) => b.size - a.size)
-    .slice(0, 12);
+  const extras = extraPromise ? await extraPromise : [];
+  return aggregateLanguages([
+    ...user.repositories.nodes,
+    ...extras.flatMap((owner) => owner.nodes),
+  ]);
 }

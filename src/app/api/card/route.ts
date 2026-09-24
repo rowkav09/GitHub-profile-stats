@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { fetchGitHubStats } from "@/lib/github";
+import { fetchGitHubStats, parseExtraOwners } from "@/lib/github";
 import { renderCard, renderErrorCard } from "@/lib/svg";
 import { resolveTheme } from "@/lib/themes/themes";
 import { sanitizeUsername, sanitizeHexParam } from "@/lib/sanitize";
@@ -70,7 +70,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const stats = await fetchGitHubStats(username, allTime);
+    const extraOwners = parseExtraOwners(params.get("orgs"), username);
+    const stats = await fetchGitHubStats(username, allTime, extraOwners);
     return new Response(renderCard(stats, theme, options), {
       status: 200,
       headers,
