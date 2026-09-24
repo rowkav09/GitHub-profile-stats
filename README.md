@@ -38,6 +38,21 @@ Free, real-time GitHub stat cards, badges, and charts -- drop a URL into your RE
 [![](https://ghstats.dev/api/card?username=YOUR_USERNAME&theme=forest&size=compact&compact_count=6)](https://github.com/rowkavdev/GitHub-profile-stats)
 ```
 
+**Combine an org (`orgs=`)**
+
+Moved your repos into an organisation? Add `orgs=` to count that org's public repos on your card too. Stars, repos and languages are combined. Commits, PRs, issues and streaks stay yours, because GitHub already credits your work in org repos to you.
+
+| Just `rowkav09` | `rowkav09` + `orgs=rowkavdev` |
+| --- | --- |
+| [![Stars, user only](https://ghstats.dev/api/mini?username=rowkav09&metric=stars&style=for-the-badge)](https://github.com/rowkavdev/GitHub-profile-stats) | [![Stars, user plus org](https://ghstats.dev/api/mini?username=rowkav09&orgs=rowkavdev&metric=stars&style=for-the-badge)](https://github.com/rowkavdev/GitHub-profile-stats) |
+| [![Repos, user only](https://ghstats.dev/api/mini?username=rowkav09&metric=repos&style=for-the-badge)](https://github.com/rowkavdev/GitHub-profile-stats) | [![Repos, user plus org](https://ghstats.dev/api/mini?username=rowkav09&orgs=rowkavdev&metric=repos&style=for-the-badge)](https://github.com/rowkavdev/GitHub-profile-stats) |
+
+[![](https://ghstats.dev/api/card?username=rowkav09&orgs=rowkavdev&theme=tokyonight)](https://github.com/rowkavdev/GitHub-profile-stats)
+
+```
+[![](https://ghstats.dev/api/card?username=YOUR_USERNAME&orgs=YOUR_ORG&theme=tokyonight)](https://github.com/rowkavdev/GitHub-profile-stats)
+```
+
 **Languages (bar, stacked, grid, horizontal list, vertical list, donut, vertical donut, compact)**
 
 | Layout              | Preview                                                                                                                                                              | Markdown                                                                                                                                               |
