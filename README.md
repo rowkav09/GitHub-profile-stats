@@ -79,6 +79,14 @@ Any metric, any colour, any style — perfect for sprinkling through a README.
 
 Pass `label=...` to override the default label text and `style=...` to switch between `flat`, `flat-square`, `for-the-badge`, `plastic`, and `minimal` (see the table below).
 
+**Workflow runs across public repos**
+
+[![Workflow runs](https://ghstats.dev/api/workflows?username=rowkav09&orgs=rowkavdev&style=for-the-badge)](https://github.com/rowkavdev/GitHub-profile-stats)
+
+`[![Workflow runs](https://ghstats.dev/api/workflows?username=YOUR_USERNAME&style=for-the-badge)](https://github.com/rowkavdev/GitHub-profile-stats)`
+
+`/api/workflows` counts GitHub Actions **workflow runs**, not jobs, across all public repositories owned by the given username. Add `orgs=my-org` for public repositories owned by up to three other accounts; these include runs by other people in those repos. Forks are included, private repos are not. For quota safety, the badge refuses owner sets above 150 public repos rather than showing a misleading partial total. This is an all-time repo total, not just runs authored by the user. The badge uses the same `style`, `color`, and `label` controls as mini badges. It is cached for 24 hours at the edge and in the server cache to protect GitHub's API quota; a failed refresh keeps the last verified value. Redis is required: without it the route fails closed rather than repeatedly polling every repository.
+
 **Badge styles -- pick a look**
 
 | Style           | Preview                                                |
