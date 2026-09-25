@@ -5,6 +5,8 @@ const API = "https://api.github.com";
 const MAX_REPOS = 150; // Refuse oversized sets before a costly fanout.
 const FRESH_SECONDS = 86400;
 const STALE_SECONDS = 604800;
+const FETCH_TIMEOUT_MS = 12000;
+const SWEEP_DEADLINE_MS = 180000;
 
 type Repo = { name: string; owner: { login: string } };
 type Page = { data?: { repositoryOwner?: { repositories: { nodes: Repo[]; pageInfo: { hasNextPage: boolean; endCursor: string | null } } } | null }; errors?: { message: string }[] };
@@ -22,7 +24,7 @@ function token(): string {
   return value;
 }
 
-async function listRepos(login: string, auth: string): Promise<Repo[]> {
+async function listRepos(login: string, auth: string, signal: AbortSignal): Promise<Repo[]> {
   const repos: Repo[] = [];
   let cursor: string | null = null;
   do {
@@ -38,6 +40,7 @@ async function listRepos(login: string, auth: string): Promise<Repo[]> {
         }
       }`, variables: { login, cursor } }),
       cache: "no-store",
+      signal,
     });
     if (!response.ok) throw new Error(`GitHub repository lookup failed (${response.status})`);
     const page = await response.json() as Page;
@@ -53,11 +56,12 @@ async function listRepos(login: string, auth: string): Promise<Repo[]> {
   return repos;
 }
 
-export async function fetchWorkflowRuns(owners: string[]): Promise<{ count: number; repos: number }> {
+export async function fetchWorkflowRuns(owners: string[], signal?: AbortSignal): Promise<{ count: number; repos: number }> {
+  const deadline = signal ? AbortSignal.any([signal, AbortSignal.timeout(SWEEP_DEADLINE_MS)]) : AbortSignal.timeout(SWEEP_DEADLINE_MS);
   const auth = token();
   const repos: Repo[] = [];
   for (const owner of owners) {
-    repos.push(...await listRepos(owner, auth));
+    repos.push(...await listRepos(owner, auth, deadline));
     if (repos.length > MAX_REPOS) throw new Error(`More than ${MAX_REPOS} public repositories; unable to show an accurate total`);
   }
   const unique = [...new Map(repos.map((repo) => [`${repo.owner.login}/${repo.name}`.toLowerCase(), repo])).values()];
@@ -68,6 +72,7 @@ export async function fetchWorkflowRuns(owners: string[]): Promise<{ count: numb
       const response = await fetch(`${API}/repos/${encodeURIComponent(repo.owner.login)}/${encodeURIComponent(repo.name)}/actions/runs?per_page=1`, {
         headers: { Authorization: `Bearer ${auth}`, Accept: "application/vnd.github+json", "User-Agent": "github-profile-stats" },
         cache: "no-store",
+        signal: AbortSignal.any([deadline, AbortSignal.timeout(FETCH_TIMEOUT_MS)]),
       });
       if (!response.ok) throw new Error(`GitHub workflow run lookup failed (${response.status})`);
       const body = await response.json() as { total_count?: number };
@@ -80,35 +85,58 @@ export async function fetchWorkflowRuns(owners: string[]): Promise<{ count: numb
 }
 
 /** Redis lock prevents a cache stampede. A stale verified total is better than a partial one. */
-export async function getWorkflowRuns(owners: string[]): Promise<Snapshot> {
-  const store = redis();
+export async function getWorkflowRuns(
+  owners: string[],
+  store: Pick<Redis, "get" | "set" | "eval"> | null = redis(),
+  refresh: (owners: string[]) => Promise<{ count: number; repos: number }> = fetchWorkflowRuns,
+): Promise<Snapshot> {
   if (!store) throw new Error("Workflow badge cache is not configured");
   const key = `workflow-runs:v1:${owners.map((o) => o.toLowerCase()).sort().join(",")}`;
   const old = await store.get<Snapshot>(key);
   if (old && Date.now() - old.updated < FRESH_SECONDS * 1000) return old;
   const lockKey = `${key}:lock`;
+  const lockId = crypto.randomUUID();
   // Global gate: a new query variant or a long-running fanout cannot start
-  // another refresh in parallel. Allow at most one upstream sweep per hour.
+  // another refresh in parallel. Allow at most one upstream attempt per day.
   const globalKey = "workflow-runs:v1:global-budget";
-  const budget = await store.set(globalKey, "1", { nx: true, ex: 3600 });
+  const budget = await store.set(globalKey, "1", { nx: true, ex: 86400 });
   if (!budget) {
     if (old) return old;
     throw new Error("Workflow run total is updating; retry later");
   }
-  const locked = await store.set(lockKey, "1", { nx: true, ex: 1800 });
-  if (!locked) {
-    if (old) return old;
-    throw new Error("Workflow run total is updating; retry shortly");
-  }
   try {
-    const result = await fetchWorkflowRuns(owners);
+    const locked = await store.set(lockKey, lockId, { nx: true, ex: 600 });
+    if (!locked) {
+      if (old) return old;
+      throw new Error("Workflow run total is updating; retry shortly");
+    }
+    const result = await refresh(owners);
     const current = { ...result, updated: Date.now() };
-    await store.set(key, current, { ex: STALE_SECONDS });
+    // Only the holder can publish. If its lease expired or was replaced, a
+    // later refresh must never be overwritten with an older result.
+    const published = await store.eval<[string, string, string], number>(`if redis.call("GET", KEYS[1]) == ARGV[1] then
+      redis.call("SET", KEYS[2], ARGV[2], "EX", ARGV[3])
+      return 1
+    end
+    return 0`, [lockKey, key], [lockId, JSON.stringify(current), String(STALE_SECONDS)]);
+    if (!published) {
+      if (old) return old;
+      throw new Error("Workflow refresh lease expired; retry later");
+    }
     return current;
   } catch (error) {
     if (old) return old;
     throw error;
   } finally {
-    await store.del(lockKey);
+    // Never delete a successor's lease after ours expires. Atomic compare and
+    // delete, including when the refresh throws or times out.
+    try {
+      await store.eval<[string], number>(`if redis.call("GET", KEYS[1]) == ARGV[1] then
+        return redis.call("DEL", KEYS[1])
+      end
+      return 0`, [lockKey], [lockId]);
+    } catch {
+      // A failed unlock is safe: the lease expires. Do not mask a valid count.
+    }
   }
 }
