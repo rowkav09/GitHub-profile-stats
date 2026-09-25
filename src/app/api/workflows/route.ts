@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { sanitizeUsername, sanitizeHexParam, formatNumber } from "@/lib/sanitize";
-import { parseExtraOwners } from "@/lib/github";
 import { getWorkflowRuns } from "@/lib/workflow-runs";
+import { resolveWorkflowOwners } from "@/lib/workflow-scope";
 import { renderBadge, resolveBadgeStyle } from "@/lib/svg/badge";
 import { resolveTheme } from "@/lib/themes/themes";
 import { renderErrorCard } from "@/lib/svg";
@@ -15,8 +15,13 @@ export async function GET(request: NextRequest) {
   const theme = resolveTheme(params.get("theme") ?? "default", {});
   const headers = { "Content-Type": "image/svg+xml", ...getCacheHeaders("daily") };
   if (!username) return new Response(renderErrorCard("Missing or invalid username", theme), { status: 400, headers });
+  // This expensive badge is deliberately limited to Rowan's repos. A public
+  // per-request owner selector would let anyone drain the shared GitHub token.
+  const owners = resolveWorkflowOwners(username, params.get("orgs"));
+  if (!owners) {
+    return new Response(renderErrorCard("Workflow badge is currently limited to rowkav09 and optional rowkavdev", theme), { status: 400, headers: { "Content-Type": "image/svg+xml", ...getCacheHeaders("no-store") } });
+  }
   try {
-    const owners = [username, ...parseExtraOwners(params.get("orgs"), username)];
     const { count } = await getWorkflowRuns(owners);
     const label = params.get("label")?.trim().slice(0, 32) || "Workflow runs";
     const accent = sanitizeHexParam(params.get("color")) ?? "4c8eda";

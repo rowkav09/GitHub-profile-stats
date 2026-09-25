@@ -1,6 +1,7 @@
 import { test, beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import { fetchWorkflowRuns } from "../src/lib/workflow-runs.ts";
+import { resolveWorkflowOwners } from "../src/lib/workflow-scope.ts";
 
 const originalFetch = globalThis.fetch;
 let calls;
@@ -46,4 +47,12 @@ test("failure refuses partial totals", async () => {
 test("missing owner fails rather than publishing zero", async () => {
   globalThis.fetch = async () => new Response(JSON.stringify({ data: { repositoryOwner: null } }));
   await assert.rejects(fetchWorkflowRuns(["missing"]), /not found/);
+});
+
+test("fixed owner scope rejects arbitrary requests before any GitHub lookup", () => {
+  assert.deepEqual(resolveWorkflowOwners("rowkav09", null), ["rowkav09"]);
+  assert.deepEqual(resolveWorkflowOwners("ROWKAV09", "ROWKAVDEV"), ["rowkav09", "rowkavdev"]);
+  for (const [username, org] of [["attacker", null], ["rowkav09", "other"], ["rowkav09", "rowkavdev,other"], ["rowkav09", ""]]) {
+    assert.equal(resolveWorkflowOwners(username, org), null);
+  }
 });

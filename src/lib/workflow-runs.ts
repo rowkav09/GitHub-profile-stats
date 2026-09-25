@@ -87,7 +87,15 @@ export async function getWorkflowRuns(owners: string[]): Promise<Snapshot> {
   const old = await store.get<Snapshot>(key);
   if (old && Date.now() - old.updated < FRESH_SECONDS * 1000) return old;
   const lockKey = `${key}:lock`;
-  const locked = await store.set(lockKey, "1", { nx: true, ex: 600 });
+  // Global gate: a new query variant or a long-running fanout cannot start
+  // another refresh in parallel. Allow at most one upstream sweep per hour.
+  const globalKey = "workflow-runs:v1:global-budget";
+  const budget = await store.set(globalKey, "1", { nx: true, ex: 3600 });
+  if (!budget) {
+    if (old) return old;
+    throw new Error("Workflow run total is updating; retry later");
+  }
+  const locked = await store.set(lockKey, "1", { nx: true, ex: 1800 });
   if (!locked) {
     if (old) return old;
     throw new Error("Workflow run total is updating; retry shortly");
