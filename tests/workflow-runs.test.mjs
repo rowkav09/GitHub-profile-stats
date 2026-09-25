@@ -76,15 +76,15 @@ function fakeRedis() {
   };
 }
 
-test("failed attempt consumes shared daily budget and avoids another GitHub fanout", async () => {
+test("failed attempt consumes its variant daily budget", async () => {
   const { getWorkflowRuns } = await import("../src/lib/workflow-runs.ts");
   const store = fakeRedis();
   let attempts = 0;
   const fail = async () => { attempts++; throw new Error("upstream failed"); };
   await assert.rejects(getWorkflowRuns(["rowkav09"], store, fail), /upstream failed/);
-  await assert.rejects(getWorkflowRuns(["rowkav09", "rowkavdev"], store, fail), /updating/);
+  await assert.rejects(getWorkflowRuns(["rowkav09"], store, fail), /updating/);
   assert.equal(attempts, 1);
-  assert.equal(store.data.get("workflow-runs:v1:global-budget").expires, 86400);
+  assert.equal(store.data.get("workflow-runs:v1:rowkav09:daily-attempt").expires, 86400);
 });
 
 test("old holder cannot remove successor lease or overwrite newer total", async () => {
@@ -103,3 +103,22 @@ test("old holder cannot remove successor lease or overwrite newer total", async 
   assert.equal(store.data.get(lockKey).value, "successor");
   assert.equal(store.data.get("workflow-runs:v1:rowkav09").value.count, 99);
 });
+
+for (const order of [["rowkav09", "rowkav09,rowkavdev"], ["rowkav09,rowkavdev", "rowkav09"]]) {
+  test(`cold starts in order ${order.join(" then ")} each get one bounded sweep`, async () => {
+    const { getWorkflowRuns } = await import("../src/lib/workflow-runs.ts");
+    const store = fakeRedis();
+    let attempts = 0;
+    const refresh = async () => ({ count: ++attempts, repos: 1 });
+    for (const variant of order) {
+      const owners = variant.split(",");
+      const first = await getWorkflowRuns(owners, store, refresh);
+      assert.equal(first.count, attempts);
+      assert.equal((await getWorkflowRuns(owners, store, refresh)).count, first.count);
+    }
+    assert.equal(attempts, 2);
+    assert.equal([...store.data.keys()].filter((key) => key.endsWith(":daily-attempt")).length, 2);
+    await assert.rejects(getWorkflowRuns(["stranger"], store, refresh), /Unsupported/);
+    assert.equal(attempts, 2);
+  });
+}

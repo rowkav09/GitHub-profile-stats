@@ -91,15 +91,20 @@ export async function getWorkflowRuns(
   refresh: (owners: string[]) => Promise<{ count: number; repos: number }> = fetchWorkflowRuns,
 ): Promise<Snapshot> {
   if (!store) throw new Error("Workflow badge cache is not configured");
+  // Defence in depth: only the two fixed variants can consume quota, even if
+  // a future caller bypasses the HTTP route's owner validation.
+  const normalized = owners.map((owner) => owner.toLowerCase()).sort().join(",");
+  if (normalized !== "rowkav09" && normalized !== "rowkav09,rowkavdev") throw new Error("Unsupported workflow badge owners");
   const key = `workflow-runs:v1:${owners.map((o) => o.toLowerCase()).sort().join(",")}`;
   const old = await store.get<Snapshot>(key);
   if (old && Date.now() - old.updated < FRESH_SECONDS * 1000) return old;
   const lockKey = `${key}:lock`;
   const lockId = crypto.randomUUID();
-  // Global gate: a new query variant or a long-running fanout cannot start
-  // another refresh in parallel. Allow at most one upstream attempt per day.
-  const globalKey = "workflow-runs:v1:global-budget";
-  const budget = await store.set(globalKey, "1", { nx: true, ex: 86400 });
+  // At most one attempt per 24h for each of the TWO allowed variants.
+  // Independent budgets avoid the user-only badge blocking the combined one.
+  // Hard owner validation bounds overall spend to two sweeps/day.
+  const budgetKey = `${key}:daily-attempt`;
+  const budget = await store.set(budgetKey, "1", { nx: true, ex: 86400 });
   if (!budget) {
     if (old) return old;
     throw new Error("Workflow run total is updating; retry later");
